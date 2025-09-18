@@ -1,28 +1,180 @@
 <!DOCTYPE html>
-<html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>AP Computer Science A</title>
-	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,400italic|Source+Code+Pro:400,600' rel 'stylesheet' type 'text/css'>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lord Byng Computer Science</title>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,400italic|Source+Code+Pro:400,600' rel 'stylesheet' type 'text/css'>
 </head>
 
 <body>
-	<div id="wrapper">
-		<header>
-			<h1><a href="http://lordbyng.net/compsci">AP Computer Science A</a></h1>
-		</header>
+  <div id="wrapper">
+      <header>
+        <h1><a href="http://lordbyng.net/compsci">Lord Byng Computer Science </a></h1>
+      </header>
 
-		<nav>
-			<ul>
-				<li><a href="cs10.html">Computer Studies 10</a></li>
-				<li><a href="prog11.html">Programming 11</a></li>
-				<li><a href="prog12.html">Programming 12</a></li>
-				<li><a href="ap.html">AP Computer Science</a></li>
-			</ul>
-		</nav>
-  </div>
+      <nav>
+        <ul>
+          <li><a href="cs10.html">Computer Studies 10</a></li>
+          <li><a href="prog11.html">Programming 11</a></li>
+          <li><a href="prog12.html">Programming 12</a></li>
+          <li><a href="ap.html">AP Computer Science</a></li>
+        </ul>
+      </nav>
+
+      <div class="page-content" id="programming-from-a-to-z">
+        <img id="random-image" src="" style="float: left; margin-right: 20px; width: 600px;">
+        <p id="random-title"></p>
+        <hr>
+        <p id="random-caption"></p>
+        
+      </div>
+
+    <script>
+        // Array of objects containing image sources and their matching captions
+        const images = [
+            {
+                src: 'img/famousPeople/feiFeiLi.jpg',
+                title: 'Fei-Fei Li (1976-present)',
+                caption: 'Fei-Fei Li is a pioneering figure in the field of artificial intelligence, particularly in computer vision. Her contributions have been instrumental in training AI systems to recognize and understand images and objects, leading to breakthroughs in machine learning. Fei-Fei Li has also been a strong advocate for the ethical and inclusive development of AI technologies. She co-founded AI4ALL, a nonprofit organization dedicated to increasing diversity and inclusion in the field of artificial intelligence.'
+            },
+            {
+                src: 'img/famousPeople/andrewYao.jpg',
+                title: 'Andrew Chi-Chih Yao (1946-present)',
+                caption: 'A Chinese-American computer scientist, Andrew Chi-Chih Yao is renowned for his foundational contributions to theoretical computer science. Yao\'s work on computational complexity, particularly his development of the Yao\'s Principle, has profoundly influenced the field. He also made significant advancements in cryptography and quantum computing. In 2000, Yao was awarded the Turing Award, often considered the highest distinction in computer science, for his groundbreaking contributions to the theory of computation. His research continues to shape and inspire developments in computer science and related disciplines.'
+            },
+            {
+                src: 'img/famousPeople/adaLovelace.jpg',
+                title: 'Ada Lovelace (1815-1852)',
+                caption: 'Often considered the first computer programmer, Ada Lovelace wrote algorithms for Charles Babbage\'s early mechanical general-purpose computer, the Analytical Engine. Her work laid the foundation for modern computer programming.'
+            },
+            {
+                src: 'img/famousPeople/alanTuring.jpg',
+                title: 'Alan Turing (1912-1954)',
+                caption: 'A British mathematician and logician, Turing is best known for his work on the theoretical foundations of computing and artificial intelligence. His Turing Machine concept is fundamental to computer science, and he played a crucial role in breaking the Enigma code during World War II.'
+            },
+            {
+                src: 'img/famousPeople/graceHopper.jpg',
+                title: 'Grace Hopper (1906-1992)',
+                caption: 'An American computer scientist and United States Navy rear admiral, Hopper was a pioneer in developing computer programming languages. She developed the first compiler for a computer programming language and was instrumental in the creation of COBOL.'
+            },
+            {
+                src: 'img/famousPeople/johnVonNeumann.jpg',
+                title: 'John von Neumann (1903-1957)',
+                caption: 'A Hungarian-American mathematician, von Neumann made significant contributions to the development of the digital computer and the architecture that bears his name. His design for a stored-program computer is the basis for most modern computer architectures.'
+            },
+            {
+                src: 'img/famousPeople/katherineJohnson.jpg',
+                title: 'Katherine Johnson (1918-2020)', 
+                caption: 'Katherine Johnson\'s calculations of orbital mechanics were critical to the success of the first U.S. crewed spaceflights. Her work at NASA was pivotal in ensuring the safety and accuracy of the space missions.'
+            },
+            {
+                src: 'img/famousPeople/claudeShannon.jpg',
+                title: 'Claude Shannon (1916-2001)',
+                caption: 'Known as the "father of information theory," Shannon\'s work laid the groundwork for digital circuit design theory and telecommunications. His 1948 paper "A Mathematical Theory of Communication" introduced the concept of bit as a unit of information.'
+            },
+            {
+                src: 'img/famousPeople/timBernersLee.jpg',
+                title: 'Tim Berners-Lee (1955-present)',
+                caption: 'An English engineer and computer scientist, Berners-Lee invented the World Wide Web in 1989. His creation revolutionized information sharing and communication, making the internet accessible to the general public.'
+            },
+            {
+                src: 'img/famousPeople/margaretHamilton.jpg',
+                title: 'Margaret Hamilton (1936-present)',
+                caption: 'Computer scientist and systems engineer Margaret Hamilton led the team that developed the onboard flight software for NASA\'s Apollo missions. Her work was critical to the success of the moon landings, and her practices laid the foundations for making software as an engineering discipline.'
+            },
+            {
+                src: 'img/famousPeople/vintCerf.jpg',
+                title: 'Vint Cerf (1943-present)',
+                caption: 'Known as one of the "fathers of the internet," Cerf co-designed the TCP/IP protocols, which are fundamental to internet communication. His work has been instrumental in the development and growth of the internet.'
+            },
+            {
+                src: 'img/famousPeople/francesAllen.jpg',
+                title: 'Frances E. Allen (1932-2020)',
+                caption: 'Frances Allen was a pioneer in the field of optimizing compilers. She was the first woman to win the Turing Award, recognizing her contributions to program optimization and parallel computing.'
+            },
+            {
+                src: 'img/famousPeople/billGates.jpg',
+                title: 'Bill Gates (1955-present)',
+                caption: 'Co-founder of Microsoft, Gates was instrumental in making personal computers accessible and affordable to the masses. His work in software development, particularly the Windows operating system, revolutionized computing.'
+            },
+            {
+                src: 'img/famousPeople/hedyLamarr.jpg',
+                title: 'Hedy Lamarr (1914-2000)',
+                caption: 'Both an actor and inventor, Lamarr co-developed a frequency-hopping spread spectrum technology, which is foundational to modern wireless communication technologies such as Wi-Fi and Bluetooth.'
+            },
+            {
+                src: 'img/famousPeople/radiaPerlman.jpg',
+                title: 'Radia Perlman (1951-present)',
+                caption: 'An American computer scientist, Perlman is known as the "mother of the internet" for her invention of the spanning-tree protocol (STP), which is crucial for network bridge operations. Her work has greatly influenced network design and infrastructure.'
+            },
+            {
+                src: 'img/famousPeople/johnMcCarthy.jpg',
+                title: 'John McCarthy (1927-2011)',
+                caption: 'John McCarthy is known for coining the term "artificial intelligence" and developing the Lisp programming language. His work laid the foundation for the field of AI research.'
+            },
+            {
+                src: 'img/famousPeople/barbaraLiskov.jpg',
+                title: 'Barbara Liskov (1939-present)',
+                caption: 'Barbara Liskov is a pioneer in programming languages and distributed computing. She developed the Liskov substitution principle, which is a fundamental concept in object-oriented programming.'
+            },
+            {
+                src: 'img/famousPeople/kenThompson.gif',
+                title: 'Ken Thompson (1943-present)',
+                caption: 'An American computer scientist, Thompson co-created the UNIX operating system and the B programming language, which influenced the development of C. His contributions have been foundational to modern operating systems and software development.'
+            },
+            {
+                src: 'img/famousPeople/evelynGranville.jpg',
+                title: 'Evelyn Boyd Granville (1924-2023)',
+                caption: 'One of the first African-American women to receive a Ph.D. in mathematics, Granville worked on various projects for IBM, including the Mercury space program. Her work contributed to early space exploration and computer science education.'
+            },
+            {
+                src: 'img/famousPeople/donaldKnuth.jpg',
+                title: 'Donald Knuth (1938-present)',
+                caption: 'An American computer scientist, Knuth is best known for his multi-volume work "The Art of Computer Programming." He developed the TeX typesetting system and made significant contributions to algorithms and programming languages.'
+            },
+            {
+                src: 'img/famousPeople/shafiGoldwasser.jpg',
+                title: 'Shafi Goldwasser (1958-present)',
+                caption: 'Shafi Goldwasser has made pioneering contributions to cryptography and complexity theory. She is a two-time recipient of the Gödel Prize and a Turing Award winner for her work on interactive proofs and zero-knowledge protocols.'
+            },
+            {
+                src: 'img/famousPeople/steveWozniak.jpg',
+                title: 'Steve Wozniak (1950-present)',
+                caption: 'An American electronics engineer, programmer, and technology entrepreneur, Steve Wozniak co-founded Apple Inc. alongside Steve Jobs and Ronald Wayne. Wozniak is credited with designing and building the Apple I and Apple II computers, which were among the first highly successful mass-produced personal computers. His innovations in hardware and software design significantly influenced the personal computing revolution of the late 20th century.'
+            },
+            {
+                src: 'img/famousPeople/georgeBoole.jpg',
+                title: 'George Boole (1815-1864)',
+                caption: 'An English mathematician, philosopher, and logician, George Boole is best known for his work in developing Boolean algebra, the foundation of modern digital computer logic. His seminal work, "The Laws of Thought," introduced the concepts of Boolean logic, which uses binary variables (true/false, 1/0) and logical operations (AND, OR, NOT). Boole\'s contributions have profoundly impacted computer science, electrical engineering, and mathematics, enabling the development of digital circuits and computer programming.'
+            },
+            {
+                src: 'img/famousPeople/charlesBabbage.jpg',
+                title: 'Charles Babbage (1791-1871)',
+                caption: 'An English polymath, Charles Babbage is often referred to as the "father of the computer." He conceptualized and designed the first mechanical computer, the Difference Engine, intended to automate mathematical calculations. Later, he developed plans for a more advanced machine, the Analytical Engine, which had features of a modern computer, such as a stored program, control flow via loops and conditionals, and an integrated memory. Although Babbage\'s machines were never completed in his lifetime, his ideas laid the groundwork for future developments in computing.'
+            },
+            {
+                src: 'img/famousPeople/jerryLawson.png',
+                title: 'Jerry Lawson (1940-2011)',
+                caption: 'Jerry Lawson was a pioneering engineer who led the development of the Fairchild Channel F, the first home video game console with interchangeable cartridges, revolutionizing the gaming industry. His work paved the way for modern gaming systems.'
+            }
+        ];
+
+        // Function to select a random image and caption
+        function displayRandomImage() {
+            const randomIndex = Math.floor(Math.random() * images.length);
+            const selectedImage = images[randomIndex];
+
+            document.getElementById('random-image').src = selectedImage.src;
+            document.getElementById('random-title').innerText = selectedImage.title;
+            document.getElementById('random-caption').innerText = selectedImage.caption;
+        }
+
+        // Call the function to display a random image and caption when the page loads
+        window.onload = displayRandomImage;
+    </script>
+
+    </div>
 </body>
 </html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>AP Computer Science A</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,400italic|Source+Code+Pro:400,600' rel 'stylesheet' type 'text/css'>
+</head>
+
+<body>
+	<div id="wrapper">
+		<header>
+			<h1><a href="http://lordbyng.net/compsci">AP Computer Science A</a></h1>
+		</header>
+
+		<nav>
+			<ul>
+				<li><a href="cs10.html">Computer Studies 10</a></li>
+				<li><a href="prog11.html">Programming 11</a></li>
+				<li><a href="prog12.html">Programming 12</a></li>
+				<li><a href="ap.html">AP Computer Science</a></li>
+			</ul>
+		</nav>
+
+		<div class="page-content" id="programming-from-a-to-z">
+
+			<p>The AP CSA exam is on <strong>Friday May 15, 2026 at 12:00 PM!<br>
+			</strong>Time remaining: <span id="countdown"></span></p>
+
+			<h3>About the Course</h3>
+
+			<ol>
+				<li><a href="https://docs.google.com/document/d/1J7690LeEhUVQs4UtMocygWgIxF5UlYD7Cdki3HHSaGc/edit?usp=sharing" target="_blank">Course Syllabus</a>. Read all about this course, student expectations, and how you will be evaluated.
+				<li><a href="https://apcentral.collegeboard.org/media/pdf/ap-computer-science-a-course-overview.pdf" target="_blank">AP Computer Science A Description</a>. The official College Board information about this course.</li>
+				<li><a href="https://docs.google.com/document/d/14weOsSl7_yR0XhM4RMlB_cGe4rIWdoOD1K_1NimdSxw/edit?usp=sharing" target="_blank">Code of Honour</a>. All about how to collaborate without plagiarism in this course.</li>
+				<li><a href="https://apstudents.collegeboard.org/courses/ap-computer-science-a/assessment" target="_blank">About the AP Exam</a>. Updated for 2024-25.</li>
+				<li><a href="https://forms.office.com/r/biSL97AUDf" target="_blank">Send me your GitHub username for handin!</a></li>
+			</ol>
+
+<!--
+				<li><a href="http://www.meteochu.me/Countdown/" target="_blank">Exam Countdown</a> (by Andy Liang)</li>
+				<li><a href="http://www.skylit.com/javamethods/JM-Appendix-A.pdf" target="_blank">Java Style Guide</a> for this course.</li>
+				<li>An excellent Java textbook, available in <a href="https://books.trinket.io/thinkjava/">interactive format</a> and as <a href="http://greenteapress.com/thinkjava6/thinkjava.pdf">a PDF</a>.</li>
+-->
+
+
+			<h3>Resources</h3>
+
+			<ol>
+				<li>We are using the textbook <em>Think Java 2nd Edition</em> by Allen Downey and Chris Mayfield. You can 
+						<a href="http://greenteapress.com/thinkjava7/thinkjava2.pdf" target="_blank">download the pdf version</a>, use 
+						<a href="https://chrismayfield.github.io/ThinkJava2/"        target="_blank">the online version</a>, or use the 
+						<a href="https://books.trinket.io/thinkjava2/"               target="_blank">interactive version</a>.
+
+				<li>Some additional free text books: 
+						<a href="https://runestone.academy/ns/books/published/csawesome/index.html" target="_blank">CS Awesome</a> (requires free account), 
+						<a href="https://drive.google.com/file/d/1c4NlIyL0S9mfYSQ9f5KVEoiQD88nI3nu/view?usp=sharing" target="_blank">Tokyo EdTech's Intro to Java</a></li>
+			</ol>
+
+			<h3>Chapter 1. Computer Programming</h3>
+
+			<p>Ch 1 introduces the fundamentals of computers and programming, covering what a computer is, and basic programming instructions like input, output, mathematical operations, decisions, and repetitions. It presents the "Hello World" program to explain Java classes, methods, statements, and comments. The chapter also distinguishes between high-level and low-level languages, detailing the compilation and interpretation process (javac, java, JVM, byte code). It discusses displaying multiple messages using print vs println, source code formatting, escape sequences, and introduces the broader field of computer science. Finally, it outlines the three types of programming errors: compile-time, run-time, and logic errors, and provides initial debugging advice
+			</p><br>
+
+			<p><b>Additional Notes:</b></p>
+			<ol>
+				<li><a href="http://math.hws.edu/javanotes/c1/index.html" target="_blank">Chapter 1 from "Introduction to Programming Using Java"</a> by David J. Eck is recommended for expanding upon the topic of "What is a computer."</li>
+				<li>Notes about <a href="https://docs.google.com/document/d/1cKX5QmbuwrlEkoe6sQ8nC-gmYeBJakW2gIn0ZeQKQOg/edit?usp=sharing" target="_blank">Compilers, Interpreters, and Java</a></li>
+				<li><a href="https://www.youtube.com/playlist?list=PL__Tph-7Dyp0sndXYlT7Clh_Vx2s05GBV">YouTube playlist</a> of my explanation of Compilers, Interpreters, and Java</li>
+			</ol>
+
+			<h3>Chapter 2. Variables and Operators</h3>
+
+			<p>This chapters delves into variables for storing values (numbers, text) and their declaration and assignment. It introduces memory diagrams to visualise how values are stored and changed. The chapter covers arithmetic operators (+, -, *, /, %) and introduces floating-point numbers (double), discussing rounding errors and string concatenation. It further explains compiler error messages, run-time errors, and logic errors, providing insights into their identification.</p><br>
+
+			<p><b>Assigned Work:</b> Repository "ch2", assigned Sept. 9th</p>
+			<ul>
+				<li>2.2: Date.java</li>
+				<li>2.3: Time.java</li>
+			</ul>
+
+			<h3>Chapter 3. Input and Output</h3>
+
+			<p>This chapters focuses on user interaction, explaining the System class (System.out, System.in) and the Scanner class for reading keyboard input. It details Java's language elements such as packages, classes, methods, statements, expressions, and tokens. The chapter covers literals and constants, formatting output with printf and format specifiers, and how to interpret error messages. It also introduces type cast operators and the remainder (modulo) operator, integrating these concepts into complete programs. We also deal with the "Scanner Bug," which is an annoying problem but easy to avoid if you know about it.</p><br>
+
+			<p><b>Assigned Work:</b> Repository "ch3", assigned Sept 11th</p>
+			<ul>
+				<li>3.2: Temperature.java</li>
+				<li>3.3: ConvertTime.java</li>
+				<li>3.4: GuessMyNumber.java</li>
+			</ul>
+
+			<p><b>Additional Notes</b></p>
+			<ul>
+				<li><a href="https://docs.google.com/document/d/1a5Hy_2db2oOwz-PAoaLfxVSBC79ivftCftb8B3JXnmw/edit?usp=sharing" target="_blank">Operator Precedence Table (BEDMAS)</a></li>
+				<li><a href="https://docs.google.com/document/d/1RBWvKz5ukhqVDXAUiFJoSp_jpRIE6CJ15o1gFUbpNr4/edit?usp=sharing" target="_blank">Extra Practice with Operations</a></li>
+				<li><a href="https://docs.google.com/document/d/1QxN03Mgu4MsY_Y6kNWsKC83oeWta3h63xh4fMMMWZV0/edit?usp=sharing" target="_blank">Extra Practice with Writing Code</a></li>
+			</ul>
+
+			<h3>Chapter 4. Methods and Testing</h3>
+
+			<p>This chapter teaches how to organise programs into multiple methods. It differentiates between void methods (no return value) and value-returning methods, explaining return types and return statements. Concepts such as flow of execution, parameters and arguments, and multiple parameters are introduced. Stack diagrams are presented as a tool to visualise the scope of variables and method execution. The chapter also explores methods in the Math class and the principle of composition, concluding with a discussion on incremental development and the use of stubs and scaffolding for testing.</p><br>
+
+			<p><b>Assigned Work:</b> Repository "ch4", assigned Sept 16th</p>
+			<ul>
+				<li>4.1: FormatDate.java</li>
+				<li>4.2-4.5 Do these on a piece of paper. No need to submit to GitHub
+				<li>4.6: Multadd.java</li>
+			</ul>
+
+
+
+<!--
+			<h3>Unit 1. Primitive Types</h3>
+
+			<p>This unit introduces you to the basics of Java programming, starting with the structure of a simple "Hello, World!" program and progressing through variables, data types, expressions, and assignment operators. Students will learn about primitive data types, the scope of variables, arithmetic and compound assignment operations, casting, and handling different types of programming errors.</p><br>
+
+			<ul>
+				<li><a href="https://docs.google.com/presentation/d/1LhR_oYvt3kLgpI4cnbdqZrYpfw-plev0oniZhDt5--Y/edit?usp=sharing" target="_blank">Unit 1 Slides</a></li>
+				<li>Problem Sets:
+					<a href="https://docs.google.com/document/d/1SC5FZZzfVnTj_u7bZliBkdLctik_1jOR_RxVyqOW6BI/edit?usp=sharing" target="_blank">Problem Set 1A</a>,
+
+					<a href="https://docs.google.com/document/d/1QxN03Mgu4MsY_Y6kNWsKC83oeWta3h63xh4fMMMWZV0/edit?usp=sharing" target="_blank">Problem Set 1B</a>,
+
+					<a href="https://docs.google.com/document/d/1RBWvKz5ukhqVDXAUiFJoSp_jpRIE6CJ15o1gFUbpNr4/edit?usp=sharing" target="_blank">Problem Set 1C</a> [<a href="https://photos.app.goo.gl/Nww5i7n6SuTSxb22A" target="_blank">answers for Problem Set 1C</a>].</li>
+
+				<li><a href="https://docs.google.com/document/d/1iZBkBUo9p5MhWQqqecXCIS9YM0hL5CDDWUWW5UYkUQg/edit?usp=sharing" target="_blank">Unit 1 Glossary</a></li>
+				<li><a href="https://docs.google.com/document/d/1Dw6xqQqgWEe1qGbZ-auzIUEDcvGVx4uI1KlpFn46I2A/edit?usp=sharing" target="_blank">Unit 1 Summary</a></li>
+			</ul>
+
+			<h3>Unit 2: Using Objects</h3>
+
+			<p>This unit explores objects and classes as a way to represent real-world objects in programming. You'll learn how to create objects using constructors, define their behaviours through methods, and utilise class libraries like String, Integer, Double, and Math.  The unit emphasises object-oriented programming (OOP), a software design paradigm that revolves around interacting objects and mirroring real-world interactions for efficient and organised programming.</p><br>
+
+			<ul>
+				<li><a href="files/AP CS Unit 2.pdf" target="_blank">Unit 2 Notes</a></li>
+				<li><a href="https://docs.google.com/document/d/1Dvuj56dRX5MiUDzTMnqphpBwmnl_6kor/edit?usp=sharing&ouid=102945596975178095550&rtpof=true&sd=true" target="_blank">Problem Set 2A</a>, <a href="https://docs.google.com/document/d/1I3RPMKET-vXjbRvBcCbQQVmAqHcsLt2z/edit?usp=sharing&ouid=102945596975178095550&rtpof=true&sd=true">Problem Set 2B</a>,
+					<a href="https://docs.google.com/document/d/17a4RKplOqC0xiWPSrx6x05DoaFvMjEVF/edit?usp=sharing&ouid=102945596975178095550&rtpof=true&sd=true" target="_blank">Problem Set 2C</a></li>
+				<li><a href="https://docs.google.com/document/d/1CbFNuolB8dLMwBubFJ2To3r2FX0fswIOZvu51GHv-JI/edit?usp=sharing" target="_blank">Unit 2 Vocabulary</a></li>
+			</ul>
+
+			<h3>Unit 3: Boolean Expressions and If Statements</h3>
+
+			<p>This unit covers the core concepts of Boolean logic, including relational operators, compound expressions, and the use of truth tables to determine equivalence. We learn to controll the flow of execution through the use of if, if-else, and if-else-if statements. We also will look at object comparison and the importance of understanding the difference between comparing object references and object content.</p><br/>
+
+			<ul>
+				<li><a href="files/AP CS Unit 3.pdf" target="_blank">Unit 3 Notes</a></li>
+				<li>
+					<a href="https://docs.google.com/document/d/1pJKMnusAC5ZkNPKkcsnunn4fq2FVCYEGBTqKNOoggeE/edit?usp=sharing" target="_blank">Problem Set 3A</a>,
+					<a href="https://docs.google.com/document/d/1oFvE07Ly8obUwFu0sSFWGnJE0i6yGLcUZtc976o3Sp8/edit?usp=sharing" target="_blank"> Problem Set 3B,</a>
+					<a href="https://docs.google.com/document/d/1UuuKdEb9N0bvbQFKS-bFpWTnauI-RYVQKvAGm3OdQYM/edit?usp=sharing" target="_blank">Problem Set 3C Assignment</a>,
+					<a href="files/Problem Set 3C.zip" target="_blank">Problem Set 3C Code</a>
+				</li>
+			</ul>
+
+			<h3>Unit 4: Iteration</h3>
+			<p>This unit explores ways to make computer programs repeat themselves, a key concept in programming. It introduces <b>while loops</b> that repeat code as long as a certain condition is true, and <b>for loops</b>, a simpler way to repeat code a set number of times. We will write lots of loops to work with <b>Strings</b> espeically: building new strings from old ones, count things within them, and search for specific patterns. You'll also explore <b>nested loops</b>, allowing for more complex patterns of repetition. Finally, you will learn how to analyse code to see how many times each instruction runs, which can help make programs more efficient.</p><br/>
+			<ul>
+				<li><a href="files/AP CS Unit 4.pdf" target="_blank">Unit 4 Notes</a></li>
+				<li><a href="https://docs.google.com/document/d/1TrUT_LdnbcUB3OotA0asHTyoGQrxagbE-ZG0d6eY5rk/edit?usp=sharing" target="_blank">Problem Set 4A</a></li>
+				<li>Problem Set 4B (
+					<a href="https://codingbat.com/java/String-2" target="_blank">String-2</a>, First 2 Columns),
+					<a href="https://youtube.com/playlist?list=PL__Tph-7Dyp3Ml4lVX9OopZcizrqO361e&si=MtqYpoIj4rNHEw98" target="_blank">Help Videos</a>,
+					<a href="files/String2answers.txt" target="_blank">Reference Solutions</a></li>
+				<li><a href="files/consumer-review-lab-student-guide.pdf" target="_blank">Problem Set 4C</a>,
+					<a href="files/PS4C.zip" target="_blank">PS4C Starter Files</a></li>
+			</ul>
+
+			<h3>Unit 5: Writing Classes</h3>
+			<p>This unit explores object-oriented programming in Java. Key concepts covered include class structure, encapsulation, and information hiding using public and private keywords. The unit also details constructors (default, parameterised, and copy), accessor and mutator methods, and the use of Javadoc comments for documentation. Finally, it examines static methods and variables, variable scope, and the this keyword for improved code clarity.</p><br/>
+
+			<ul>
+				<li><a href="files/AP CS Unit 5.pdf" target="_blank">Unit 5 Notes</a></li>
+				<li><a href="https://docs.google.com/document/d/1eH1SqloqBYo1CIlixUAx1FHacNIducBS/edit?usp=sharing&ouid=102945596975178095550&rtpof=true&sd=true" target="_blank">Problem Set 5A: Fraction Class</a></li>
+				<li><a href="https://docs.google.com/document/d/1qeBhPApFkFzvm9RWJS5EBs18yc-big4gWbVJibkzg8c/edit?usp=sharing" target="_blank">Problem Set 5B: Using Fraction Class</a></li>
+
+			</ul>
+
+      <h3>Unit 6: Arrays</h3>
+      <p>This unit focuses on one-dimensional arrays (1D arrays), a data structure that allows programmers to represent collections of related primitive or object reference data using a single variable. You will learn how to create, access, and manipulate elements within a 1D array, as well as traverse these arrays using different loop structures, such as the enhanced for loop and indexed for loop</p><br/>
+      <ul>
+        <li><b>Note: Unit 4 Exams are marked. Grades can be seen on MyEd!</b></li>
+        <li><a href="https://codingbat.com/doc/java-array-loops.html" target="_blank">Unit 6 Notes from Nick Parlante</a></li>
+        <li>PS6A: Array-1 (first column) [<a href="files/array-1 answers.txt" target="_blank">Solutions</a>]</li>
+        <li>PS6B: Array-2 (first two columns) [<a href="files/array-2 answers.txt" target="_blank">Solutions</a>]</li>
+        <li>PS6C: Array-3 (first and last columns) [<a href="files/array-3 answers.txt" target="_blank">Solutions</a>]</li>
+        <li><b>All AP Classroom MCQ's have been assigned.</b></li>
+      </ul>
+
+      <h3>Unit 7: ArrayLists</h3>
+      <p>ArrayLists are a dynamic data structure similar to arrays, but they can grow and shrink. ArrayLists can only store objects as opposed to primitive data types; however, Java offers “wrapper classes” that allow primitives to be stored. The unit explores various methods for using ArrayLists including adding, removing, and accessing elements. Additionally, it explains how to traverse ArrayLists, develop algorithms for using ArrayLists, and search and sort them.</p><br/>
+
+      <ul>
+        <li><a href="https://docs.google.com/document/d/1zL1-WGCa-TY6I3jqtfckvXs-c_Uelcky-AuBpTeD2Us/edit?usp=sharing" target="_blank">Our notes on ArrayLists</a></li>
+        <li><a href="https://www.youtube.com/watch?v=NbYgm0r7u6o" target="_blank">Here is a great video</a> on the differences between Arrays and ArrayLists. You may also want to check out the college board's Unit 7 videos on AP Classroom.</li>
+        <li>PS7A: There are <b>secret levels</b> to CodingBat! Try out <a href="https://codingbat.com/prob/p207740?parent=/home/orion.a.smith@gmail.com/apcsa-lists" target="_blank">The ArrayList secret levels</a>, by doing the "No Loops" and "With Loops" sections.</li>
+        <li>PS7B: See pink handout in class [<a href="https://photos.app.goo.gl/FdtbeG3FHgSDsDYDA" target="_blank">Answer Key</a>]</li>
+        <li><a href="https://docs.google.com/document/d/1EUxP6Yw_oGhCx8ePfdlkwpzKLaU5-lsZ4ehSL-74qQ8/edit?usp=sharing" target="_blank">PS7C</a></li>
+      </ul>
+
+      <h3>Unit 8: 2D Array</h3>
+      <p>This unit is all about 2D Arrays! Java 2D arrays are "arrays of arrays," structured like a grid or table, where each element is accessed using two indices: one for the row and one for the column.</p><br/>
+
+      <ul>
+      	<li><a href="files/AP CS Unit 8.pdf" target="_blank">Unit 8 Notes</a></li>
+        <li><a href="https://docs.google.com/document/d/10fSIYk8_6jiUwOZDLnJ8f-rHu7oLtSd9T73PO1wNogA/edit?usp=sharing" target="_target">Problem Set 8a</a></li>
+        <li><a href="files/chomp4students2019.zip" target="_blank">Problem Set 8b - Chomp</a></li>
+       </ul>
+
+       <h3>Unit 9: Polymorphism and Inheritence</h3>
+       <p></p><br/>
+
+        <ul>
+        	<li><a href="files/Inheritance and polymorphism.pdf" target="_blank">Unit 9 Notes</a></li>
+      		<li><a href="https://docs.google.com/document/d/1zkvy0LL48yaqNnJJUhU1UypM27h81LeF6imvZkq50CU/edit?usp=sharing" target="_blank">Problem Set 9A</a></li>
+      	</ul>
+
+
+       <h3>Unit 10: Recursion</h3>
+       <p>Recursion in Java is a programming technique where a method calls itself to solve smaller instances of a problem until reaching a base case that stops the recursive calls. Recursion can provide elegant solutions for solving complex problems that can be broken down into smaller, similar subproblems, such as in algorithms for searching, sorting, and traversing data structures.</p><br/>
+
+       <ul>
+       	<li><a href="https://codingbat.com/java/Recursion-1" target="_target">Problem Set 10a: CodingBat Recursion-1</a> (selected questions)</li>
+       </ul>
+-->			
+
+		</div>
+	</div>
+
+	<script>
+        function updateCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            const targetDate = new Date('May 15, 2026 12:00:00').getTime();
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                countdownElement.innerHTML = "The countdown is over!";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdownElement.innerHTML = `${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds!`;
+        }
+
+        setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>

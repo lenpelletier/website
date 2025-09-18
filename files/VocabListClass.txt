@@ -1,0 +1,109 @@
+import java.util.ArrayList;
+
+public class VocabList{
+
+    // -------------------------- Instance Variables -------------------------
+
+    private ArrayList<String> words;
+    private ArrayList<String> definitions = new ArrayList<String>();
+
+    // -------------------------- Constructors -------------------------------
+
+    public VocabList(){
+        words = new ArrayList<String>();
+        definitions = new ArrayList<String>();
+    }
+
+    public VocabList(String[] a, String[] b){
+        for (int i = 0; i < a.length; i++) {
+            this.add(a[i], b[i]); //this uses our class's mutator method below
+        }
+    }
+
+    public VocabList (VocabList v) {
+        this.words = (ArrayList<String>) v.words.clone();
+        this.definitions = (ArrayList<String>) v.definitions.clone();
+    }
+
+    // ----------------------------- Accessors --------------------------------
+
+    public int size() {
+        return words.size();
+    }
+
+    public boolean contains(String word) {
+        for (String w : words) {
+            if (w.equals(word)) return true;
+        }
+        return false;
+    }
+
+    public String getDefinition(String word) {
+        for (int i = 0; i < words.size(); i++) {
+            String w = words.get(i);
+            if (w.equals(word)) {
+                return definitions.get(i);
+            }
+        }
+        return "Undefined";
+    }
+
+    public String getWord(String definition) {
+        for (int i = 0; i < words.size(); i++) {
+            String d = definitions.get(i);
+            if (d.equals(definition)) {
+                return words.get(i);
+            }
+        }
+        return "Undefined";
+    }
+
+    public String getRandomWord() {
+        int rand = (int) (Math.random()*words.size());
+        return words.get(rand);
+    }
+
+    public String getRandomDefinition() {
+        int rand = (int) (Math.random()*definitions.size());
+        return definitions.get(rand);
+    }
+
+    public String toString() {
+        String ans= "";
+        for (int i = 0; i < words.size(); i++) {
+            ans += words.get(i) + ": " + definitions.get(i) + "\n\n";
+        }
+        return ans;
+    }
+
+    // ---------------------------------- Mutator Methods --------------------------
+
+    public void add(String word, String definition){
+        if (words.size() == 0) {
+            words.add(word);
+            definitions.add(definition);
+        } else {
+            int i = 0;
+            while (word.compareTo(words.get(i)) < 0) {
+                i++;
+            }
+            words.add(i, word);
+            definitions.add(i, definition);
+        }
+    }
+
+    public void remove(String word) {
+        if (words.size() == 0) {
+            System.out.println("Word not found");
+        } else {
+            for (int i = 0; i < words.size(); i++) {
+                if (word.equals(words.get(i))) {
+                    words.remove(i);
+                    definitions.remove(i);
+                    return;
+                }
+            }
+            System.out.println("Word not found");
+        }
+    }
+}

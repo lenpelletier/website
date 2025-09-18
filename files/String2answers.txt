@@ -1,0 +1,342 @@
+public String doubleChar(String str) {
+   String answerString = "";
+
+   for (int i = 0; i < str.length(); i++) {
+      String letter = str.substring(i,i+1);
+      answerString += letter + letter;
+   }
+
+   return answerString;
+}
+
+
+public int countHi(String str) {
+  int count = 0;
+
+  for (int i = 0; i < str.length()-1; i++) {
+    String s = str.substring(i, i+2);
+    if (s.equals("hi")) {
+      count ++;
+    }
+  }
+  return count;
+}
+
+
+public boolean catDog(String str) {
+
+  int dogCount = 0;
+  int catCount = 0;
+
+  for (int i = 0; i <= str.length()-3; i++) {
+    if (str.substring(i,i+3).equals("dog"))
+      dogCount++;
+    else if (str.substring(i,i+3).equals("cat"))
+      catCount++;
+  }
+
+  return (catCount == dogCount);
+}
+
+
+public int countCode(String str) {
+  int count = 0;
+
+  for (int i = 0; i <= str.length()-4; i++) {
+    if (str.charAt(i)   == 'c' && str.charAt(i+1) == 'o' && str.charAt(i+3) == 'e') {
+      count++;
+    }
+  }
+
+  return count;
+}
+
+
+public boolean endOther(String a, String b) {
+  String shorter = "";
+  String longer  = "";
+
+  if (a.length() <= b.length()) {
+    shorter = a.toLowerCase();
+    longer  = b.toLowerCase();
+  } else {
+    shorter = b.toLowerCase();
+    longer  = a.toLowerCase();
+  }
+
+  String longerEnd = longer.substring(longer.length() - shorter.length());
+  return longerEnd.equals(shorter);
+}
+
+
+public boolean xyzThere(String str) {
+
+  if (str.length() < 3)  return false;
+  if (str.length() == 3) return str.equals("xyz");
+  if (str.substring(0,3).equals("xyz")) return true;
+
+  for (int i = 1; i < str.length()-2; i++) {
+    String xyzCandidate = str.substring(i,i+3);
+    String before = str.substring(i-1,i);
+    if (xyzCandidate.equals("xyz") && !before.equals("."))
+      return true;
+  }
+
+  return false;
+}
+
+
+public boolean bobThere(String str) {
+  for (int i = 0; i <= str.length()-3; i++) {
+    if (str.charAt(i) == 'b' && str.charAt(i+2) == 'b') return true;
+  }
+  return false;
+}
+
+
+public boolean xyBalance(String str) {
+  int lastX = str.lastIndexOf("x");
+  int lastY = str.lastIndexOf("y");
+
+  return (lastY > lastX || lastY == lastX);
+}
+
+
+public String mixString(String a, String b) {
+  int maxlen = Math.max(a.length(), b.length());
+  String ans = "";
+
+  for (int i = 0; i < maxlen; i++) {
+    String pieceOfA = "";
+    String pieceOfB = "";
+    if (i < a.length()) pieceOfA = a.substring(i,i+1);
+    if (i < b.length()) pieceOfB = b.substring(i,i+1);
+    ans += pieceOfA + pieceOfB;
+  }
+
+  return ans;
+}
+
+
+public String repeatEnd(String str, int n) {
+  String end = str.substring(str.length()-n);
+  String newString = "";
+
+  for (int i = 0; i < n; i++) {
+    newString += end;
+  }
+
+  return newString;
+}
+
+
+public String repeatFront(String str, int n) {
+  String ans = "";
+
+  for (int i = n; i > 0; i--) {
+    ans += str.substring(0,i);
+  }
+
+  return ans;
+}
+
+
+public String repeatSeparator(String word, String sep, int count) {
+  //Brennan's solution
+  String ans = word;
+  if (count == 0) ans = "";
+  
+  for (int i = 0; i < count-1; i++)
+    ans += sep + word;
+    
+  return ans;
+}
+
+
+public boolean prefixAgain(String str, int n) {
+  int strLen = str.length();
+  String prefix = str.substring(0, n);
+
+  for (int i = n; i <= strLen-n; i++) {
+    String chunk = str.substring(i, i+n);
+    if (chunk.equals(prefix)) return true;
+  }
+
+  return false;
+}
+
+
+public boolean xyzMiddle(String str) {
+
+  if (str.length() < 3) return false;
+
+  int a = 0;              //index of the start
+  int z = str.length()-1; //index at the end
+  while (a < z) {
+    a++;                  //move a and z toward each
+    z--;                  //other until they converge
+  }
+  return str.substring(a-1, a+2).equals("xyz") ||
+         str.substring(z-1, z+2).equals("xyz");
+}
+
+
+public String getSandwich(String str) {
+  String answer = "";
+
+  int b1 = str.indexOf("bread");
+  int b2 = str.lastIndexOf("bread");
+  if (b1 != b2) {
+    answer = str.substring(b1+5, b2);
+  }
+
+  return answer;
+}
+
+
+public boolean sameStarChar (String str) {
+  if (str.length() < 3) return true;
+
+  for (int i = 1; i < str.length()-1; i++) {
+    if (str.charAt(i) == '*') {
+      char front = str.charAt(i-1);
+      char back  = str.charAt(i+1);
+      if (front != back)
+        return false;
+    }
+  }
+
+  return true;
+}
+
+
+public String oneTwo(String str) {
+  String ans = "";
+
+  while (str.length() >= 3) {
+    String a  = str.substring(0,1);
+    String bc = str.substring(1,3);
+    ans += bc + a;
+    str = str.substring(3);  //instead of moving the index forward, I cut away the front of str
+  }
+
+  return ans;
+}
+
+
+public String zipZap(String str) {
+
+  public String zipZap(String str) {
+  
+  //edge case: if the string is shorter than 3 chars, it can't contain zap
+  if (str.length() < 3) return str;
+  
+  //parse through the string. I am using a while loop because I want to have
+  //more control over the itteration step. Also, it is important to make sure
+  //the variable i is available outside the loop for the last step.
+  String ans = "";
+  int i;
+  for (i = 0; i <= str.length()-3; i++) {
+    if (str.charAt(i) == 'z' && str.charAt(i+2) == 'p') {
+      ans += "zp";
+      i += 2;
+    } else {
+      ans += str.charAt(i);
+    }
+  }
+  
+  //add on the remaining letters, if necessary
+  if (i < str.length()) {
+    return ans + str.substring(i);
+  } else {
+    return ans;
+  }
+  
+}
+
+
+}
+
+
+public String starOut(String str) {
+
+  String answer = "";
+
+  //deal with tiny strings
+  if (str.length() < 3) {
+    if (str.contains("*")) {
+      return "";
+    } else {
+      return str;
+    }
+  }
+
+  //process larger strings
+  for (int i = 0; i < str.length()-1; i++) {
+    String sub = str.substring(i,i+2);
+    char a = str.charAt(i);
+    char b = str.charAt(i+1);
+    if (!sub.contains("*")) {
+      answer += a;
+    }
+    else {
+      if (a == '*' & b != '*') {
+        i++; //skip ahead 2
+      } else {
+        //do nothing, will skip ahead 1 because of for loop
+      }
+    }
+  }
+
+  //deal with last character separately to avoid out of bounds
+  String lastTwo = str.substring(str.length()-2);
+  char lastChar = str.charAt(str.length()-1);
+  if (!lastTwo.contains("*")) {
+    answer += lastChar;
+  }
+
+  return answer;
+}
+
+
+public String plusOut(String str, String word) {
+  String newString = "";
+  int i = 0;
+  int s = str.length();
+  int w = word.length();
+
+  while (i < s-w+1) {
+    String chunk = str.substring(i, i+w);
+    if (chunk.equals(word)) {
+      newString += word;
+      i += w;
+    }
+    else {
+      newString += "+";
+      i++;
+    }
+  }
+
+  while (i < s) {
+    newString += "+";
+    i++;
+  }
+
+  return newString;
+}
+
+
+public String wordEnds(String str, String word) {
+  int w = word.length();
+  int s = str.length();
+  String ans = "";
+
+  int i = str.indexOf(word);
+
+  while(i >= 0) {                          //keep going until there are no more words
+    if (i > 0) ans += str.charAt(i-1);     //get character before word
+    if (s > i + w) ans += str.charAt(i+w); // get character after word
+    i = str.indexOf(word, i+1);            //find next word
+  }
+  return ans;
+}

@@ -1,0 +1,298 @@
+UNIT 1 & 2 REVIEW
+-----------------
+
+1. Number Systems
+-----------------
+
+Make sure you can convert between the following number systems
+
+Binary (base-2) <---> Decimal (base-10)
+Binary (base-2) <---> Hexadecimal (base-16)
+Hexadecimal (base-16) <---> Decimal (base-10)
+base-? <----> Decimal (base-10)
+
+Some example questions:
+
+A. Convert 10110101 (bin) to Decimal and Hexadecimal
+B. Convert 4E (hex) to Decimal and Binary
+C. Convert 99 (dec) to Binary and Hexadecimal
+D. Convert 1234 (base-5) to Decimal.
+E. Convert 100 (dec) to base-5
+
+2. Compilers & Interpreters
+---------------------------
+
+A. What is the difference between a compiled program and an interpreted program?
+
+B. What are the main advantages and disadvantages of compilers and interpreters?
+
+C. Using the terms Source Code, Compiler, JBC (Java Byte Code), JVM (Java Virtual Machine), and Machine Instructions, explain the steps involved when compiling and 
+running a Java program.
+
+D. Explain why Java Developers made Java both a compiled and interpreted language.
+
+3. Java and Math
+----------------
+
+A. What is a String?  An int?  A double?  A boolean?  How do you declare a variable?  How do you assign a variable a value?
+
+B. How does Java evaluate Integer math?  Double math?  What happens when you assign doubles to int variables and vice versa?  For example, how does java evaluate:
+i.   1 / 4
+ii.  4.0 / 2
+iii. 1.0 / 4.0
+iv.  int x = 4.0 / 2
+v.   double x = 1 / 4
+
+C. How do casting operators work?  For example, how do these evaluate?
+i.   int x = (int) 4.999;
+ii.  double x = (int) 0.999;
+iii. int x = (double) 8;
+iv.  int x = (int) 4.999 / (int) 2.5;
+v.   int x = (int) (4.5 / 0.9);
+
+D. Know how to use common methods and variables from the Math class, including Math.abs(),  Math.pow(), Math.sqrt(), and Math.PI.  Expect to recreate some basic math formula in Java code.  For example, how would you write the formula for solving for the hypotenuse (c) in the Pythagorean Theorem a^2 + b^2 = c^2?
+
+E. Know how to generate random integers in an arbitrary range. 
+
+Ex: write a Java expression to generate a random integer in the range 10 to 20.
+
+F. Understand how the modulus operator (%) works, and how it differs from the division
+operator (/). 
+
+Ex 1. What do the following operations evaluate to?
+
+ i.   59 / 10
+ ii.  59 % 10
+ iii. 64 / 8
+ iv.  64 % 8
+ v.   19 / 20
+ vi.  19 % 20
+ 
+4. Making Decisions
+-------------------
+
+A. What is the difference between a series of if statements and a series of if-else statements?  For example, what is the result of the following code if a == 100? 
+
+if (a > 90) 
+	System.out.println("harder");
+if (a > 60)
+	System.out.println("faster");
+if (a > 30)
+	System.out.println("better");
+if (a > 0)
+	System.out.println("stronger");
+
+How about this code if a == 100?
+
+if (a > 90) 
+	System.out.println("harder");
+else if (a > 60)
+	System.out.println("faster");
+else if (a > 30)
+	System.out.println("better");
+else
+	System.out.println("stronger");
+
+B. Know how all the operators that we discussed work.  This includes, in order of operation:
+
+(1) !, ++, --
+(2) *, /, %
+(3) +, -
+(4) <, >, <=, >=
+(5) ==, !=
+(6) &&
+(7) ||
+(8) =, +=, -=, *=, /=
+
+For example, is the following statement true or false when a == 1, b == 2, c == 3?
+
+	a > 0 && b - a * c > 0 || c / a * c == a 
+
+C. What is short circuit evaluation?  
+
+Ex 1. If x is set to 0 what happens?
+
+	if (x != 0 && 100 / x > 10) {
+		codeA();
+	} else {
+		codeB();
+	}
+	codeC();
+
+
+	a. codeA() runs followed by codeC()
+	b. codeB() runs followed by codeC()
+	c. Only codeC() runs.
+	d. Error: divide by zero exception
+
+D. Know how to read Nested If statements, especially the "dangling else" problems.  For example, for the following program, why does the program print "3 is not positive" when n == 3?  How could you fix this program so that it worked as intended?
+
+int n = sc.nextInt();
+if (n > 0)
+	if (n % 2 == 0)
+		System.out.println(n);
+else
+	System.out.println(n + " is not positive);
+
+
+5. Working in the Terminal and Methods
+--------------------------------------
+
+A. What is the difference between the statements System.out.print() and System.out.println()? 
+
+Ex 1: What is the output of the following program fragment?
+
+   System.out.print(“The days are long “);
+   System.out.println(“but the years are”);
+   System.out.print(“short”);
+
+B. Know how to use Scanner objects to read ints, doubles, and Strings from the terminal. You do not need to know how to instantiate or import them, just how to use them.  
+
+C. Draw a stack diagram for the following program to illustrate Java’s method stack just after the last time that the ping method is invoked.
+
+public static void zoop() {
+    baffle();
+    System.out.print("You wugga ");
+    baffle();
+}
+
+public static void main(String[] args) {
+    System.out.print("No, I ");
+    zoop();
+    System.out.print("I ");
+    baffle();
+}
+
+public static void baffle() {
+    System.out.print("wug");
+    ping();
+}
+
+public static void ping() {
+    System.out.println(".");
+}
+
+6.  Loops
+---------
+
+A. Understand how while and for loops work by describing the output of a given loop or writing a loop to create the given output.
+
+Ex 1:  Write a for loop that *calculates* and prints out the first ten powers of 2, starting with 2^0.
+
+Ex 2: Write a while loop that *calculates* and prints out the first 10 numbers in the fibonacci series (assume the series begins with 1, 1).
+
+B.  Convert a for loop to a while loop and vice versa
+
+Ex:  Rewrite as a while loop:
+
+for (int i = 0; i < 999; i++) {
+   System.out.print("G");
+}
+
+C.  Write the output produced by a nested loop (a loop inside a loop).
+
+Ex: What is the output after the execution of this code segment?
+
+int x = 10; y = 0;
+while (x > 5)
+{
+	y = 3;
+	while (y < x)
+	{
+		y *= 2;
+		if (y % x == 1)
+			y += x;
+	}
+	x -= 3;
+}
+System.out.println(x + " " + y)
+
+
+D.  Another type of question is: given an output, write a program that produces that output.  
+
+Ex 1: Using nested loops, write the method 'squarePattern' that takes an int parameter 's' and produces the specific square pattern shown below.  For example, squarePattern(4) would produce the following 4 x 4 pattern:
+
+2 - - -
+- 4 - -
+- - 6 -
+- - - 8
+
+Whereas squarePattern(6) would produce the following 6 x 6 pattern:
+
+2 - - - - -
+- 4 - - - -
+- - 6 - - -
+- - - 8 - -
+- - - - 10 -
+- - - - - 12
+
+To get you started, here is the method definition:
+
+private void squarePattern(int s) {
+
+}
+
+
+Ex 2: Write the void method "triangle" that draws isosceles triangles that are h lines tall.  For example, the following triangle is the output of triangle(5) is
+
+    *
+   ***
+  *****
+ *******
+*********
+
+Where as the output of triangle(2) would be
+
+ *
+***
+
+To get you started, here is the method definition: 
+
+private void triangle (int h) {
+
+}
+
+Ex 3: Write the void method "triangle" that prints a right triangle that is h lines tall.  Assume h is always an integer greater or equal to 1.  For example, the following triangle is the output of triangle(5) is
+
+....X
+...XX
+..XXX
+.XXXX
+XXXXX
+
+Where as the output of triangle(3) would be
+
+..X
+.XX
+XXX
+
+private void triangle (int h) {
+
+	// write your code here!
+
+}
+
+7. Some Additional Topics
+-------------------------
+
+A. What is the difference between a runtime error and a compile time error?
+
+Ex 1: Classify the following as runtime or compile time errors:
+
+i.    An infinte loop
+ii.   Mismatching types during variable assignment (e.g.: int x = “42”)
+iii.  Dividing by zero
+iv.   Forgetting to end a line with a semicolon
+v.    Sending the wrong arguments to a method, either the wrong number of arguments or the wrong type of arguments.
+vi.   When the program prompts the user for an integer and reads their input with Scanner’s nextInt() but the user types in 0.5.
+vii.  Math.sqrt(-1)
+viii. Trying to use a variable before it is declared
+
+B. Escape Sequences
+
+Ex 1: Know how to print the following characters to the terminal:
+
+“ (\”)
+‘ (\’)
+\ (\\)
+A new line (\n)

@@ -1,0 +1,37 @@
+//Server
+
+import processing.net.*;
+
+Server myserver;
+String outgoing;
+String incoming;
+
+void setup() {
+  size(300, 300);
+  textAlign(CENTER, CENTER);
+  textSize(20);
+  outgoing = "";
+  incoming = "";
+  myserver = new Server(this, 1234);
+}
+
+void draw() {
+  background(0);
+  fill(255);
+  text(outgoing, width/2, height/2);
+  text(incoming, width/2, height/2+100);
+
+  Client myclient = myserver.available();
+  if (myclient != null) {
+    incoming = myclient.readString();
+  }
+}
+
+void keyReleased() {
+  if (key == ENTER) {
+    myserver.write(outgoing);
+    outgoing = "";
+  } else {
+    outgoing = outgoing + key;
+  }
+}

@@ -1,0 +1,20 @@
+public Puzzle() {
+        words = new ArrayList<String>();
+
+        try {
+            File file = new File("words.txt");
+            Scanner scanner = new Scanner(file);
+
+            while (scanner.hasNext()) {
+                String tempWord = scanner.next().toUpperCase();
+                words.add(tempWord);
+            }
+            scanner.close();
+			
+			//ONCE THIS LINE OF CODE IS REACHED, YOUR words ArrayList
+			//CONTAINS ALL THE WORDS IN words.txt
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }

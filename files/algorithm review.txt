@@ -1,0 +1,51 @@
+Sorting Algorithms
+==================
+
+1. Selection Sort
+-----------------
+
+Pros:
+- Minimizes the number of times data is moved, so it is useful when data movement is costly
+- Worst case and best case are the same, therefore consistent & predictable no matter what kind of data you have.
+
+Cons:
+- Classified as O(n^2) complexity, which means it performs poorly for large data sets
+
+2. Insertion Sort
+-----------------
+
+Pros:
+- The fastest sorting algorithm for sorting sorted (or near-sorted) data!
+
+Cons:
+- Worst case is O(n^2) complexity, which means it performs poorly for large, unsorted data sets
+
+3. Mergesort
+------------
+
+Pros:
+- Fast even for large data sets; considered O(n*lgn) complexity
+
+Cons:
+- The merge step requires enough space to have a duplicate copy of the array, which uses up double the amount of space.
+
+Searching Algorithms
+====================
+
+1. Sequential Search
+--------------------
+
+Pros: 
+- For small amounts of data, it is efficient
+- Does not require data to be pre-sorted
+
+Cons:
+- O(n) complexity, so performs worse as the amount of data increases
+
+2. Binary Search
+
+Pros:
+- O(lgn) complexity, so it is efficient even for very large amounts of data
+
+Cons:
+- Requires data to be sorted before searching

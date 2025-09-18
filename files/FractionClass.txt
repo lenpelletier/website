@@ -1,0 +1,132 @@
+class Fraction {
+
+    //--------------------------- INSTANCE VARS ------------------------------
+
+    private int n;
+    private int d;
+
+    //--------------------------- CONSTRUCTORS --------------------------------
+
+    public Fraction () {  //default
+        this.n = 1;
+        this.d = 2;
+    }
+
+    public Fraction (int n, int d) {
+        this.n = n;
+        if (d != 0) {
+            this.d = d;
+        }else {
+            System.out.println ("Error: Undefined fraction");
+        }
+    }
+
+    public Fraction (String str) {
+        int slashIndex = str.indexOf ("/");
+        int num = Integer.parseInt( str.substring (0,slashIndex) );
+        int den = Integer.parseInt( str.substring (slashIndex+1) );
+
+        this.n = num;
+        if (den != 0) {
+            this.d = den;
+        }else {
+            System.out.println ("Error: Undefined fraction");
+        }
+
+    }
+
+    public Fraction (Fraction f) { //copy constructor
+        this.n = f.n;
+        this.d = f.d;
+    }
+
+    // ------------------------ACCESSOR METHODS------------------------------
+
+    public int getNum () {
+        return this.n;
+    }
+
+    public int getDenom () {
+        return this.d;
+    }
+
+    public String toString () { //special
+        return this.n + "/" + this.d;
+    }
+
+    public Double toDouble () {
+        return (double) this.n / this.d;
+    }
+
+    // ----------------------- MUTATOR METHODS ------------------------------
+
+    public void reduce () {
+        int gcf = GCF(n,d);
+        this.n /= gcf;
+        this.d /= gcf;
+    }
+
+    public void setNum (int n) {
+        this.n = n;
+    }
+
+    public void setDenom (int d) {
+       if (d != 0) {
+          this.d = d;
+        }else {
+            System.out.println ("Error: Undefined fraction");
+        }
+    }
+
+    // ----------------------- HELPER METHODS -------------------------------
+
+    private int GCF (int a, int b) {
+        if (n == 0 || d == 0) return 1;
+
+        a = Math.abs(a);
+        b = Math.abs(b);
+        while (a!=b) {
+          if (a>b) a = a-b;
+          else     b = b-a;
+        }
+        return a;
+    }
+
+    // ----------------------- STATIC METHODS --------------------------------
+
+    public static Fraction multiply (Fraction A, Fraction B) {
+        int num = A.n*B.n;
+        int den = A.d*B.d;
+        Fraction C = new Fraction (num, den);
+        C.reduce ();
+        return C;
+    }
+
+    public static Fraction divide (Fraction A, Fraction B) {
+        if (B.n == 0) {
+            System.out.println ("Error: cannot divide by zero");
+            return null;
+        }
+        int num = A.n*B.d;
+        int den = A.d*B.n;
+        Fraction C = new Fraction (num, den);
+        C.reduce ();
+        return C;
+    }
+
+    public static Fraction add (Fraction A, Fraction B) {
+        int num = A.n*B.d + A.d*B.n;
+        int den = A.d * B.d;
+        Fraction C = new Fraction (num, den);
+        C.reduce ();
+        return C;
+    }
+
+    public static Fraction subtract (Fraction A, Fraction B) {
+        int num = A.n*B.d - A.d*B.n;
+        int den = A.d * B.d;
+        Fraction C = new Fraction (num, den);
+        C.reduce ();
+        return C;
+    }
+}

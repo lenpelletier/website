@@ -1,0 +1,92 @@
+<!DOCTYPE html> 
+
+<html> 
+
+<head>
+	<title>First Website</title>
+	<style>
+	
+		body {
+			background-color: lavender;	
+			
+			color: lavender;
+			font-family: Arial;
+			font-size: 16pt;
+		}
+		
+		div {
+			background-color: black;
+			border: 10px solid green;
+			margin-left: auto;
+			margin-right: auto;
+			margin-top: 0px;
+			padding: 30px;
+			width: 600px;
+		}
+		
+		h1 {
+			color: green;
+			font-size: 50pt;
+			text-align: center;
+		}
+		
+		h2 {
+			color: green;
+		}
+		
+		img {
+			float: left;
+			margin-right: 20px;
+			margin-bottom: 10px;
+			border: 5px solid green;
+		}
+		
+	</style>
+	
+</head>
+
+<body> 
+
+<div>
+
+
+<h1>Mr Pelletier</h1>
+
+<img src="snorlax.jpg" width="200px">
+
+<p>Hi, I'm Mr. Pelletier, I love teaching! I have been teaching for 12 years at Lord Byng. I used to teach Math and Social Studies but now I teach only Computer Science courses! I enjoyed designing the entire Computer Science program here at Byng, and I love it when graduates come back to visit.</p>
+
+<p>I love starcraft! I enjoy playing Zerg the most because you can make so many units and it's fantastic!!!! I also like Dungeons and Dragons. It's such a fun game where your imagination can really thrive.</p> 
+
+<br>
+
+
+<h2>Things I like</h2>
+<ul>
+  <li>Starcraft</li>
+  <li>Lego</li>
+  <li>Dungeons & Dragons</li>
+</ul>
+
+<h2>Things I don't like</h2>
+<ol>
+  <li>Zerg rushes</li>
+  <li>Stepping on Lego</li>
+  <li>Critical Fails</li>
+</ol>
+
+<p>Link to <a href="http://www.github.com">a website</a> I think is great.</p> 
+
+<p>Youtube Video I like:</p> 
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/DBoqrSn1GR8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+
+</div>
+
+
+</body>
+
+</html>
+

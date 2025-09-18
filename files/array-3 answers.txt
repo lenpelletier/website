@@ -1,0 +1,173 @@
+public int maxSpan(int[] nums) {
+
+  int biggestSpan = 0;
+  
+  for (int i = 0; i < nums.length; i++) {
+    int newSpan = lastIndexOf(nums, nums[i]) - i + 1;
+    if (newSpan > biggestSpan) biggestSpan = newSpan;
+  }
+  
+  return biggestSpan;
+}
+
+public int lastIndexOf (int[] nums, int value) {
+  for (int i = nums.length-1; i >= 0; i--) {
+    if (nums[i] == value) return i;
+  }
+  return -1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+public int[] fix34(int[] nums) {
+  
+  int mostRecent4 = 0; //represents the position of the most recently moved 4
+  
+  for (int i = 0; i < nums.length-1; i++) {
+    if (nums[i] == 3) {
+      int nextFour = findNextFour(nums, mostRecent4);
+      swap(nums, i+1, nextFour);
+      mostRecent4 = nextFour+1;
+    }
+  }
+  return nums;
+}
+
+public int findNextFour(int[] nums, int start) {
+  for (int i = start; i < nums.length; i++) {
+    if (nums[i] == 4) return i;
+  }
+  return -1;
+}
+
+public void swap (int[] nums, int i, int j) {
+  int temp = nums[i];
+  nums[i] = nums[j];
+  nums[j] = temp;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+
+public int[] fix45(int[] nums) {
+  
+  int mostRecent5 = 0; //represents the position of the most recently moved 4
+  
+  for (int i = 0; i < nums.length-1; i++) {
+    if (nums[i] == 4 && nums[i+1] != 5) {
+      int nextFive = findNextFive(nums, mostRecent5);
+      swap(nums, i+1, nextFive);
+      mostRecent5 = nextFive+1;
+    }
+  }
+  return nums;
+}
+
+public int findNextFive(int[] nums, int start) {
+  if (start == 0) {
+    if (nums[0] == 5) return 0;
+  }
+  
+  for (int i = start; i < nums.length; i++) {
+    if (nums[i] == 5 && nums[i-1] != 4) return i;
+  }
+  return -1;
+}
+
+public void swap (int[] nums, int i, int j) {
+  int temp = nums[i];
+  nums[i] = nums[j];
+  nums[j] = temp;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+
+public boolean canBalance(int[] nums) {
+  for (int i = 0; i < nums.length; i++) {
+    if (subsum(nums, 0, i) == subsum(nums, i+1, nums.length-1)) return true;
+  }
+  return false;
+}
+
+public int subsum (int[] nums, int start, int end) {
+  int sum= 0;
+  for (int i = start; i <= end; i++) {
+    sum += nums[i];
+  }
+  return sum;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+
+public boolean linearIn(int[] outer, int[] inner) {
+  int i = 0;
+  int j = 0;
+  while (j < inner.length) {
+    if (i == outer.length) return false;
+    else if (outer[i] > inner[j]) return false;
+    else if (outer[i] == inner[j]) j++;
+    else if (outer[i] < inner[j]) i++;
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+
+public int[] squareUp(int n) {
+  int[] s = new int[n*n];
+  int max = 1;
+  for (int i = 0; i < n*n; i += n){
+     for (int j = n-1; j >= n-max; j--) {
+        s[i+j] = n-j;
+     }
+     max++;
+  } 
+  return s;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+
+public int[] seriesUp(int n) {
+  int[] answer = new int[n*(n + 1)/2];
+  int i = 0;
+  for (int a = 1; a <= n; a++) {
+    for (int b = 1; b <= a; b++) {
+      answer[i] = b;
+      i++;
+    }
+  }
+  return answer;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+public int maxMirror(int[] nums) {
+    int max = 0;
+    
+    for(int i = 0; i < nums.length; i++) {
+        int count = 0;
+        for(int j = nums.length - 1; j >= 0 && i + count < nums.length; j--) {
+            if(nums[i + count] == nums[j]) {
+                count++;
+            } else {
+                max = Math.max(max, count);
+                count = 0;
+            }
+        }
+        max = Math.max(max, count);
+    }
+    return max;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+public int countClumps(int[] nums) {
+  int clumps = 0;
+  for (int i = 1; i < nums.length; i++) {
+    if (nums[i] == nums[i-1]) {
+      clumps++;
+      while (i < nums.length && nums[i] == nums[i-1]) i++;
+    } 
+  }
+  return clumps;
+}
+

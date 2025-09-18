@@ -1,0 +1,259 @@
+import java.util.ArrayList;
+
+public class test 
+{
+    public test() {
+
+    }
+
+    public static void main (String[] args) {
+        test t = new test();
+
+        System.out.println("*** UNIT 4 TEST ***");
+
+        System.out.println("\nQuestion 1: printArray");
+        int[] a = {1,2,3,4};
+        t.printArray(a);
+
+        System.out.println("\nQuestion 2: equalCorners");
+        int[][] m = { {1,0,1}, {0,0,0}, {2,0,1}};
+        System.out.println(t.equalCorners(m));
+
+        System.out.println("\nQuestion 3: rotateRight");
+        t.printArray(t.rotateRight(a));
+
+        System.out.println("\nQuestion 4: filter");        
+        ArrayList<Integer> b = new ArrayList<Integer>();
+        b.add(1);
+        b.add(3);
+        b.add(5);
+
+        ArrayList<Integer> c = new ArrayList<Integer>();
+        c.add(2);
+        c.add(3);
+        c.add(5);
+
+        t.filter(b,c);
+        System.out.println(b);
+
+        System.out.println("Question 5: add");
+        int[] d = {1,0,8,9};
+        int[] e = {0,0,1,1};
+        t.printArray(t.add(d,e));
+
+        System.out.println("\n\n*** Unit 7 test ***");
+        System.out.println("\nQuestion 1: sumArray");
+        System.out.println(t.sumArray(a));
+
+        System.out.println("\nQuestion 2: cut");
+        int[] f = {1,2,3,4,5};
+        t.printArray(t.cut(f, 3));
+
+        System.out.println("\nQuestion 4: getColumn");
+        t.printArray(t.getColumn(m,0));
+
+        System.out.println("\nQuestion 5: combine");
+        ArrayList<Integer> g = new ArrayList<Integer>();
+        g.add(1);
+        g.add(3);
+        g.add(5);
+
+        ArrayList<Integer> h = new ArrayList<Integer>();
+        h.add(2);
+        h.add(3);
+        h.add(5);
+        System.out.println(t.combine(g,h));
+
+        System.out.println("\n*** ArrayList Quiz 1 ***\n");
+        ArrayList<String> lst = new ArrayList<String>();
+        lst.add("P");
+        lst.add("Q");
+        lst.add("R");
+        lst.set(2, "s");
+        lst.add(2, "T");
+        lst.add("u");
+        System.out.println("\nQuestion 1: " + lst);
+
+        System.out.println("\nQuestion 2: ");
+        t.numQuest();
+
+        System.out.println("\nQuestion 3: ");
+        ArrayList<String> ints = new ArrayList<String>();
+        ints.add("0");
+        ints.add("1");
+        ints.add("2");
+        ints.add("3");
+        ints.add("4");
+        ints.add("5");
+        ints.add("6");
+        ints.add("7");
+
+        t.neverTellMeTheOdds(ints);
+        System.out.println(ints);
+
+        System.out.println("\nQuestion 4: ");
+        ArrayList<String> x = new ArrayList<String>();
+        ArrayList<String> y = new ArrayList<String>();
+
+        x.add("A");
+        x.add("A");
+        x.add("A");
+        x.add("A");
+
+        y.add("B");
+        y.add("B");
+        y.add("B");
+        y.add("B");
+
+        System.out.println(t.interleave(x, y));
+    }
+
+    public void printArray (int[] a) {
+        System.out.print("{");
+        for (int n : a) {
+            System.out.print(n + " ");
+        }
+        System.out.println("}");
+    }
+
+    public boolean equalCorners (int[][] m) {
+        int tl = m[0][0];
+        int tr = m[0][m[0].length-1];
+        int bl = m[m.length-1][0];
+        int br = m[m.length-1][m[0].length-1];
+        return tl == tr && tr == bl && bl == br;
+    }
+
+    public int[] rotateRight(int[] a) {
+        if (a.length == 0) {
+            return a;
+        }
+        int[] b = new int[a.length];
+        b[0] = a[a.length-1];
+        for (int i = 0; i < a.length-1; i++) {
+            b[i+1] = a[i];
+        }
+        return b;
+    }
+
+    public void filter (ArrayList<Integer> list1, ArrayList<Integer> list2) {
+        for (int n : list2) {
+            for (int i = list1.size()-1; i >= 0; i--) {
+                if (list1.get(i) == n) {
+                    list1.remove(i);
+                }
+            }
+        }
+    }
+
+    public int[] add (int[] a, int[] b) {
+        int[] c = new int[a.length];
+        int carry = 0;
+        for (int i = a.length-1; i >= 0; i--) {
+            c[i]  = (a[i] + b[i] + carry) % 10;
+            carry = (a[i] + b[i] + carry) / 10;
+        }
+        return c;
+    }
+
+    public int sumArray(int[] a) {
+        int sum = 0;
+        for (int n : a) {
+            sum += n;
+        }
+        return sum;
+    }
+
+    public int[] cut (int[] deck, int cutIndex) {
+        if (cutIndex >= deck.length-1 || cutIndex < 0) {
+            return deck;
+        }
+
+        int[] newdeck = new int[deck.length];
+        for (int i = 0; i < cutIndex; i++) {
+            newdeck[cutIndex+i-1] = deck[i]; 
+        }
+        for (int i = cutIndex; i < deck.length; i++) {
+            newdeck[i-cutIndex] = deck[i];
+        }
+        return newdeck;
+    }
+
+    public int[] getColumn (int[][] m, int col) {
+        if (col >= m[0].length)
+            return null;
+        int[] column = new int[m.length];
+        for (int i = 0; i < m.length; i++) {
+            column[i] = m[i][col];
+        }
+        return column;
+    }
+
+    public void cullTheWeak (ArrayList<Integer> list1, int cutOff) {
+        for (int i = list1.size(); i >= 0; i--) {
+            if (list1.get(i) < cutOff) {
+                list1.remove(i);
+            }
+        }
+    }
+
+    public ArrayList<Integer> combine (ArrayList<Integer> list1, ArrayList<Integer> list2) {
+        ArrayList<Integer> list3 = new ArrayList<Integer>();
+        while (list1.size() > 0 && list2.size() > 0) {
+            if (list1.get(0) <= list2.get(0)) {
+                list3.add(list1.remove(0));
+            } else {                
+                list3.add(list2.remove(0));
+            }
+        }
+        if (list1.size() == 0) {
+            for (int n : list2) {
+                list3.add(n);
+            }
+        } else {
+            for (int n : list1) {
+                list3.add(n);
+            }
+        }
+        return list3;
+    }
+
+    public void numQuest() {
+        ArrayList<Integer> nums = new ArrayList<Integer>();
+        nums.add(0);
+        nums.add(0);
+        nums.add(4);
+        nums.add(2);
+        nums.add(5);
+        nums.add(0);
+        nums.add(3);
+        nums.add(0);
+
+        int k = 0;
+        while (k < nums.size()) {
+            if (nums.get(k) == 0) {
+                nums.remove(k);
+            }
+            k++;
+        }
+        System.out.println(nums);
+    }
+
+    public void neverTellMeTheOdds (ArrayList<String> nums) {
+        for (int i = nums.size()-1; i <= 0; i--) {
+            int n = Integer.parseInt(nums.get(i));   
+            if (n % 2 != 0) {
+                nums.remove(i);
+            }
+        }
+    }
+
+    public ArrayList<String> interleave(ArrayList<String> a, ArrayList<String> b) {
+        ArrayList<String> c = new ArrayList<String>();        
+        for (int i = 0; i < a.size(); i++) {
+            c.add(a.get(i));
+            c.add(b.get(i));
+        }
+        return c;
+    }
+}

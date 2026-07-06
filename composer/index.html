@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Composer — GP Post Writer</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===================================================
+       APP HEADER
+       =================================================== -->
+  <header id="app-header">
+    <div id="header-brand">
+      <span id="app-logo">Composer</span>
+      <span id="app-tagline">for Gamers' Plane</span>
+    </div>
+  </header>
+
+  <!-- ===================================================
+       DASHBOARD VIEW
+       =================================================== -->
+  <div id="dashboard" class="view">
+    <div id="dashboard-header">
+      <h2>My Posts</h2>
+      <button id="new-post-btn" class="btn btn-primary">+ New Post</button>
+    </div>
+    <div id="posts-container"></div>
+    <div id="empty-state" class="hidden">
+      <div class="empty-icon">✏</div>
+      <h3>No posts yet</h3>
+      <p>Start composing your first post for Gamers' Plane</p>
+      <button class="btn btn-primary" onclick="App.newPost()">+ New Post</button>
+    </div>
+  </div>
+
+  <!-- ===================================================
+       EDITOR VIEW
+       =================================================== -->
+  <div id="editor" class="view hidden">
+
+    <!-- Editor top bar -->
+    <div id="editor-header">
+      <button id="back-btn" class="btn btn-ghost">&#8592; Posts</button>
+      <input type="text" id="post-title" placeholder="Post title (for your reference)…" autocomplete="off">
+      <div id="view-modes">
+        <button class="view-mode-btn active" data-mode="split"   title="Split view">Split</button>
+        <button class="view-mode-btn"        data-mode="source"  title="Source only">BBCode</button>
+        <button class="view-mode-btn"        data-mode="preview" title="Preview only">Preview</button>
+      </div>
+      <button id="save-btn" class="btn btn-primary">Save</button>
+    </div>
+
+    <!-- Formatting toolbar -->
+    <div id="editor-toolbar">
+
+      <!-- Text style -->
+      <div class="tool-group">
+        <button class="tool-btn" data-action="bold"      title="Bold (Ctrl+B)"><b>B</b></button>
+        <button class="tool-btn" data-action="italic"    title="Italic (Ctrl+I)"><i>I</i></button>
+        <button class="tool-btn" data-action="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+        <button class="tool-btn" data-action="strike"    title="Strikethrough"><s>S</s></button>
+      </div>
+      <div class="tool-sep"></div>
+
+      <!-- Color & Size -->
+      <div class="tool-group">
+        <button class="tool-btn" data-action="color" title="Text color">
+          <span class="color-label">A</span><span class="color-bar" id="color-indicator"></span>
+        </button>
+        <div class="tool-dropdown-wrap" id="size-dropdown-wrap">
+          <button class="tool-btn" data-action="size" title="Text size">A<sup>+</sup></button>
+          <div class="tool-dropdown" id="size-dropdown">
+            <button data-size="75">Tiny (75%)</button>
+            <button data-size="85">Small (85%)</button>
+            <button data-size="100">Normal (100%)</button>
+            <button data-size="125">Large (125%)</button>
+            <button data-size="150">Larger (150%)</button>
+            <button data-size="200">Huge (200%)</button>
+          </div>
+        </div>
+      </div>
+      <div class="tool-sep"></div>
+
+      <!-- Links & Media -->
+      <div class="tool-group">
+        <button class="tool-btn" data-action="link"    title="Insert link">Link</button>
+        <button class="tool-btn" data-action="image"   title="Insert image">Img</button>
+        <button class="tool-btn" data-action="youtube" title="Insert YouTube video">YT</button>
+        <button class="tool-btn" data-action="hr"      title="Horizontal rule">&#8212;&#8212;</button>
+      </div>
+      <div class="tool-sep"></div>
+
+      <!-- Lists -->
+      <div class="tool-group">
+        <div class="tool-dropdown-wrap" id="list-dropdown-wrap">
+          <button class="tool-btn" data-action="list" title="Insert list">List &#9660;</button>
+          <div class="tool-dropdown" id="list-dropdown">
+            <button data-list="bullet">&#8226; Bullet list</button>
+            <button data-list="#">&#35; Numbered list</button>
+            <button data-list="a">a. Alphabetic list</button>
+            <button data-list="i">i. Roman numeral list</button>
+          </div>
+        </div>
+      </div>
+      <div class="tool-sep"></div>
+
+      <!-- Block tags -->
+      <div class="tool-group">
+        <button class="tool-btn" data-action="quote"   title="Quote block">&#8220;Quote&#8221;</button>
+        <button class="tool-btn" data-action="ooc"     title="Out of character">OOC</button>
+        <button class="tool-btn" data-action="spoiler" title="Spoiler / collapsible">Spoiler</button>
+        <button class="tool-btn" data-action="code"    title="Code block">Code</button>
+      </div>
+      <div class="tool-sep"></div>
+
+      <!-- Layout -->
+      <div class="tool-group">
+        <div class="tool-dropdown-wrap" id="layout-dropdown-wrap">
+          <button class="tool-btn" data-action="layout" title="Column / table layouts">Layout &#9660;</button>
+          <div class="tool-dropdown" id="layout-dropdown">
+            <button data-layout="2col">2-column</button>
+            <button data-layout="3col">3-column</button>
+            <button data-layout="table">Table</button>
+          </div>
+        </div>
+      </div>
+      <div class="tool-sep"></div>
+
+      <!-- Private / notes -->
+      <div class="tool-group">
+        <button class="tool-btn" data-action="note"    title="Private note to user">[note]</button>
+        <button class="tool-btn" data-action="private" title="Private hidden text">[private]</button>
+      </div>
+
+    </div><!-- /#editor-toolbar -->
+
+    <!-- Mobile tab bar (hidden on desktop via CSS) -->
+    <div id="mobile-tabs">
+      <button class="mobile-tab" data-mode="source">&#9998; Edit</button>
+      <button class="mobile-tab" data-mode="split">&#9135; Split</button>
+      <button class="mobile-tab" data-mode="preview">&#9673; Preview</button>
+    </div>
+
+    <!-- Editor area (split pane) -->
+    <div id="editor-area">
+
+      <div id="source-pane" class="editor-pane">
+        <div class="pane-label">BBCode Source</div>
+        <textarea id="bbcode-input" spellcheck="true" placeholder="Write your post here using BBCode… or use the toolbar above.&#10;Tip: paste or drop an image anywhere here to auto-upload it."></textarea>
+      </div>
+
+      <div id="pane-divider" title="Drag to resize"></div>
+
+      <div id="preview-pane" class="editor-pane">
+        <div class="pane-label">
+          Preview
+          <button class="pane-copy-btn" id="pane-copy-btn" title="Copy BBCode">&#9112; Copy BBCode</button>
+        </div>
+        <div id="preview-output" class="gp-post"></div>
+      </div>
+
+    </div><!-- /#editor-area -->
+
+  </div><!-- /#editor -->
+
+</div><!-- /#app -->
+
+<!-- ===================================================
+     MODALS
+     =================================================== -->
+<div id="modal-overlay" class="hidden">
+
+  <!-- Link -->
+  <div id="modal-link" class="modal hidden">
+    <div class="modal-header">Insert Link</div>
+    <label>URL
+      <input type="url" id="link-url" placeholder="https://…" autocomplete="off">
+    </label>
+    <label>Link text <span class="optional">(optional)</span>
+      <input type="text" id="link-text" placeholder="Displayed text…" autocomplete="off">
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost"    onclick="Editor.closeModal()">Cancel</button>
+      <button class="btn btn-primary"  onclick="Editor.insertLink()">Insert</button>
+    </div>
+  </div>
+
+  <!-- Image -->
+  <div id="modal-image" class="modal hidden">
+    <div class="modal-header">Insert Image</div>
+    <div id="img-drop-area" class="drop-area">
+      <p>Drop an image here</p>
+      <p class="drop-or">or</p>
+      <button class="btn btn-ghost btn-sm" id="img-browse-btn">Browse file</button>
+      <input type="file" id="img-file-input" accept="image/*" style="display:none">
+    </div>
+    <div id="img-upload-status" class="upload-status"></div>
+    <div class="modal-sep">— or paste a URL —</div>
+    <label>Image URL
+      <input type="url" id="img-url" placeholder="https://i.imgur.com/…" autocomplete="off">
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost"    onclick="Editor.closeModal()">Cancel</button>
+      <button class="btn btn-primary"  onclick="Editor.insertImageUrl()">Insert URL</button>
+    </div>
+  </div>
+
+  <!-- YouTube -->
+  <div id="modal-youtube" class="modal hidden">
+    <div class="modal-header">Insert YouTube Video</div>
+    <label>YouTube URL
+      <input type="url" id="yt-url" placeholder="https://youtu.be/…" autocomplete="off">
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost"    onclick="Editor.closeModal()">Cancel</button>
+      <button class="btn btn-primary"  onclick="Editor.insertYoutube()">Insert</button>
+    </div>
+  </div>
+
+  <!-- Quote -->
+  <div id="modal-quote" class="modal hidden">
+    <div class="modal-header">Insert Quote</div>
+    <label>Author <span class="optional">(optional)</span>
+      <input type="text" id="quote-author" placeholder="Username…" autocomplete="off">
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost"    onclick="Editor.closeModal()">Cancel</button>
+      <button class="btn btn-primary"  onclick="Editor.insertQuote()">Insert</button>
+    </div>
+  </div>
+
+  <!-- Spoiler -->
+  <div id="modal-spoiler" class="modal hidden">
+    <div class="modal-header">Insert Spoiler</div>
+    <label>Title <span class="optional">(optional)</span>
+      <input type="text" id="spoiler-title" placeholder="Spoiler title…" autocomplete="off">
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost"    onclick="Editor.closeModal()">Cancel</button>
+      <button class="btn btn-primary"  onclick="Editor.insertSpoiler()">Insert</button>
+    </div>
+  </div>
+
+  <!-- Note -->
+  <div id="modal-note" class="modal hidden">
+    <div class="modal-header">Private Note</div>
+    <p class="modal-desc">A note to a specific user — they get a notification but others can't see it.</p>
+    <label>To (username)
+      <input type="text" id="note-user" placeholder="Username…" autocomplete="off">
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost"    onclick="Editor.closeModal()">Cancel</button>
+      <button class="btn btn-primary"  onclick="Editor.insertNote()">Insert</button>
+    </div>
+  </div>
+
+  <!-- Private -->
+  <div id="modal-private" class="modal hidden">
+    <div class="modal-header">Private Hidden Text</div>
+    <p class="modal-desc">Text hidden from everyone except the listed user. No notification is sent.</p>
+    <label>For (username)
+      <input type="text" id="private-user" placeholder="Username…" autocomplete="off">
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost"    onclick="Editor.closeModal()">Cancel</button>
+      <button class="btn btn-primary"  onclick="Editor.insertPrivate()">Insert</button>
+    </div>
+  </div>
+
+</div><!-- /#modal-overlay -->
+
+<!-- ===================================================
+     TOAST NOTIFICATION
+     =================================================== -->
+<div id="toast"></div>
+
+<script src="js/bbcode.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+  // Copy BBCode button in preview pane label
+  document.getElementById('pane-copy-btn').addEventListener('click', () => {
+    const content = Editor.getContent();
+    navigator.clipboard.writeText(content)
+      .then(() => window._appToast('BBCode copied!'))
+      .catch(() => window._appToast('Copy failed'));
+  });
+</script>
+
+</body>
+</html>

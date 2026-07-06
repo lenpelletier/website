@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>PbP Map Annotator</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bangers&family=Bebas+Neue&family=Cinzel&family=Exo+2:ital@0;1&family=IM+Fell+English:ital@0;1&family=Metamorphous&family=Orbitron&family=Pirata+One&family=Uncial+Antiqua&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== TOOLBAR ===== -->
+  <div id="toolbar">
+
+    <!-- Drawing tools -->
+    <div class="tool-group" id="draw-tools">
+      <button class="tool-btn active" data-tool="select" title="Select / Move  [V]">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 2 L3 13 L6 10 L8.5 15 L10.5 14 L8 9 L12 9 Z" fill="currentColor"/>
+        </svg>
+      </button>
+      <button class="tool-btn" data-tool="pan" title="Pan / Navigate  [H]">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 2 L8 4 M8 12 L8 14 M2 8 L4 8 M12 8 L14 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M8 5.5 C6.6 5.5 5.5 6.6 5.5 8 C5.5 9.4 6.6 10.5 8 10.5 C9.4 10.5 10.5 9.4 10.5 8 C10.5 6.6 9.4 5.5 8 5.5Z" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="8" cy="8" r="1.2" fill="currentColor"/>
+        </svg>
+      </button>
+      <button class="tool-btn" data-tool="text" title="Text Label  [T]">
+        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+          <text x="8" y="13" text-anchor="middle" font-size="13" font-weight="bold" font-family="sans-serif" fill="currentColor">T</text>
+        </svg>
+      </button>
+      <button class="tool-btn" data-tool="marker" title="Number Marker  [M]">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" fill="rgba(255,255,255,0.15)"/>
+          <text x="8" y="12" text-anchor="middle" font-size="9" font-weight="bold" font-family="sans-serif" fill="currentColor">1</text>
+        </svg>
+      </button>
+      <button class="tool-btn" data-tool="arrow" title="Arrow  [A]">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="3" y1="13" x2="12" y2="4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <polyline points="7,4 12,4 12,9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="tool-btn" data-tool="line" title="Line  [L]">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="2" y1="14" x2="14" y2="2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="tool-btn" data-tool="circle" title="Circle  [C]">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
+      <button class="tool-btn" data-tool="rect" title="Rectangle  [R]">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="3" width="12" height="10" stroke="currentColor" stroke-width="2" rx="1"/>
+        </svg>
+      </button>
+      <button class="tool-btn" data-tool="freehand" title="Freehand / Path  [F]">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 12 Q4 4 7 8 Q10 12 13 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="tool-btn" data-tool="stamp" title="Image Stamp — upload an image overlay">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="5" cy="6.5" r="1.5" fill="currentColor"/>
+          <path d="M1 11 L4.5 7.5 L7 10 L10 7 L15 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="11" y1="1" x2="11" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="9" y1="3" x2="13" y2="3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <input type="file" id="stamp-input" accept=".png,.jpg,.jpeg,.webp,.gif,.svg" style="display:none">
+    </div>
+
+    <div class="toolbar-sep"></div>
+
+    <!-- Tool options -->
+    <div id="tool-options">
+
+      <!-- Color -->
+      <div class="opt-group">
+        <span class="opt-label">Color</span>
+        <button class="color-preset active" data-color="#ff0000" style="background:#ff0000" title="Red"></button>
+        <button class="color-preset" data-color="#ff8800" style="background:#ff8800" title="Orange"></button>
+        <button class="color-preset" data-color="#ffee00" style="background:#ffee00" title="Yellow"></button>
+        <button class="color-preset" data-color="#00cc44" style="background:#00cc44" title="Green"></button>
+        <button class="color-preset" data-color="#0066ff" style="background:#0066ff" title="Blue"></button>
+        <button class="color-preset" data-color="#ffffff" style="background:#ffffff" title="White"></button>
+        <button class="color-preset" data-color="#000000" style="background:#000000;border-color:#666" title="Black"></button>
+        <input type="color" id="color-picker" value="#ff0000" title="Custom color">
+      </div>
+
+      <div class="toolbar-sep"></div>
+
+      <!-- Stroke width -->
+      <div class="opt-group">
+        <span class="opt-label">Width</span>
+        <button class="width-btn"        data-width="1" title="Thin">1</button>
+        <button class="width-btn active" data-width="2" title="Medium">2</button>
+        <button class="width-btn"        data-width="4" title="Thick">4</button>
+        <button class="width-btn"        data-width="6" title="Heavy">6</button>
+      </div>
+
+      <!-- Fill (circles & rects) -->
+      <div class="opt-group" id="fill-option" style="display:none">
+        <label class="fill-label">
+          <input type="checkbox" id="fill-toggle"> Fill
+        </label>
+      </div>
+
+      <!-- Font size (text & markers) -->
+      <div class="opt-group" id="fontsize-option" style="display:none">
+        <span class="opt-label">Size</span>
+        <button class="fontsize-btn" data-size="12" title="Small (12px)">S</button>
+        <button class="fontsize-btn active" data-size="18" title="Medium (18px)">M</button>
+        <button class="fontsize-btn" data-size="28" title="Large (28px)">L</button>
+      </div>
+
+      <!-- Text-only options (shown when text tool active or text annotation selected) -->
+      <div class="toolbar-sep" id="text-sep" style="display:none"></div>
+
+      <!-- Font family -->
+      <div class="opt-group" id="text-font-option" style="display:none">
+        <span class="opt-label">Font</span>
+        <select id="font-family-select" title="Font family">
+          <option value="default">Default</option>
+          <option value="bangers">Bangers</option>
+          <option value="anton">Anton</option>
+          <option value="bebas">Bebas Neue</option>
+          <option value="cinzel">Cinzel</option>
+          <option value="exo2">Exo 2</option>
+          <option value="im-fell">IM Fell</option>
+          <option value="metamorphous">Metamorphous</option>
+          <option value="orbitron">Orbitron</option>
+          <option value="pirata">Pirata One</option>
+          <option value="uncial">Uncial Antiqua</option>
+        </select>
+      </div>
+
+      <!-- Bold / Italic -->
+      <div class="opt-group" id="text-style-option" style="display:none">
+        <button class="style-btn active" id="bold-btn" title="Bold"><b>B</b></button>
+        <button class="style-btn" id="italic-btn" title="Italic"><i>I</i></button>
+      </div>
+
+      <!-- Outline -->
+      <div class="opt-group" id="text-outline-option" style="display:none">
+        <label class="fill-label">
+          <input type="checkbox" id="outline-toggle"> Outline
+        </label>
+        <input type="color" id="outline-color-picker" value="#000000" title="Outline color">
+        <button class="width-btn" data-outline-width="1">1</button>
+        <button class="width-btn active" data-outline-width="2">2</button>
+        <button class="width-btn" data-outline-width="4">4</button>
+      </div>
+
+      <!-- Shadow -->
+      <div class="opt-group" id="text-shadow-option" style="display:none">
+        <label class="fill-label">
+          <input type="checkbox" id="shadow-toggle" checked> Shadow
+        </label>
+        <input type="color" id="shadow-color-picker" value="#000000" title="Shadow color">
+        <button class="width-btn" data-shadow-blur="2">S</button>
+        <button class="width-btn active" data-shadow-blur="6">M</button>
+        <button class="width-btn" data-shadow-blur="12">L</button>
+      </div>
+    </div>
+
+    <div class="toolbar-sep"></div>
+
+    <!-- Actions -->
+    <div class="tool-group">
+      <button class="tool-btn" id="undo-btn" title="Undo  [Ctrl+Z]" disabled>
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 8 Q3 3 8 3 Q13 3 13 8 Q13 13 8 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <polyline points="3,4 3,8 7,8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="tool-btn" id="redo-btn" title="Redo  [Ctrl+Shift+Z]" disabled>
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13 8 Q13 3 8 3 Q3 3 3 8 Q3 13 8 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <polyline points="13,4 13,8 9,8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="toolbar-sep"></div>
+
+    <!-- Zoom -->
+    <div class="tool-group">
+      <button class="tool-btn" id="zoom-out" title="Zoom Out">
+        <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <line x1="4.5" y1="7" x2="9.5" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="11" y1="11" x2="14" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="tool-btn" id="zoom-fit" title="Fit to Window">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="5" height="5" stroke="currentColor" stroke-width="1.5" rx="0.5"/>
+          <rect x="9" y="2" width="5" height="5" stroke="currentColor" stroke-width="1.5" rx="0.5"/>
+          <rect x="2" y="9" width="5" height="5" stroke="currentColor" stroke-width="1.5" rx="0.5"/>
+          <rect x="9" y="9" width="5" height="5" stroke="currentColor" stroke-width="1.5" rx="0.5"/>
+        </svg>
+      </button>
+      <button class="tool-btn" id="zoom-in" title="Zoom In">
+        <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <line x1="7" y1="4.5" x2="7" y2="9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="4.5" y1="7" x2="9.5" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="11" y1="11" x2="14" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="toolbar-sep"></div>
+
+    <!-- File / Export / Session actions -->
+    <div class="tool-group">
+      <button class="tool-btn hidden" id="replace-image-btn" title="Replace Map Image">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="2" width="14" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="5.5" cy="6" r="1.5" fill="currentColor"/>
+          <path d="M1 11 L5 7 L8 10 L10 8 L15 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <input type="file" id="replace-image-input" accept=".png,.jpg,.jpeg,.webp" style="display:none">
+
+      <button class="action-btn" id="export-image" title="Export annotated image as PNG">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 2 L8 10 M5 7 L8 10 L11 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12 L2 14 L14 14 L14 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Export PNG
+      </button>
+
+      <button class="action-btn" id="copy-forum" title="Upload current view to imgbb and copy link">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="5" y="1" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="1" y="4" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.5" fill="var(--bg-panel)"/>
+          <line x1="4" y1="8" x2="8" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="4" y1="11" x2="9" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Upload &amp; Copy Link
+      </button>
+
+      <div class="toolbar-sep"></div>
+
+      <button class="action-btn" id="save-session" title="Save session to JSON file">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="14" height="14" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="4" y="1" width="8" height="5" rx="0.5" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="3" y="8" width="10" height="6" rx="0.5" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        Save
+      </button>
+
+      <button class="action-btn" id="load-session-btn" title="Load session from JSON file">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 4 L1 14 L15 14 L15 6 L9 6 L7 4 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <line x1="8" y1="8" x2="8" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M5 10 L8 12.5 L11 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Load
+      </button>
+      <input type="file" id="load-session-input" accept=".json" style="display:none">
+    </div>
+
+  </div>
+  <!-- /toolbar -->
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div id="main">
+
+    <!-- Left: canvas workspace -->
+    <div id="canvas-panel">
+      <div id="canvas-container">
+        <canvas id="main-canvas"></canvas>
+
+        <!-- Drop zone (shown when no image loaded) -->
+        <div id="drop-zone">
+          <div class="drop-icon">🗺️</div>
+          <p>Drop a map image here</p>
+          <p>or click to upload</p>
+          <p style="font-size:0.7em; color:#55557a; margin-top:4px">PNG · JPG · WEBP &nbsp;|&nbsp; Pinch or scroll to zoom &nbsp;|&nbsp; Two fingers or Space+drag to pan</p>
+          <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.webp" style="display:none">
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: markdown editor + annotation list -->
+    <div id="right-panel">
+
+      <div id="markdown-section">
+        <div id="markdown-toolbar">
+          <span>Annotation Markdown</span>
+          <div>
+            <button id="apply-markdown" title="Parse markdown and update canvas">Apply</button>
+            <button id="copy-markdown"  title="Copy markdown to clipboard">Copy</button>
+          </div>
+        </div>
+        <textarea id="markdown-editor" spellcheck="false"
+          placeholder="# Map Annotations&#10;&#10;Load a map image and start drawing, or type annotations here and click Apply.&#10;&#10;## Markers&#10;- [1] (100, 200) &quot;Guard post&quot;&#10;&#10;## Shapes&#10;- arrow (50, 50) -> (200, 200) color:red width:2&#10;- circle (300, 300) r:50 color:blue &quot;Area of effect&quot;&#10;&#10;## Notes&#10;> GM notes go here..."></textarea>
+      </div>
+
+      <div id="annotation-list-section">
+        <div id="annotation-list-header">
+          <span>Layers</span>
+        </div>
+        <div id="annotation-list">
+          <div class="ann-empty">No annotations yet.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- /main -->
+
+</div>
+<!-- /app -->
+
+<!-- ===== PANEL BACKDROP (mobile) ===== -->
+<div id="panel-backdrop"></div>
+
+<!-- ===== ICON PICKER PANEL ===== -->
+<div id="icon-picker" class="hidden">
+  <div class="icon-picker-header">
+    <span>Image Stamps</span>
+    <button id="icon-picker-close" title="Close">✕</button>
+  </div>
+  <div class="icon-picker-actions">
+    <button id="icon-picker-upload" title="Upload your own image">↑ Upload Image</button>
+    <input type="text" id="icon-search" placeholder="Search icons…" autocomplete="off">
+  </div>
+  <div class="icon-category-tabs" id="icon-category-tabs">
+    <button class="cat-tab active" data-cat="All">All</button>
+    <button class="cat-tab" data-cat="Weapons">Weapons</button>
+    <button class="cat-tab" data-cat="Magic">Magic</button>
+    <button class="cat-tab" data-cat="Hazards">Hazards</button>
+    <button class="cat-tab" data-cat="Terrain">Terrain</button>
+    <button class="cat-tab" data-cat="Creatures">Creatures</button>
+    <button class="cat-tab" data-cat="Status">Status</button>
+  </div>
+  <div id="icon-grid"></div>
+  <div class="icon-attribution">Icons by <a href="https://game-icons.net" target="_blank" rel="noopener">game-icons.net</a> — CC BY 3.0 (Delapouite &amp; Lorc)</div>
+</div>
+
+<!-- ===== EXPORT MODAL ===== -->
+<div id="export-modal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Exported Map Preview</h3>
+      <button id="export-modal-close" title="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <img id="export-preview-img" alt="Exported map preview">
+      <p style="color:#7a7aaa; font-size:11px">Right-click the image to copy or save. The file has also been downloaded.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div id="toast"></div>
+
+<!-- ===== MOBILE PANEL FAB ===== -->
+<button id="panel-toggle" title="Notes &amp; Layers">
+  <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="3" width="16" height="14" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+    <line x1="12" y1="4" x2="12" y2="16" stroke="currentColor" stroke-width="1.8"/>
+    <line x1="4" y1="8" x2="10" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="4" y1="11.5" x2="9" y2="11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+</button>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="js/history.js"></script>
+<script src="js/annotations.js"></script>
+<script src="js/markdown.js"></script>
+<script src="js/canvas.js"></script>
+<script src="js/tools.js"></script>
+<script src="js/export.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/iconpicker.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

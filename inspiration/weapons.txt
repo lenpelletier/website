@@ -1,0 +1,98 @@
+Battleaxe;10 gp;1d8;slashing;4 lb.;Versatile (1d10);Axe;Battleaxe
+Battleaxe;10 gp;1d8;slashing;4 lb.;Versatile (1d10);Axe;Battleaxe
+Battleaxe;10 gp;1d8;slashing;4 lb.;Versatile (1d10);Axe;Battleaxe
+Battleaxe;10 gp;1d8;slashing;4 lb.;Versatile (1d10);Axe;Battleaxe
+Club;1 sp;1d4;bludgeoning;2 lb.;Light;Baton;Blackjack;Bludgeon;Cudgel;Truncheon;Nunchaku;Jitte;Tonfa;Fan;Frying Pan
+Club;1 sp;1d4;bludgeoning;2 lb.;Light;Baton;Blackjack;Bludgeon;Cudgel;Truncheon;Nunchaku;Jitte;Tonfa;Fan;Frying Pan
+Club;1 sp;1d4;bludgeoning;2 lb.;Light;Baton;Blackjack;Bludgeon;Cudgel;Truncheon;Nunchaku;Jitte;Tonfa;Fan;Frying Pan
+Club;1 sp;1d4;bludgeoning;2 lb.;Light;Baton;Blackjack;Bludgeon;Cudgel;Truncheon;Nunchaku;Jitte;Tonfa;Fan;Frying Pan
+Dagger;2 gp;1d4;piercing;1 lb.;Finesse, light, thrown (range 20/60);Dagger;Knife;Blade;Stiletto;Edge;Shank;Kris;Dirk;Tanto
+Dagger;2 gp;1d4;piercing;1 lb.;Finesse, light, thrown (range 20/60);Dagger;Knife;Blade;Stiletto;Edge;Shank;Kris;Dirk;Tanto
+Dagger;2 gp;1d4;piercing;1 lb.;Finesse, light, thrown (range 20/60);Dagger;Knife;Blade;Stiletto;Edge;Shank;Kris;Dirk;Tanto
+Dagger;2 gp;1d4;piercing;1 lb.;Finesse, light, thrown (range 20/60);Dagger;Knife;Blade;Stiletto;Edge;Shank;Kris;Dirk;Tanto
+Flail;10 gp;1d8;bludgeoning;2 lb.;-;Flail;Thresher
+Flail;10 gp;1d8;bludgeoning;2 lb.;-;Flail;Thresher
+Flail;10 gp;1d8;bludgeoning;2 lb.;-;Flail;Thresher
+Glaive;20 gp;1d10;slashing;6 lb.;Heavy, reach, two-handed;Glaive;Naginata
+Glaive;20 gp;1d10;slashing;6 lb.;Heavy, reach, two-handed;Glaive;Naginata
+Glaive;20 gp;1d10;slashing;6 lb.;Heavy, reach, two-handed;Glaive;Naginata
+Greataxe;30 gp;1d12;slashing;6 lb.;Heavy, two-handed;Greataxe;Bardiche
+Greataxe;30 gp;1d12;slashing;6 lb.;Heavy, two-handed;Greataxe;Bardiche
+Greataxe;30 gp;1d12;slashing;6 lb.;Heavy, two-handed;Greataxe;Bardiche
+Greatclub;2 sp;1d8;bludgeoning;10 lb.;Two-handed;Bludgeon;Cudgel;Truncheon;Tetsubo
+Greatclub;2 sp;1d8;bludgeoning;10 lb.;Two-handed;Bludgeon;Cudgel;Truncheon;Tetsubo
+Greatclub;2 sp;1d8;bludgeoning;10 lb.;Two-handed;Bludgeon;Cudgel;Truncheon;Tetsubo
+Greatsword;50 gp;2d6;slashing;6 lb.;Heavy, two-handed;Greatsword;Claymore;Estoc;Zweihander
+Greatsword;50 gp;2d6;slashing;6 lb.;Heavy, two-handed;Greatsword;Claymore;Estoc;Zweihander
+Greatsword;50 gp;2d6;slashing;6 lb.;Heavy, two-handed;Greatsword;Claymore;Estoc;Zweihander
+Greatsword;50 gp;2d6;slashing;6 lb.;Heavy, two-handed;Greatsword;Claymore;Estoc;Zweihander
+Halberd;20 gp;1d10;slashing;6 lb.;Heavy, reach, two-handed;Halberd;Bill;Spade;Poleaxe;Bladestaff
+Halberd;20 gp;1d10;slashing;6 lb.;Heavy, reach, two-handed;Halberd;Bill;Spade;Poleaxe;Bladestaff
+Halberd;20 gp;1d10;slashing;6 lb.;Heavy, reach, two-handed;Halberd;Bill;Spade;Poleaxe;Bladestaff
+Halberd;20 gp;1d10;slashing;6 lb.;Heavy, reach, two-handed;Halberd;Bill;Spade;Poleaxe;Bladestaff
+Handaxe;5 gp;1d6;slashing;2 lb.;Light, thrown (range 20/60);Hatchet;Tomahawk;Cleaver;Kama
+Handaxe;5 gp;1d6;slashing;2 lb.;Light, thrown (range 20/60);Hatchet;Tomahawk;Cleaver;Kama
+Handaxe;5 gp;1d6;slashing;2 lb.;Light, thrown (range 20/60);Hatchet;Tomahawk;Cleaver;Kama
+Handaxe;5 gp;1d6;slashing;2 lb.;Light, thrown (range 20/60);Hatchet;Tomahawk;Cleaver;Kama
+Javelin;5 sp;1d6;piercing;2 lb.;Thrown (range 30/120);Javelin;Harpoon
+Javelin;5 sp;1d6;piercing;2 lb.;Thrown (range 30/120);Javelin;Harpoon
+Javelin;5 sp;1d6;piercing;2 lb.;Thrown (range 30/120);Javelin;Harpoon
+Lance;10 gp;1d12;piercing;6 lb.;Reach, special;Lance
+Light Hammer;2 gp;1d4;bludgeoning;2 lb.;Light, thrown (range 20/60);Mallet;Hammer
+Light Hammer;2 gp;1d4;bludgeoning;2 lb.;Light, thrown (range 20/60);Mallet;Hammer
+Light Hammer;2 gp;1d4;bludgeoning;2 lb.;Light, thrown (range 20/60);Mallet;Hammer
+Light Hammer;2 gp;1d4;bludgeoning;2 lb.;Light, thrown (range 20/60);Mallet;Hammer
+Longsword;15 gp;1d8;slashing;3 lb.;Versatile (1d10);Katana;Sword;Steel;Edge;Blade;Brand;Broadsword
+Longsword;15 gp;1d8;slashing;3 lb.;Versatile (1d10);Katana;Sword;Steel;Edge;Blade;Brand;Broadsword
+Longsword;15 gp;1d8;slashing;3 lb.;Versatile (1d10);Katana;Sword;Steel;Edge;Blade;Brand;Broadsword
+Longsword;15 gp;1d8;slashing;3 lb.;Versatile (1d10);Katana;Sword;Steel;Edge;Blade;Brand;Broadsword
+Mace;5 gp;1d6;bludgeoning;4 lb.;-;Mace;Rod;Scepter
+Mace;5 gp;1d6;bludgeoning;4 lb.;-;Mace;Rod;Scepter
+Mace;5 gp;1d6;bludgeoning;4 lb.;-;Mace;Rod;Scepter
+Mace;5 gp;1d6;bludgeoning;4 lb.;-;Mace;Rod;Scepter
+Maul;10 gp;2d6;bludgeoning;10 lb.;Heavy, two-handed;Maul;Greathammer;Sledgehammer;Sledge
+Maul;10 gp;2d6;bludgeoning;10 lb.;Heavy, two-handed;Maul;Greathammer;Sledgehammer;Sledge
+Maul;10 gp;2d6;bludgeoning;10 lb.;Heavy, two-handed;Maul;Greathammer;Sledgehammer;Sledge
+Maul;10 gp;2d6;bludgeoning;10 lb.;Heavy, two-handed;Maul;Greathammer;Sledgehammer;Sledge
+Morningstar;15 gp;1d8;piercing;4 lb.;-;Morningstar
+Morningstar;15 gp;1d8;piercing;4 lb.;-;Morningstar
+Morningstar;15 gp;1d8;piercing;4 lb.;-;Morningstar
+Pike;5 gp;1d10;piercing;18 lb.;Heavy, reach, two-handed;Pike
+Pike;5 gp;1d10;piercing;18 lb.;Heavy, reach, two-handed;Pike
+Pike;5 gp;1d10;piercing;18 lb.;Heavy, reach, two-handed;Pike
+Quarterstaff;2 sp;1d6;bludgeoning;4 lb.;Versatile (1d8);Staff;Quarterstaff;Shaft
+Quarterstaff;2 sp;1d6;bludgeoning;4 lb.;Versatile (1d8);Staff;Quarterstaff;Shaft
+Quarterstaff;2 sp;1d6;bludgeoning;4 lb.;Versatile (1d8);Staff;Quarterstaff;Shaft
+Quarterstaff;2 sp;1d6;bludgeoning;4 lb.;Versatile (1d8);Staff;Quarterstaff;Shaft
+Rapier;25 gp;1d8;piercing;2 lb.;Finesse;Rapier;Steel;Edge;Blade;Foil
+Rapier;25 gp;1d8;piercing;2 lb.;Finesse;Rapier;Steel;Edge;Blade;Foil
+Rapier;25 gp;1d8;piercing;2 lb.;Finesse;Rapier;Steel;Edge;Blade;Foil
+Rapier;25 gp;1d8;piercing;2 lb.;Finesse;Rapier;Steel;Edge;Blade;Foil
+Scimitar;25 gp;1d6;slashing;3 lb.;Finesse, light;Cutlass;Scimitar;Steel;Edge;Blade;Saber;Falchion;Khopesh;Talwar
+Scimitar;25 gp;1d6;slashing;3 lb.;Finesse, light;Cutlass;Scimitar;Steel;Edge;Blade;Saber;Falchion;Khopesh;Talwar
+Scimitar;25 gp;1d6;slashing;3 lb.;Finesse, light;Cutlass;Scimitar;Steel;Edge;Blade;Saber;Falchion;Khopesh;Talwar
+Scimitar;25 gp;1d6;slashing;3 lb.;Finesse, light;Cutlass;Scimitar;Steel;Edge;Blade;Saber;Falchion;Khopesh;Talwar
+Shortsword;25 gp;1d6;piercing;2 lb.;Finesse, light;Sword;Steel;Edge;Blade;Brand;Machete;Wakizashi;Gladius
+Shortsword;25 gp;1d6;piercing;2 lb.;Finesse, light;Sword;Steel;Edge;Blade;Brand;Machete;Wakizashi;Gladius
+Shortsword;25 gp;1d6;piercing;2 lb.;Finesse, light;Sword;Steel;Edge;Blade;Brand;Machete;Wakizashi;Gladius
+Shortsword;25 gp;1d6;piercing;2 lb.;Finesse, light;Sword;Steel;Edge;Blade;Brand;Machete;Wakizashi;Gladius
+Sickle;1 gp;1d4;slashing;2 lb.;Light;Sickle;Cleaver;Khopesh;Hook
+Sickle;1 gp;1d4;slashing;2 lb.;Light;Sickle;Cleaver;Khopesh;Hook
+Sickle;1 gp;1d4;slashing;2 lb.;Light;Sickle;Cleaver;Khopesh;Hook
+Spear;1 gp;1d6;piercing;3 lb.;Thrown (range 20/60), versatile (1d8);Spear
+Spear;1 gp;1d6;piercing;3 lb.;Thrown (range 20/60), versatile (1d8);Spear
+Spear;1 gp;1d6;piercing;3 lb.;Thrown (range 20/60), versatile (1d8);Spear
+Spear;1 gp;1d6;piercing;3 lb.;Thrown (range 20/60), versatile (1d8);Spear
+Trident;5 gp;1d6;piercing;4 lb.;Thrown (range 20/60), versatile (1d8);Trident
+Trident;5 gp;1d6;piercing;4 lb.;Thrown (range 20/60), versatile (1d8);Trident
+Warpick;5 gp;1d8;piercing;2 lb.;-;Warpick;Adze
+Warpick;5 gp;1d8;piercing;2 lb.;-;Warpick;Adze
+Warpick;5 gp;1d8;piercing;2 lb.;-;Warpick;Adze 
+Warhammer;15 gp;1d8;bludgeoning;2 lb.;Versatile (1d10);Hammer;Warhammer;Sledge
+Warhammer;15 gp;1d8;bludgeoning;2 lb.;Versatile (1d10);Hammer;Warhammer;Sledge
+Warhammer;15 gp;1d8;bludgeoning;2 lb.;Versatile (1d10);Hammer;Warhammer;Sledge
+Warhammer;15 gp;1d8;bludgeoning;2 lb.;Versatile (1d10);Hammer;Warhammer;Sledge
+Whip;2 gp;1d4;slashing;3 lb.;Finesse, reach;Whip;Cord;Strap
+Whip;2 gp;1d4;slashing;3 lb.;Finesse, reach;Whip;Cord;Strap
+Whip;2 gp;1d4;slashing;3 lb.;Finesse, reach;Whip;Cord;Strap
+Whip;2 gp;1d4;slashing;3 lb.;Finesse, reach;Whip;Cord;Strap

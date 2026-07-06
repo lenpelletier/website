@@ -1,0 +1,20 @@
+Amulet
+Belt
+Boots
+Bracers
+Cap
+Circlet
+Cloak
+Collar
+Gauntlets
+Gloves
+Helm
+Mask
+Medallion
+Orb
+Pendant
+Quiver
+Ring
+Scabbard
+Tiara
+Wizard Hat

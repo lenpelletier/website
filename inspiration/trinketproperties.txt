@@ -1,0 +1,127 @@
+Abyssal;of the Abyss;When on the plane of the Abyss, the bearer has advantage on saving throws against Abyssal Corruption. (DMG p. 62)
+Acolyte's;of the Acolyte;The bearer gains a +1 bonus to Wisdom (Religion) checks.
+Adamantine;of Adamantine;The item is indestructible.
+Adroit;of Intellect;The bearer gains +1 bonus to Intelligence saving throws.
+Alarming;of Alarms;Contains 1d4 unreplenishable charges of the Alarm spell (1st level).
+Arborean;of Arborea;When on the plane of Arborea, the bearer has advantage on saving throws against the effects of Intense Yearning. (DMG p. 61)
+Arcadian;of Arcadia;When on the plane of Arcardia, the bearer is unaffected by Planar Vitality (DMG p. 67) 
+Arctic;of the North;The bearer suffers no harm in temperature as cold as -20 degrees Fahrenheit.
+Arresting;of Safety;Once per day, the bearer may use their reaction to reduce fall damage by 1d6 until the end of turn.
+Assassin's;of the Assassin;The bearer may add their proficiency bonus to damage rolls dealt during surprise rounds.  
+Astral;of the Astral Sea;When travelling the Astral Sea, it takes half the number of hours to locate a Color Pool to a specific plane.  You have advantage on saving throws vs. the effects of Psychic Wind (DMG p. 47-48)
+Barbarian's;of the Barbarian;The bearer gains a +1 bonus to Strength (Athletics) checks.
+Bard's;of the Bard;The bearer gains +1 to Charisma (Performance) checks.
+Beastial;of the Beastlands;When on the plane of The Beastlands, the bearer has advantage on saving throws vs. Beast Transformation (DMG p. 60)
+Beastspeaker's;of Beastspeakers;Contains 1d4 unreplenishable charges of the Speak with Animals spell (1st level).
+Benedictine;of Benediction;Contains 1d4 unreplenishable charges of the Healing Word spell (1st level).
+Blasted;of Blasting;Contains 1d4 unreplenishable charges of the Fire Bolt spell (1st level).
+Blessed;of Blessings;Whenever bearer of this item receives divine healing, they gain an additional 1d4 hit points.
+Bold;of Boldness;Contains 1d4 unreplenishable charges of the Heroism spell (1st level).
+Bountiful;of Bounty;Contains 1d4 unreplenishable charges of the Goodberry spell (1st level).
+Burglar's;of the Burglar;The bearer gains +1 to Dexterity (Sleight of Hand) checks.
+Bytopian;of Bytopia;When on the plane of Bytopia, the bearer has advantage on saving throws against Pervasive Goodwill. (DMG p. 59-60) 
+Carcerian;of Carceri;When on the plane of Carceri, the bearer knows the direction to the closest secret exit from this prison plane. (DMG p. 63)
+Cardinal;of the Lodestone;The wielder can use an action to learn which way is north.
+Cartographic;of Cartography;On its own volition, the item records a map of the environments that the bearer is exploring, and can magically project it for the bearer to see.
+Channelling;of Channelling;Once per day, the bearer may ignore the Verbal and/or Somatic components of a spell they are casting.
+Chill;of Chills;Contains 1d4 unreplenishable charges of the Ray of Frost spell (1st level).
+Clockwork;of Gears;When on the plane of Mechanus, the bearer has advantage on saving throws against Imposing Order (DMG p. 66)
+Cloy;of Cloying;The bearer may cast Friends once per day.
+Compassionate;of Compassion;Contains 1d4 unreplenishable charges of the Cure Wounds spell (1st level).
+Concordant;of Concordance;The bearer has advantage on saving throws vs. Psychic Dissonance when travelling the Outer Planes. (DMG p. 59)
+Conjurer's;of the Conjurer;The bearer may cast Prestidigitation once per day.
+Corrosive;of Dissolving;Contains 1d4 unreplenishable charges of the Acid Splash spell (1st level).
+Crawling;of Vermin;The crawling things of the earth, such as insects, snakes, and vermin, are attracted to this item.  When placed on the ground, such creatures will scurry toward the item like moths drawn to the flame.
+Dancer's;of the Dancer;The bearer gains a +1 bonus to Dexterity (Acrobatics) checks.
+Defensive;of Defence;Whenever the bearer takes a dodge action, they may move an additional 5 feet.
+Delver's;of the Delver;While underground, the bearer of this item always knows the item's depth below the surface and the direction to the nearest staircase, ramp, or other path leading upward.
+Desperate;of Last Chances;The bearer has advantage on perception checks when searching for items long lost in the the Swamp of Oblivion on the Plane of Earth. (DMG p. 54)
+Druid's;of the Druid;The bearer gains a +1 bonus to Intelligence (Nature) checks.
+Drunkard's;of Taverns;The bearer always knows the direction to the closest alcoholic beverage.
+Dynamic;of the Dynamo;The bearer has +1 to Charisma saving throws.
+Eavesdropper's;of Eavesdropping;As long as it is on the same plane, the bearer can hear through this item as if they were present.
+Elysian;of Elysium;When on the plane of Elysium, the bearer has advantage on saving throws against the effects of Overwhelming Joy (DMG p. 60)
+Etherbound;of Ethereal Shores;The bearer can see creatures in the Border Ethereal that overlap with their plane as clearly as if they were fully in the bearer's plane.  Such creatures appear as apparitions or ghosts. 
+Exalting;of Exaltation;Contains 1d4 unreplenishable charges of the Bless spell (1st level).
+Expeditious;of Expedience;Contains 1d4 unreplenishable charges of the Expeditious Retreat spell.
+False;of Falsehoods;The bearer gains a +1 bonus to Charisma (Deception) checks.
+Fathoming;of Tongues;Contains 1d4 unreplenishable charges of the Comprehend Languages spell.
+Favored;of the Favored;Once per day, the bearer may roll a saving throw with advantage. 
+Feathered;of Feathers;Contains 1d4 unreplenishable charges of the Feather Fall spell (1st level).
+Feybound;of the Fey;The bearer knows the general direction to the closest Fey Crossing within a 60 mile radius. (DMG p. 50)
+First;of Speed;The bearer gain a +1 bonus to initiative rolls
+Forgiven;of Forgiveness;When on the plane of Mount Celestia, the bearer of this item can receive the benefits of Blessed Beneficence regardless of their alignment.
+Fortune Teller's;of the Fortune Teller;Every time you are hit by a monster, you glimpse a random image of its future or past.
+Friendly;of Friendship;Contains 1d4 unreplenishable charges of the Animal Friendship spell (1st level).
+Gehennan;of Gehenna;When on the plane of Gehenna, the bearer has advantage on saving throws against Cruel Hindrance. (DMG p. 63)
+Gracious;of Grace;The bearer may cast Spare the Dying once per day.
+Grim;of Coercion;The bearer gains a +1 bonus to Charisma (Intimidation) checks if the target can see this item.
+Hadean;of Hades;When on the plane of Hades, the bearer has advantage on saving throws against Vile Transformation. (DMG p. 63)
+Harmonious;of Harmony;Attuning to this item takes only 1 minute.
+Healing;of Healing;This item contains 4 weak healing nodes.  As an action, a character can use one node to heal 1d4 hit points at touch range.  The item regains 1d4 charges at sunrise.
+Hellish;of the Nine Hells;When in the Nine Hells, the bearer has advantage on saving throws against Pervasive Evil. (DMG p. 64) 
+Heroic;of Heroes;The bearer has advantage on saving throws vs. fear.
+Histrionic;of Histrionics;the bearer gains +1 to Charisma (Performance) checks.
+Holy;of Faith;When the bearer of this item rolls hit dice, they can choose to re-roll them and take the second result.
+Iconic;of Symbols;The item is inscribed with holy symbols of the God of the DM's choice.  A cleric or paladin that serves that god may use this item as a divine focus.
+Inquisitor's;of the Inquisitor;The bearer gains a +1 bonus to Intelligence (Investigation) checks.
+Inspired;of Inspiration;The bearer regains their Constitution modifier in temporary hit points whenever they gain or use inspiration.
+Leaping;of Leaping;Contains 1d4 unreplenishable charges of the Jump spell (1st level).
+Liar's;of Lies;Contains 1d4 unreplenishable charges of the Silent Image spell (1st level).
+Limbo;of Limbo;When on the plane of Limbo, the bearer has advantage to Intelligence checks to alter or move non-magical objects within the plane. (DMG p. 61-62)
+Locating;of Locating;Once attuned, the bearer always knows the exact location of this item
+Loquacious;of the Silver Tongue;The bearer gains +1 to Charisma (Persuasion) checks.
+Malediction;of Malediction;Contains 1d4 unreplenishable charges of the Bane spell(1st level).
+Manipulating;of Manipulation;The bearer may cast Mage Hand once per day.
+Master's;of Servants;Contains 1d4 unreplenishable charges of the Unseen Servant spell (1st level).
+Maverick;of the Maverick;The bearer has a +1 bonus to any skill check involving gambling and games of chance (Insight, Sleight of Hand, Investigation, etc).
+Messenger;of Messages;The bearer may cast Message once per day.
+Meteoric;of Falling Stars;Contains 1 unreplenishable charge of Scorching Ray (1st level).
+Mindful;of Mindfulness;The bearer gains a +1 bonus to Wisdom saving throws.
+Miraculous;of Miracles;The bearer may cast Thaumaturgy once per day.
+Mocking;of Mockery;The bearer may cast Vicious Mockery once per day.
+Natural;of Nature;Contains 1d4 unreplenishable charges of the Locate Animals or Plants spell (1st level).
+Neutralizing;of Neutrality;Contains 1d4 unreplenishable charges of the Protection from Good and Evil spell (1st level).
+Nimble;of Agility;The bearer gains a +1 bonus to Dexterity saving throws.
+Nourishing;of Nourishment;The bearer rarely feels hungry, and only needs to consume one-fifth the usual amount of food.
+Pandemonium;of Pandemonium;When on the plane of Pandemonium, the bearer has advantage on saving throws against the Mad Winds. (DMG p. 62)
+Preacher's;of the Preacher;The bearer may extend the range of their Channel Divinity by 5 feet.
+Projecting;of Projection;The bearer can send messages mentally to willing characters within 30 feet.  This communication is one-way only.
+Protective;of Protection;The bearer may cast Blade Ward once per day.
+Reaper's;of the Reaper;The bearer has advantage on death saving throws.
+Renaissance;of the Renaissance;Once per day, the bearer may gain +1 to any skill check. 
+Revealing;of Revelation;Contains 1d4 unreplenishable charges of the Detect Magic spell (1st level).
+Riutal;of Rituals;Whenever the bearer casts a spell as a ritual, they have advantage to maintain concentration during the ritual.
+Sacred;of the Sacred;The bearer may increase their Lay on Hands hit point pool by 5.
+Sagacious;of Acumen;The bearer gains +1 to Wisdom (Insight) checks.
+Sage's;of the Sage;The bearer gains a +1 bonus to Intelligence (History) checks.
+Secret;of Secrets;Contains 1d4 unreplenishable charges of the Illusory Script spell (1st level).
+Sentinel;of the Sentinel;Faintly glows when creatures of a certain race (DMs choice) are within a 100 foot radius.
+Shading;of Shade;The bearer suffers no harm in temperatures as high as 120 degrees Fahrenheit. 
+Shadowbound;of the Shadowfell;The bearer knows the general direction to the closest Shadow Crossing within a 60 mile radius.  They have advantage on saving throws vs. Shadowfell Dispair (DMG p. 51-52)
+Shepherd's;of the Shepherd;The bearer gains a +1 bonus to (Wisdom) Animal Handling checks.
+Shielding;of Shielding;This item contains 1d4 unreplenishable charges of the Shield spell.
+Shifting;of Shifting;The bearer may change minor aspects of the physical appearance of this item.
+Silent;of the Night;The bearer gains a +1 bonus to Dexterity (Stealth) checks.
+Smith's;of Reparations;The bearer may cast Mending once per day.
+Sojourner's;of the Sojouner;A poem, story, or map that describes a long-forgotten treasure is etched on the surface of the item.
+Solemn;of Solemnity;The bearer may spend an action removing all the failed death saving throws from a target within 5 feet of them.  The target is still not stabilized.
+Sparkling;of Lights;The bearer may cast Dancing Lights once per day.
+Striding;of Strides;Contains 1d4 unreplenishable charges of the Longstrider spell (1st level).
+Surgeon's;of the Surgeon;The bearer gains a +1 bonus to Wisdom (Medicine) checks. 
+Tenacious;of the Tenacious;When the bearer takes a long rest, they gain back one additional hit die.
+Tracker's;of the Tracker;The bearer gains a +1 to Wisdom (Survival) checks.
+Translucent;of Translucence;The bearer gains an extra level one spell slot, which recovers only after a full moon rises.
+Trickster's;of Trickery;The bearer may cast Minor Illusion once per day.
+True;of Truth;The bearer may cast True Strike once per day.
+Unbroken;of Heart;The bearer gains a +1 bonus to Constitution saving throws.
+Verdant;of Druidcraft;The bearer may cast Druidcraft once per day.
+Victorious;of Victory;Whenever the bearer kills a creature they gain temporary hit points equal to the creature's CR.
+Vigilant;of Vigilance;The bearer gains +2 to their Passive Perception.
+Vigorous;of Vigor;The bearer gains a +1 bonus to Strength saving throws.
+Vital;of Vitality;The bearer's maximum hit points increases by their constitution modifier while attuned to this item.  These hit points are lost when the bearer unattunes the item.
+War Leader's;of the War Leader;The bearer can use an action to amplify their voice so that it clearly carries for up to 300 feet.
+Waterborne;of the Sea;The item floats on water or other liquids.  Its bearer has advantage on Strength (Athletics) checks to swim.
+Windborne;of the Labyrinth Wind;When in the Plane of Air, the bearer can navigate the Labyrinth Wind intuitively, and knows the path to the nearest Earth Mote within 60 miles.
+Wizard's;of the Wizard;The bearer gains a +1 to Intelligence (Arcana) checks. 
+Wrathful;of Ysgard;When on the plane of Ysgard, the bearer is unaffected by Immortal Wrath. (DMG p. 61)

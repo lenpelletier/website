@@ -1,0 +1,369 @@
+/* -------------------------------------------------------- CSS RESET -------------------------------------------------*/
+
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, ../images, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/* ------------------------------------------------------ Page Structure ---------------------------------------------*/
+
+#microcontent {
+	width: 500px;
+	background-color: black;
+	padding: 20px;
+}
+
+#container {
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+	width: 1000px;
+}
+
+#header {
+	width: 100%;
+	height: 300px;
+	background-image: url(../images/header1.png);
+	background-repeat: no-repeat;
+}
+
+#nav {
+	width: 100%;
+	height: 50px;
+
+}
+
+#topBorder {
+    height: 26px;
+    width: 100%;
+	background-image: url(../images/content_top_frame.png);
+}
+
+#content {
+	width: 940px;
+	height: 100%;
+	padding: 30px;
+	background-color: black;
+	background-image: url(../images/content_bg.png);
+}
+
+#bottomBorder {
+	height: 26px;
+    width: 100%;
+	background-image: url(../images/content_bottom_frame.png);
+}
+
+#footer {
+	margin-bottom: 200px;
+}
+
+#menu {
+	background-image: url(../images/menu.png);
+	background-position: center bottom;
+	background-repeat: no-repeat;
+	bottom: 0px;
+	left: 50%;
+	margin:-625px 0 0 -625px;
+	width:1250px;
+	height:167px;
+	position: fixed;
+	z-index: 100;	
+}
+
+#buttons {
+	position: relative;
+	top: 55.5%;
+	left: 302px;
+}
+
+#map {
+	width: 900px;
+	height: 700px;
+}
+
+.itembox {
+	margin: 5px 20px;
+	padding: 15px;
+	color: #9a8964;
+	border: 1px dashed #999;
+	background: #5d513a;
+	margin-bottom: 40px;
+	overflow: auto;
+	font-style: italic;
+}
+
+body {
+	background-attachment: fixed;
+	background-image: url(../images/black_bg.jpg);
+	background-color: black;
+	background-position: center top;
+	background-repeat: no-repeat;
+	color: #5d513a;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	line-height: 2em;
+	font-size: 16px;
+}
+
+body.subscreen {
+	background-color: black;
+	background-image: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	line-height: 2em;
+	font-size: 16px;
+}
+
+h1 {
+	background: url(../images/post_title_bg.png) no-repeat center bottom;
+	color: #9a8964;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 24px;
+	margin-bottom: 20px;
+	padding: 0 79px 20px 79px;
+	text-align: center;
+}
+
+h2 {
+	color: #9a8964;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 24px;
+	margin-bottom: 20px;
+	padding: 0 79px 20px 79px;
+	text-align: center;
+}
+
+img.microcontent {
+	border: 2px solid #9a8964;
+}
+
+h2 {
+	color: #9a8964;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;	
+	margin: 5px 20px;
+	text-align: center;
+}
+
+
+b {
+	color: #9a8964;
+}
+
+a {
+	text-decoration: none;
+	color: #9a8964;
+}
+
+
+a:hover {
+	text-decoration: underline;
+}
+
+.icon {
+	float: left;
+	margin-right: 20px;
+	margin-left: 20px;
+	height: 100px;
+	width: 100px;
+}
+
+.items {
+	float: right;
+	margin-right: 20px;
+	margin-left: 20px;
+	
+}
+
+
+blockquote {
+	margin: 5px 20px;
+	padding: 15px;
+	color: #9a8964;
+	border: 1px dashed #999;
+	background: #5d513a;
+	font-style: italic;
+	margin-bottom: 40px;
+	text-indent: 40px;
+}
+
+p {
+	margin: 20px 20px;
+}
+
+p.navi{
+	text-align: center;
+	font-size: 12px;
+}
+
+.hide { display: none; }
+
+.mapButton {
+	background: url('../images/mapButton.png') bottom;
+	display: block;
+	float: left;
+	height: 58px;
+	text-indent: -99999px;
+	width: 62px;
+}
+
+.charButton {
+	background: url('../images/charButton.png') bottom;
+	display: block;
+	float: left;
+	height: 58px;
+	text-indent: -99999px;
+	width: 75px;
+}
+
+.homeButton {
+	background: url('../images/homeButton.png') bottom;
+	display: block;
+	float: left;
+	height: 58px;
+	text-indent: -99999px;
+	width: 62px;
+}
+
+.sitemapButton {
+	background: url('../images/sitemapButton.png') bottom;
+	display: block;
+	float: left;
+	height: 58px;
+	text-indent: -99999px;
+	width: 62px;
+}
+
+.refButton {
+	background: url('../images/tomesButton.png') bottom;
+	display: block;
+	float: left;
+	height: 58px;
+	text-indent: -99999px;
+	width: 62px;
+}
+
+.equipmentButton {
+	background: url('../images/equipmentButton.png') bottom;
+	display: block;
+	float: left;
+	height: 58px;
+	text-indent: -99999px;
+	width: 62px;
+}
+
+.tomesButton {
+	background: url('../images/refButton.png') bottom;
+	display: block;
+	float: left;
+	height: 58px;
+	text-indent: -99999px;
+	width: 69px;
+}
+
+.metaButton {
+	background: url('../images/metaButton.png') bottom;
+	display: block;
+	float: left;
+	height: 58px;
+	text-indent: -99999px;
+	width: 62px;
+}
+
+.mapButton:hover {
+	background-position: 0 0;
+}
+
+.charButton:hover {
+	background-position: 0 0;
+}
+
+.homeButton:hover {
+	background-position: 0 0;
+}
+
+.sitemapButton:hover {
+	background-position: 0 0;	
+}
+
+.refButton:hover {
+	background-position: 0 0;	
+}
+
+.equipmentButton:hover {
+	background-position: 0 0;	
+}
+
+.tomesButton:hover {
+	background-position: 0 0;	
+}
+
+.metaButton:hover {
+	background-position: 0 0;	
+}
+
+img.submap {
+	float: left;
+	border: 2px solid black;
+	margin: 20px 20px;
+}
+
+.tooltip {
+    background:transparent url('../images/black_arrow.png');
+    color:#eee;
+    display:none;
+    font-size:12px;
+    height:70px;
+	line-height: 2;
+    padding:25px;
+	z-index: 100;
+    width:160px;
+  }
+
+#buttons a {
+    border:0;
+    cursor:pointer;
+    margin:0 1px;
+  }

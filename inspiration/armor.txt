@@ -1,0 +1,12 @@
+Padded Armor;5 gp;11 + Dex modifier;None;Disadvantage;8 lb.;Light
+Leather Armor;10 gp;11 + Dex modifier;None;None;10 lb.;Light
+Studded Leather Armor;45 gp;12 + Dex modifier;None;None;13 lb.;Light
+Hide Armor;10 gp;12 + Dex modifier (max 2);None;None;12 lb.;Medium
+Chain Shirt;50 gp;13 + Dex modifier (max 2);None;None;20 lb.;Medium
+Scale Mail;50 gp;14 + Dex modifier (max 2);None;Disadvantage;45 lb.;Medium
+Breastplate;400 gp;14 + Dex modifier (max 2);None;None;20 lb.;Medium
+Half Plate;750 gp;15 + Dex modifier (max 2);None;Disadvantage;40 lb.;Medium
+Ring Mail;30 gp;14;;Disadvantage;40 lb.;Heavy
+Chain Mail;75 gp;16;Str 13;Disadvantage;55 lb.;Heavy
+Splint Armor;200 gp;17;Str 15;Disadvantage;60 lb.;Heavy
+Plate;1500 gp;18;Str 15;Disadvantage;65 lb.;Heavy

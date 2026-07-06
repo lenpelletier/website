@@ -1,11 +1,12 @@
-<html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Programming 12</title>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,400italic|Source+Code+Pro:400,600' rel 'stylesheet' type 'text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,400italic|Source+Code+Pro:400,600' rel='stylesheet' type='text/css'>
+	<script src="js/theme.js"></script>
 </head>
 
 <body>
@@ -23,7 +24,7 @@
 			</ul>
 		</nav>
 
-    <div class="page-content" id="programming-from-a-to-z">
+    <div class="page-content" id="main-content">
 
 		<h3>Course Information</h3>
 
@@ -37,7 +38,7 @@
 
 		<h3>Unit 1: Review </h3>
 
-		<p>Welcome to Unit 1 of Programming 12, where we’ll review the fundamentals of drawing shapes, managing colors, and exploring functions and animation. Follow the video playlist and complete each checkpoint to refresh your skills. After you complete the four checkpoints, let's make a short project to put it all together! You can choose to make The Color Game (outlined below) or try to recreate one of the mini-games from the 2-Player Games app.</p>
+		<p>Welcome to Unit 1 of Programming 12, where we’ll review the fundamentals of drawing shapes, managing colors, and exploring functions and animation. Follow the video playlist and complete each checkpoint to refresh your skills. After you complete the four checkpoints, let's make a short project to put it all together! You can choose to make The Color Game (outlined below) or try to recreate one of the mini-games from the 2-Player Games app.</p><br>
 
 		<ol>
 			<li><a href="https://docs.google.com/document/d/1WUyLq8qo8fBnOS3j-TCF8xOCoMArn-wt0sI6uCGJrkk/edit?usp=sharing">Review Lessons and Checkpoints<a></li>
@@ -45,19 +46,92 @@
 			<li>Color Game Resources: <a href="files/FAILURE.wav" target="_blank">Success Sound</a>, <a href="files/SUCCESS.wav" target="_blank">Failure Sound</a>, <a href="files/MUSIC.mp3" target="_blank">Music</a> 
 		</ol>
 
-	<!--
+	
 	<h3>Unit 2: Object Oriented Programming</h3>
 
-	<p>In this unit, we are exploring the Object Oriented software engineering paradigm. We creating classes to describes types of objects, and then creating programs that are interacting systems of these objects. In our final project, we will create a game engine that animates and coordinates a system of objects that are built on a polymorphic hierarchy.</p>
+	<p>In this unit, we are exploring the Object Oriented software engineering paradigm. We creating classes to describes types of objects, and then creating programs that are interacting systems of these objects. In our final project, we will create a game engine that animates and coordinates a system of objects that are built on a polymorphic hierarchy.</p><br>
 
 		<ol>
 			<li><a href="https://youtube.com/playlist?list=PL__Tph-7Dyp2BpxtowLdAexCvHZbwUpLR&si=0OI33kWIlxckqR5V" target="_blank">OOP Playlist</a></li>
-			<li><a href="https://youtube.com/playlist?list=PL__Tph-7Dyp0Vin50lCKvWIRvxB4Ng2k3&si=mgOnFsX6CrhJ5eP2" target="_blank">Mover Network Playlist</a></li>
+			<li><a href="https://youtube.com/playlist?list=PL__Tph-7Dyp0Vin50lCKvWIRvxB4Ng2k3&si=mgOnFsX6CrhJ5eP2" target="_blank">Mover Network Playlist
+			</a></li>
 			<li><a href="https://youtube.com/playlist?list=PL__Tph-7Dyp2PIyqrfY3OpdOqAR9YozN7&si=LfXuw8zAgI20M9iq" target="_blank">Asteroids Playlist</a></li>
 			<li><a href="https://docs.google.com/document/d/1vk820pDyH5gs6qJOFwc1rkLp30oz4Dci32beIPJHoqY/edit?usp=sharing" target="_blank">Asteroids Criteria</a></li>
-
 		</ol>
 
+
+		<h3>Unit 3: Connecting a Sketch to a Physics Engine</h3>
+
+		<p>Now that we know how to create object oriented programs, we are going to explore how object oriented programming allows us to build on top
+			 of existing object oriented programs very easily. We are going to be working with the Box2D physics engine, made famous by games such as
+			 <a href="https://youtu.be/GderFXRpM_A?si=Mhz4mWBvVLW35wly" target="_target">Angry Birds</a>, 
+			 <a href="https://youtu.be/Y4HSyVXKYz8?si=ghigJ1o5CUSwnl7M" target="_target">Limbo</a>, 
+			 <a href="https://youtu.be/BHvJ5GQoTac?si=FSsyQ2W-3J9rBREO" target="_target">Shovel Knight</a>, 
+			 and <a href="https://www.youtube.com/watch?v=8xPUdFaraoQ" target="_target">Cut the Rope</a>, 
+			 among others. Instead of inventing all the physics ourselves, we can use the Box2D classes as our superclasses, so all of the things we 
+			 create inherit physics and behave accordingly. What can we build on top of such a powerful foundation?</p><br>
+
+		<ol>
+			<li><a href="http://www.ricardmarxer.com/fisica/reference/">Online Fisica Reference Page</a></li>
+			<li><a href="files/reference.zip" target="_blank">Offline Fisica Reference as .zip</a></li>
+			<li><a href="https://youtu.be/29bW_11CCiE" target="_blank">Introduction to Pnysics Engines and Processing</a>: Watch this first!</li>
+			<li>Let's start experimenting with Fisica! Download the code in this assignment and try to accomplish some feats! All the instructions are here: <a href="https://docs.google.com/document/d/17cbHnrD6gWZHiAp7HW9_DSB4_SHpg2jMkw4mEGyPf3I/edit?usp=sharing">Fisica example sketch</a>. You will also need to download this image of Red (right click and choose "Save Image As" and add it to the data folder of your Fisica sketch).</li>
+			<img src="img/red-bird.png">
+			<!--<li><a href="https://youtu.be/U-lXso21gqY">Introduction to using a physics engine in Processing</a>!</li>
+			<li>GitHub Repo for the <a href="https://github.com/leonardpelletier/slime-volleyball">Slime Volleyball starter code</a>.</li>
+			<li>Slime Volleyball <a href="https://photos.app.goo.gl/kj3eASBz1Gj3vuFN8">Criteria</a></li>-->
+		</ol>
+
+<h3>Unit 3b: Platformer game</h3>
+		<ol>
+      <li><a href="https://youtube.com/playlist?list=PL__Tph-7Dyp0yifP3b3-GZBz9TRW128xa&si=x0FSR5veBkXG0kNy" target="_blank">Platformer Playlist</a></li>
+      <li><a href="files/mario_terrain.zip" target="_blank">Platformer Terrain</a>,
+      	  <a href="files/mario_sprites.zip" target="_blank">Mario Animations & reverseImage code</a>,
+      		<a href="files/enemies and more.zip">Enemy Spites + Spike</a></li>
+      <li>First Checkpoint: Load a map from a png, create a character that can be controlled with the keyboard, and translate the screen to follow the character.</li>
+      <li>Second Checkpoint: <a href="https://docs.google.com/document/d/15vmKt--etH2rbbXLdc5eRFzCDxDzzDChxV747UtvDjU/edit?usp=sharing" target="_blank">Implement these terrain</a> types.</li>
+      <li>Third Checkpoint: <a href="https://docs.google.com/document/d/1JF60SEtmkmzzxd7MwV7DtdTdA8Aopnn4c2OHI7JRgrI/edit?usp=sharing" target="_blank">Implement these enemy</a> types.</li>
+      <li><a href="https://docs.google.com/document/d/1s8cfV5FmX7TNLpUKtqHTFsQk4TvQLmAZMXEsbsm1vSk/edit?usp=sharing" target="_blank">Final Criteria for the Platformer Project</a></li>
+      <li><a href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=WC6KCzB7CEq6t9dVWeDjpcq8YNrVXcVDqp_Y0b5iw2VUNDVSRzYxOEJSRFM0S0JQV1k1TEVIUE5aUS4u" target="_blank">Submit your github username for marking</a></li>
+     </ol>
+
+		<!--<h4>Platformer</h4>
+
+		<h5>Basics</h5>
+
+		<ol>
+			<li><a href="img/map.png">My Map Image</a></li>
+			<li><a href="https://youtu.be/eOY6Wj9iLLQ">Platformer Lesson 1</a>: Loading worlds from an image.
+		  <li><a href="https://youtu.be/Hm-zIkuAOU0">Platformer Lesson 2</a>: Making a character move.</li>
+			<li><a href="https://youtu.be/xYfRb3p0M00">Making a Camera Follow Your Character</a></li>
+			<li><a href="https://youtu.be/YoIj1F8dVmc">Extending FBoxes and making a bomb</a></li>
+			<li><a href="https://youtu.be/edngRpWcT5U">Character Animations</a></li>
+		</ol>
+
+		<h5>Terrain</h5>
+
+		<ol>
+			<li><a href="https://youtu.be/0Ib2ICBINfI">Collapsing Bridges</a></li>
+			<li><a href="https://docs.google.com/document/d/1Ig_7ypN7yjCL__mlvlOgrYhMx-oSCKIudnTrtvIXH0A/edit?usp=sharing">Terrain Checklist</a></li>
+		</ol>
+
+		<h5>Enemies</h5>
+
+		<ol>
+			<li><a href="https://www.youtube.com/watch?v=21n0iYQI5jc">Part 1</a></li>
+			<li><a href="https://www.youtube.com/watch?v=zmhM6wLaj84">Part 2</a></li>
+		</ol> -->
+
+	  <!--<li><a href="https://youtu.be/xYfRb3p0M00">Making a Camera Follow Your Character</a></li>
+			<li><a href="https://youtu.be/edngRpWcT5U">Character Animations</a></li>
+			<li><a href="https://youtu.be/QqzehkAh4j8">Making a Collapsing Bridge</a></li>
+			<li><a href="https://youtu.be/cUPGGiSb_NY">Making Animated Terrain</a></li>
+			<li><a href="https://youtu.be/pTA21F0c9VM">Making Switches</a></li>
+			<li><a href="https://youtu.be/XnGglVilO7w">Making Swimmable Water</a></li>
+			<li><a href="https://photos.app.goo.gl/z1zogsXJbIHMywt62">Project Criteria</a></li>
+		</ol>
+
+    <!--
 		<h3>Unit 3: 3D Programming</h3>
 
 			<p>We will continue working with Object Oriented programming in the context of 3D sketches. Let's start with the basics of the P3D rendering engine, and create some simple renderings.</p>
@@ -119,18 +193,7 @@
 
 	<!--
 
-	<h3>Unit 3: Connecting a Sketch to a Physics Engine</h3>
-
-		<ol>
-			<li><a href="http://www.ricardmarxer.com/fisica/reference/">Fisica Reference Page</a></li>
-			<li><a href="files/reference.zip" target="_blank">Offline reference as .zip</a></li>
-			<li>Let's start experimenting with Fisica! Download the code in this assignment and try to accomplish the tasks: <a href="https://docs.google.com/document/d/17cbHnrD6gWZHiAp7HW9_DSB4_SHpg2jMkw4mEGyPf3I/edit?usp=sharing">Fisica example sketch</a></li>
-			<li>Download this image of Red and add it to the data folder of your Fisica sketch</li>
-			<img src="img/red-bird.png">
-			<!--<li><a href="https://youtu.be/U-lXso21gqY">Introduction to using a physics engine in Processing</a>!</li>
-			<li>GitHub Repo for the <a href="https://github.com/leonardpelletier/slime-volleyball">Slime Volleyball starter code</a>.</li>
-			<li>Slime Volleyball <a href="https://photos.app.goo.gl/kj3eASBz1Gj3vuFN8">Criteria</a></li>
-		</ol>
+	
 
 		<h3>Unit 3b: Platformer game</h3>
 		<ol>
@@ -350,5 +413,7 @@
 	  </ol>
 		</div>
 -->
+    </div>
+  </div>
   </body>
 </html>

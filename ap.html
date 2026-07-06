@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>AP Computer Science A</title>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,400italic|Source+Code+Pro:400,600' rel 'stylesheet' type 'text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,400italic|Source+Code+Pro:400,600' rel='stylesheet' type='text/css'>
+	<script src="js/theme.js"></script>
 </head>
 
 <body>
@@ -24,7 +24,7 @@
 			</ul>
 		</nav>
 
-		<div class="page-content" id="programming-from-a-to-z">
+		<div class="page-content" id="main-content">
 
 			<p>The AP CSA exam is on <strong>Friday May 15, 2026 at 12:00 PM!<br>
 			</strong>Time remaining: <span id="countdown"></span></p>
@@ -32,83 +32,225 @@
 			<h3>About the Course</h3>
 
 			<ol>
-				<li><a href="https://docs.google.com/document/d/1J7690LeEhUVQs4UtMocygWgIxF5UlYD7Cdki3HHSaGc/edit?usp=sharing" target="_blank">Course Syllabus</a>. Read all about this course, student expectations, and how you will be evaluated.
+				<li><a href="https://docs.google.com/document/d/1J7690LeEhUVQs4UtMocygWgIxF5UlYD7Cdki3HHSaGc/edit?usp=sharing" target="_blank">Course Syllabus</a>. Read all about this course, student expectations, and how you will be evaluated.</li>
 				<li><a href="https://apcentral.collegeboard.org/media/pdf/ap-computer-science-a-course-overview.pdf" target="_blank">AP Computer Science A Description</a>. The official College Board information about this course.</li>
 				<li><a href="https://docs.google.com/document/d/14weOsSl7_yR0XhM4RMlB_cGe4rIWdoOD1K_1NimdSxw/edit?usp=sharing" target="_blank">Code of Honour</a>. All about how to collaborate without plagiarism in this course.</li>
 				<li><a href="https://apstudents.collegeboard.org/courses/ap-computer-science-a/assessment" target="_blank">About the AP Exam</a>. Updated for 2024-25.</li>
 				<li><a href="https://forms.office.com/r/biSL97AUDf" target="_blank">Send me your GitHub username for handin!</a></li>
+				<li>Students get the <a href="https://apcentral.collegeboard.org/media/pdf/ap-computer-science-a-java-quick-reference.pdf" target="_blank">Java quick reference guide</a> as a cheat sheet on the AP Exam.</li>
 			</ol>
 
-<!--
-				<li><a href="http://www.meteochu.me/Countdown/" target="_blank">Exam Countdown</a> (by Andy Liang)</li>
-				<li><a href="http://www.skylit.com/javamethods/JM-Appendix-A.pdf" target="_blank">Java Style Guide</a> for this course.</li>
-				<li>An excellent Java textbook, available in <a href="https://books.trinket.io/thinkjava/">interactive format</a> and as <a href="http://greenteapress.com/thinkjava6/thinkjava.pdf">a PDF</a>.</li>
--->
 
 
 			<h3>Resources</h3>
 
 			<ol>
-				<li>We are using the textbook <em>Think Java 2nd Edition</em> by Allen Downey and Chris Mayfield. You can 
-						<a href="http://greenteapress.com/thinkjava7/thinkjava2.pdf" target="_blank">download the pdf version</a>, use 
-						<a href="https://chrismayfield.github.io/ThinkJava2/"        target="_blank">the online version</a>, or use the 
-						<a href="https://books.trinket.io/thinkjava2/"               target="_blank">interactive version</a>.
+				<li>We are using the textbook <em>Think Java 2nd Edition</em> by Allen Downey and Chris Mayfield. You can <a href="http://greenteapress.com/thinkjava7/thinkjava2.pdf" target="_blank">download the pdf version</a>, use <a href="https://chrismayfield.github.io/ThinkJava2/" target="_blank">the online version</a>, or use the <a href="https://books.trinket.io/thinkjava2/" target="_blank">interactive version</a>.</li>
 
 				<li>Some additional free text books: 
-						<a href="https://runestone.academy/ns/books/published/csawesome/index.html" target="_blank">CS Awesome</a> (requires free account), 
-						<a href="https://drive.google.com/file/d/1c4NlIyL0S9mfYSQ9f5KVEoiQD88nI3nu/view?usp=sharing" target="_blank">Tokyo EdTech's Intro to Java</a></li>
-			</ol>
+					<a href="https://runestone.academy/ns/books/published/csawesome/index.html" target="_blank">CS Awesome</a> (requires free account), 
+					<a href="https://drive.google.com/file/d/1c4NlIyL0S9mfYSQ9f5KVEoiQD88nI3nu/view?usp=sharing" target="_blank">Tokyo EdTech's Intro to Java</a></li>
 
-			<h3>Chapter 1. Computer Programming</h3>
+					<li><a href="http://www.skylit.com/javamethods/JM-Appendix-A.pdf" target="_blank">Java Style Guide</a> for this course.</li>
+				</ol>
 
-			<p>Ch 1 introduces the fundamentals of computers and programming, covering what a computer is, and basic programming instructions like input, output, mathematical operations, decisions, and repetitions. It presents the "Hello World" program to explain Java classes, methods, statements, and comments. The chapter also distinguishes between high-level and low-level languages, detailing the compilation and interpretation process (javac, java, JVM, byte code). It discusses displaying multiple messages using print vs println, source code formatting, escape sequences, and introduces the broader field of computer science. Finally, it outlines the three types of programming errors: compile-time, run-time, and logic errors, and provides initial debugging advice
-			</p><br>
 
-			<p><b>Additional Notes:</b></p>
-			<ol>
-				<li><a href="http://math.hws.edu/javanotes/c1/index.html" target="_blank">Chapter 1 from "Introduction to Programming Using Java"</a> by David J. Eck is recommended for expanding upon the topic of "What is a computer."</li>
-				<li>Notes about <a href="https://docs.google.com/document/d/1cKX5QmbuwrlEkoe6sQ8nC-gmYeBJakW2gIn0ZeQKQOg/edit?usp=sharing" target="_blank">Compilers, Interpreters, and Java</a></li>
-				<li><a href="https://www.youtube.com/playlist?list=PL__Tph-7Dyp0sndXYlT7Clh_Vx2s05GBV">YouTube playlist</a> of my explanation of Compilers, Interpreters, and Java</li>
-			</ol>
 
-			<h3>Chapter 2. Variables and Operators</h3>
+				<h3>Chapter 1. Computer Programming</h3>
 
-			<p>This chapters delves into variables for storing values (numbers, text) and their declaration and assignment. It introduces memory diagrams to visualise how values are stored and changed. The chapter covers arithmetic operators (+, -, *, /, %) and introduces floating-point numbers (double), discussing rounding errors and string concatenation. It further explains compiler error messages, run-time errors, and logic errors, providing insights into their identification.</p><br>
+				<p>Ch 1 introduces the fundamentals of computers and programming, covering what a computer is, and basic programming instructions like input, output, mathematical operations, decisions, and repetitions. It presents the "Hello World" program to explain Java classes, methods, statements, and comments. The chapter also distinguishes between high-level and low-level languages, detailing the compilation and interpretation process (javac, java, JVM, byte code). It discusses displaying multiple messages using print vs println, source code formatting, escape sequences, and introduces the broader field of computer science. Finally, it outlines the three types of programming errors: compile-time, run-time, and logic errors, and provides initial debugging advice.<br><br><b>Additional Notes:</b></p>
+				<ol>
+					<li><a href="http://math.hws.edu/javanotes/c1/index.html" target="_blank">Chapter 1 from "Introduction to Programming Using Java"</a> by David J. Eck is recommended for expanding upon the topic of "What is a computer."</li>
+					<li>Notes about <a href="https://docs.google.com/document/d/1cKX5QmbuwrlEkoe6sQ8nC-gmYeBJakW2gIn0ZeQKQOg/edit?usp=sharing" target="_blank">Compilers, Interpreters, and Java</a></li>
+					<li><a href="https://www.youtube.com/playlist?list=PL__Tph-7Dyp0sndXYlT7Clh_Vx2s05GBV">YouTube playlist</a> of my explanation of Compilers, Interpreters, and Java</li>
+				</ol>
+				<br>			
 
-			<p><b>Assigned Work:</b> Repository "ch2", assigned Sept. 9th</p>
-			<ul>
-				<li>2.2: Date.java</li>
-				<li>2.3: Time.java</li>
-			</ul>
 
-			<h3>Chapter 3. Input and Output</h3>
 
-			<p>This chapters focuses on user interaction, explaining the System class (System.out, System.in) and the Scanner class for reading keyboard input. It details Java's language elements such as packages, classes, methods, statements, expressions, and tokens. The chapter covers literals and constants, formatting output with printf and format specifiers, and how to interpret error messages. It also introduces type cast operators and the remainder (modulo) operator, integrating these concepts into complete programs. We also deal with the "Scanner Bug," which is an annoying problem but easy to avoid if you know about it.</p><br>
+				<h3>Chapter 2. Variables and Operators</h3>
 
-			<p><b>Assigned Work:</b> Repository "ch3", assigned Sept 11th</p>
-			<ul>
-				<li>3.2: Temperature.java</li>
-				<li>3.3: ConvertTime.java</li>
-				<li>3.4: GuessMyNumber.java</li>
-			</ul>
+				<p>This chapters delves into variables for storing values (numbers, text) and their declaration and assignment. It introduces memory diagrams to visualise how values are stored and changed. The chapter covers arithmetic operators (+, -, *, /, %) and introduces floating-point numbers (double), discussing rounding errors and string concatenation. It further explains compiler error messages, run-time errors, and logic errors, providing insights into their identification.</p><br>
 
-			<p><b>Additional Notes</b></p>
-			<ul>
-				<li><a href="https://docs.google.com/document/d/1a5Hy_2db2oOwz-PAoaLfxVSBC79ivftCftb8B3JXnmw/edit?usp=sharing" target="_blank">Operator Precedence Table (BEDMAS)</a></li>
-				<li><a href="https://docs.google.com/document/d/1RBWvKz5ukhqVDXAUiFJoSp_jpRIE6CJ15o1gFUbpNr4/edit?usp=sharing" target="_blank">Extra Practice with Operations</a></li>
-				<li><a href="https://docs.google.com/document/d/1QxN03Mgu4MsY_Y6kNWsKC83oeWta3h63xh4fMMMWZV0/edit?usp=sharing" target="_blank">Extra Practice with Writing Code</a></li>
-			</ul>
+				<p><b>Textbook Exercises:</b> Assigned Sept 9th. 🚀 GitHub repository "ch2" 🚀</p>
+				<ul>
+					<li>2.2: Date.java</li>
+					<li>2.3: Time.java</li>
+				</ul>
 
-			<h3>Chapter 4. Methods and Testing</h3>
 
-			<p>This chapter teaches how to organise programs into multiple methods. It differentiates between void methods (no return value) and value-returning methods, explaining return types and return statements. Concepts such as flow of execution, parameters and arguments, and multiple parameters are introduced. Stack diagrams are presented as a tool to visualise the scope of variables and method execution. The chapter also explores methods in the Math class and the principle of composition, concluding with a discussion on incremental development and the use of stubs and scaffolding for testing.</p><br>
 
-			<p><b>Assigned Work:</b> Repository "ch4", assigned Sept 16th</p>
-			<ul>
-				<li>4.1: FormatDate.java</li>
-				<li>4.2-4.5 Do these on a piece of paper. No need to submit to GitHub
-				<li>4.6: Multadd.java</li>
-			</ul>
+				<h3>Chapter 3. Input and Output</h3>
+
+				<p>This chapters focuses on user interaction, explaining the System class (System.out, System.in) and the Scanner class for reading keyboard input. It details Java's language elements such as packages, classes, methods, statements, expressions, and tokens. The chapter covers literals and constants, formatting output with printf and format specifiers, and how to interpret error messages. It also introduces type cast operators and the remainder (modulo) operator, integrating these concepts into complete programs. We also deal with the "Scanner Bug," which is an annoying problem but easy to avoid if you know about it.</p><br>
+
+				<p><b>Textbook Exercises:</b> Assigned Sept 11th. 🚀 GitHub Repository "ch3" 🚀</p>
+				<ul>
+					<li>3.2: Temperature.java</li>
+					<li>3.3: ConvertTime.java</li>
+					<li>3.4: GuessMyNumber.java</li>
+				</ul>
+
+				<p><b>Additional Notes</b></p>
+				<ul>
+					<li><a href="https://docs.google.com/document/d/1a5Hy_2db2oOwz-PAoaLfxVSBC79ivftCftb8B3JXnmw/edit?usp=sharing" target="_blank">Operator Precedence Table (BEDMAS)</a></li>
+					<li><a href="https://docs.google.com/document/d/1RBWvKz5ukhqVDXAUiFJoSp_jpRIE6CJ15o1gFUbpNr4/edit?usp=sharing" target="_blank">Extra Practice with Operations</a></li>
+					<li><a href="https://docs.google.com/document/d/1QxN03Mgu4MsY_Y6kNWsKC83oeWta3h63xh4fMMMWZV0/edit?usp=sharing" target="_blank">Extra Practice with Writing Code</a></li>
+				</ul>
+
+
+
+				<h3>Chapter 4. Methods and Testing</h3>
+
+				<p>This chapter teaches how to organise programs into multiple methods. It differentiates between void methods (no return value) and value-returning methods, explaining return types and return statements. Concepts such as flow of execution, parameters and arguments, and multiple parameters are introduced. Stack diagrams are presented as a tool to visualise the scope of variables and method execution. The chapter also explores methods in the Math class and the principle of composition, concluding with a discussion on incremental development and the use of stubs and scaffolding for testing.</p><br>
+
+				<p><b>Textbook Exercises:</b> Assigned Sept 16th. 🚀 GitHub repository "ch4" 🚀</p>
+				<ul>
+					<li>4.1: FormatDate.java</li>
+					<li>4.2-4.5 Do these on a piece of paper. No need to submit to GitHub</li>
+					<li>4.6: Multadd.java</li>
+				</ul>
+
+
+
+				<h3>Chapter 5. Boolean Logic</h3>
+
+				<p>This chapter introduces relational operators (==, !=, >, <, >=, <=) that produce boolean values (true/false). It covers conditional statements (if-else, if-else-if chains, nesting) for decision-making and the switch statement. The chapter explains logical operators (&&, ||, !), De Morgan's Laws, and the use of boolean variables and methods. A significant focus is placed on validating input and using System.err for error messages.</p><br>
+
+					<p><b>Supplemental Exercises:</b></p>
+					<ul>
+						<li><a href="https://docs.google.com/document/d/1oFvE07Ly8obUwFu0sSFWGnJE0i6yGLcUZtc976o3Sp8/edit?usp=sharing" target="_blank">Practice with Relational Operators</a>. Assigned Sept 22</li>
+					</ul> 
+
+					<p><b>Coding Bat:</b> Make an account at <a href="http://www.codingbat.com" target="_blank">codingbat.com</a></p>
+					<ul>
+						<li><a href="https://codingbat.com/java/Logic-1" target="_blank">Logic-1</a>: First Column only. <a href="files/logic-1.txt" target="_target">Mr. P's Solutions</a>. Assigned Sept 24</li>
+						<li><a href="https://codingbat.com/java/Logic-2" target="_blank">Logic-2</a>: All questions. <a href="files/logic-2.txt" target="_target">Mr. P's Solutions</a>. Assigned Sept 25</li>
+					</ul>
+
+					<p><b>Textbook Exercises:</b> Assigned Sept 29th. 🚀 GitHub repository "ch5" 🚀</p>
+					<ul>
+						<li>5.1, 5.4, 5.5: Paper exercises</li>
+						<li>5.2: GuessMyNumber.java</li>
+						<li>5.3: Fermat.java</li>
+						<li>5.6: Quadratic.java</li>
+						<li>5.7: Triangle.java</li>
+					</ul>
+
+					<p><b>Additional Notes:</b></p>
+					<ul>
+						<li><a href="https://docs.google.com/document/d/1tZXG4y09k8KQBuwAI_dAhLRJ5abUyqBsHZWZgDdk4OY/edit?usp=sharing">New Order of Operations</a></li>
+						<li><a href="files/AP CS Unit 3.pdf" target="_blank">De Morgan Notes</a></li>
+					</ul>
+
+
+
+
+					<h3>Chapter 6. Loops and Strings</h3>
+
+					<p>This chapter focuses on repetition using while and for statements, including concepts like loop body, infinite loops, and increment/decrement operators. It discusses nested loops for iterating over multiple variables. The chapter also introduces characters (char, Unicode, escape sequences) and applies loops to strings, covering string length, charAt, indexOf, and substring methods. It concludes with string comparison (equals, compareTo) and String formatting (String.format).</p><br>
+
+					<p><b>Coding Bat</b></p>
+					<ul>
+						<li><a href="https://codingbat.com/java/String-1" target="_blank">String-1</a>: First Column only, <a href="files/String-1 Answers.txt" target="_blank">My Solutions</a> (Assigned Oct 6)</li>
+						<li><a href="https://codingbat.com/java/String-2" target="_blank">String-2</a>: First 4 Rows, <a href="files/String-2 Answers.txt" target="_blank">My Solutions</a> (Assigned Oct 9)</li>
+					</ul>
+
+					<p><b>Supplemental Exercises</b></p>
+					<ul>
+						<li><a href="https://docs.google.com/document/d/1RqY0ssgzjnRRyczwKpAq3mKFUJHngiFY_bNKisEcxjc/edit?usp=sharing" target="_blank">Loops Practice Questions</a> and <a href="https://docs.google.com/document/d/15jCnqxe_DAExjOsV0ydo8jQslvN0JHoApuNbaBkuVh8/edit?usp=sharing" target="_blank">Answers</a> (Assigned Oct 8)</li>
+						<li><a href="https://docs.google.com/document/d/1K8PucTHnCL8MBtRCuV9Yvy375nWuIimA/edit?usp=sharing&ouid=102945596975178095550&rtpof=true&sd=true" target="_blank">String Parsing Practice Questions</a> Use 🚀 GitHub repository "Ch6" 🚀 Assigned Oct 14</li>
+					</ul>
+
+					<p><b>Additional Notes:</b></p>
+					<ul>
+						<li><a href="https://docs.google.com/document/d/1NztkHuK31FA27ETaAuYgj3deXBJFQ01u2NFGgRBBVpc/edit?usp=sharing" target="_blank">Strings as Object Variables</a></li>
+						<li><a href="https://docs.google.com/document/d/1C3p03059KvpZqJJ0l1P3yW5_xh4_UfUCQxl4IAZmrIc/edit?usp=sharing" target="_blank">String Parsing Question Types and Hints</a></li>
+					</ul>
+
+
+
+					<h3>Chapter 7. Arrays and References</h3>
+
+					<p>Chapter 7 introduces arrays as collections of values of the same type. It explains creating and accessing array elements using the [] operator, including ArrayIndexOutOfBoundsException. The chapter covers displaying and copying arrays (including references and aliasing), and traversing arrays for operations like searching (sequential search), reducing values (sum, product, min/max), and building histograms. It also introduces the enhanced for loop (for-each) and demonstrates character counting using arrays.</p><br>
+
+					<p><b>Coding Bat</b></p>
+					<ul>
+						<li><a href="https://codingbat.com/java/Array-1" target="_blank">Array-1</a>: First Column only, <a href="files/array1solutions.txt" target="_blank">Mr. P's Solutions</a> (Assigned Oct 17th)</li> 
+						<li><a href="https://codingbat.com/java/Array-2" target="_blank">Array-2</a>: First Column only, <a href="files/array2solutions.txt" target="_blank">Mr. P's Solutions</a> (Assigned Oct 20th)</li>
+					</ul>
+
+					<p><b>Textbook Exercises:</b> Assigned Oct 23rd. Use 🚀 GitHub repository "ch7" 🚀and place all code answers in the same class. Here are <a href="files/ch7-answers.txt" target="_blank">Mr. P's solutions</a>.</p>
+
+					<p><b>Extra Practice:</b> <a href="files/bonusAssignment.pdf" target="_blank">Four extra questions</a> with just loops. Assigned Oct 28th</p>
+
+					<p><b>AP Classroom Questions:</b> Progress Check for Loops (Unit 2 MCQ Part B) and Arrays (Unit 4 MCQ Part A). Ignore
+					the first 6 Questions in the Arrays Progress Check for this test.</p>
+
+
+
+					<h3>Data Structure Interlude 1: ArrayLists</h3>
+					
+					<p>ArrayLists are a dynamic data structure similar to arrays, but they can grow and shrink. ArrayLists can only store objects as opposed to primitive data types; however, Java offers “wrapper classes” that allow primitives to be stored. The unit explores various methods for using ArrayLists including adding, removing, and accessing elements. Additionally, it explains how to traverse ArrayLists, develop algorithms for using ArrayLists, and search and sort them.</p><br/>
+
+					<ul>
+						<li><a href="https://docs.google.com/document/d/1zL1-WGCa-TY6I3jqtfckvXs-c_Uelcky-AuBpTeD2Us/edit?usp=sharing" target="_blank">Our notes on ArrayLists</a></li>
+						<li><a href="https://www.youtube.com/watch?v=NbYgm0r7u6o" target="_blank">Here is a great video</a> on the differences between Arrays and ArrayLists.</li>
+						<li>There are <b>secret levels</b> to CodingBat! Try out <a href="https://codingbat.com/home/orion.a.smith@gmail.com/apcsa-lists" target="_blank">The ArrayList secret levels</a>, by doing the "No Loops," "With Loops," and "From other teachers" sections.</li>
+						<li><a href="https://docs.google.com/document/d/1AnqSW8wjdNXlHHeV3pQXLtM46QpBjn5-7DP2FEUriy0/edit?usp=sharing" target="_blank">PS7B</a> [<a href="https://photos.app.goo.gl/FdtbeG3FHgSDsDYDA" target="_blank">Answer Key</a>]</li>
+						<li><a href="https://docs.google.com/document/d/1EUxP6Yw_oGhCx8ePfdlkwpzKLaU5-lsZ4ehSL-74qQ8/edit?usp=sharing" target="_blank">PS7C</a> 🚀 GitHub repo name: PS7C 🚀</li>
+					</ul>
+
+
+
+					<h3>Data Structure Interlude 2: Cryptography</h3>
+
+					<ul>
+						<li>We watched <em>The Immitation Game</em> to learn about Alan Turing and the origins of the electronic computer.
+						<li><a href="https://docs.google.com/document/d/1uAPXqYBzMAVM-NV5iauERWlQoiIo9OqmRYOv723S3j4/edit?usp=sharing" target="_blank">Cyptography Assignment</a>. 🚀 GitHub Repo Name: Cryptography 🚀</li>
+					</ul>
+
+
+					<h3>Data Structure Interlude 3: 2D Array</h3>
+
+					<p>This interlude is all about 2D Arrays! Java 2D arrays are "arrays of arrays," structured like a grid or table, where each element is accessed using two indices: one for the row and one for the column.</p><br/>
+
+					<ul>
+						<li><a href="files/AP CS Unit 8.pdf" target="_blank">Unit 8 Notes</a></li>
+						<li><a href="https://docs.google.com/document/d/10fSIYk8_6jiUwOZDLnJ8f-rHu7oLtSd9T73PO1wNogA/edit?usp=sharing" target="_target">Tic Tac Toe Assignment</a>. 🚀 Github Repo Name: TicTacToe 🚀</li>
+						<li><a href="files/chomp4students2019.zip" target="_blank">Chomp Assignment.</a> 🚀 Github Repo Name: Chomp 🚀</li>
+						<li><a href="https://docs.google.com/document/d/1lsmROfw0oqH2j8yicg81Seu_37tJOWdRBHI3p9sLzWY/edit?usp=sharing" target="_blank">2D Arrays Practice Assignment</a>, [<a href="https://docs.google.com/document/d/1KeeJ0Rw_LlJYXBa5mtw1_hPAB1MUXr7spTICuCcBTX8/edit?usp=sharing" target="_blank">Answers</a>]</li>
+						<li><a href="https://docs.google.com/document/d/1fRNTECnMFlXDWaqI1A8PwmPNa5VEgmsyKphdHMw5tJ0/edit?usp=sharing" target="_blank">2D Arrays Practice #2</a></li>
+					</ul>
+
+					<h3>Chapter 8: Algorithms and Recursion</h3>
+					
+					<p>Chapter 8 introduces recursive methods, which invoke themselves to solve smaller versions of the same problem, and uses stack diagrams to visualize the flow of execution and the necessity of base cases to prevent infinite recursion. It encourages understanding these algorithms through the "leap of faith" strategy—assuming the recursive call works correctly without tracing every step—and applies these concepts to tasks such as calculating factorials and converting decimal numbers to binary</p><br/>
+
+					<ul>
+						<li><a href="https://docs.google.com/document/d/1BjbaKd1QKpZgjrpX-OhU8zUx61yrxdeSFH9tg3wBfps/edit?usp=sharing" target="_blank">Sorting Algorithms</a> 🚀 GitHub Repo Name: Sorting 🚀</li>
+						<li><a href="https://codingbat.com/java/Recursion-1" target="_blank">Coding Bat Recursion-1 (first column)</a></li>
+						<li><a href="https://codingbat.com/java/Recursion-2" target="_blank">Coding Bat Recursion-2 (first 3 questions)</a></li>
+						<li>Last week of December, we worked on the Minesweeper Game. 🚀 GitHub Repo Name: Minesweeper 🚀</li>
+					</ul>
+
+					<h3>Chapter 9, 10, 11: Object Oriented Programming</h3>
+					
+					<p>Chapter 9 introduces the distinction between primitive types and objects, focusing specifically on immutable objects like strings and wrapper classes that cannot be modified after creation. Chapter 10 expands on object-oriented concepts by exploring mutable objects, such as the Point and Rectangle classes, which allow their attributes to be changed and require careful handling of references and aliasing. Finally, Chapter 11 guides students through the process of designing their own classes to create new object types, covering essential elements like encapsulation, constructors for initialization, and methods for accessing and modifying instance variables</p><br/>
+
+					<ul>
+						<li><a href="https://docs.google.com/document/d/1eH1SqloqBYo1CIlixUAx1FHacNIducBS/edit?usp=sharing&ouid=102945596975178095550&rtpof=true&sd=true" target="_blank">The Fraction Class</a></li>
+						<li><a href="https://docs.google.com/document/d/1qeBhPApFkFzvm9RWJS5EBs18yc-big4gWbVJibkzg8c/edit?usp=sharing" target="_blank">Using Fraction Class</a> 🚀 GitHub Repo Name: Fraction 🚀</li>
+						<li>Textbook Questions from Chapter 11 🚀 GitHub Repo Name: ch11 🚀
+						<ul>
+						  <li>11.2. Tile.java</li>
+						  <li>11.3: Date.java</li>
+						</ul>
+						<li>AP Classroom multiple choice questions, including the Progress Checks. [<a href="https://lordbyng.net/compsci/files/Unit3FRQanswers.txt" target="_blank">FRQ Answers</a>]</li>
+					</ul>
+
+
+
 
 
 
@@ -224,32 +366,32 @@
        <ul>
        	<li><a href="https://codingbat.com/java/Recursion-1" target="_target">Problem Set 10a: CodingBat Recursion-1</a> (selected questions)</li>
        </ul>
--->			
+					-->			
 
-		</div>
-	</div>
+				</div>
+			</div>
 
-	<script>
-        function updateCountdown() {
-            const countdownElement = document.getElementById('countdown');
-            const targetDate = new Date('May 15, 2026 12:00:00').getTime();
-            const now = new Date().getTime();
-            const distance = targetDate - now;
+			<script>
+				function updateCountdown() {
+					const countdownElement = document.getElementById('countdown');
+					const targetDate = new Date('May 15, 2026 12:00:00').getTime();
+					const now = new Date().getTime();
+					const distance = targetDate - now;
 
-            if (distance < 0) {
-                countdownElement.innerHTML = "The countdown is over!";
-                return;
-            }
+					if (distance < 0) {
+						countdownElement.innerHTML = "The countdown is over!";
+						return;
+					}
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+					const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+					const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+					const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+					const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            countdownElement.innerHTML = `${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds!`;
-        }
+					countdownElement.innerHTML = `${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds!`;
+				}
 
-        setInterval(updateCountdown, 1000);
-    </script>
-</body>
-</html>
+				setInterval(updateCountdown, 1000);
+			</script>
+		</body>
+		</html>

@@ -295,11 +295,17 @@
    ------------------------------------------------------------- */
 * { box-sizing: border-box; }
 
+html {
+  /* Base scale: ~130% of the browser default so the whole site renders
+     about 1.3x larger (as if zoomed to 130%). Everything sized in em/rem
+     scales from here; the fixed px dimensions below are scaled to match. */
+  font-size: 130%; /* ~20.8px */
+}
+
 html, body {
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
-  font-size: 100%; /* 16px */
   font-weight: 300;
   line-height: 1.618em;
   margin: 0;
@@ -329,7 +335,7 @@ img { max-width: 100%; }
    ------------------------------------------------------------- */
 #wrapper {
   clear: both;
-  width: 900px;
+  width: 1170px;
   margin: 0 auto;
   overflow-x: hidden;
   overflow-y: auto;
@@ -380,9 +386,9 @@ a:hover, a:focus, a:active { color: var(--color-link-hover); }
 .page-content h2 { font-size: 1.4em; }
 
 /* Row that pairs a list of links with an illustrative image */
-.content-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-.content-row ol { flex: 1; margin-right: 20px; }
-.content-row img { width: 400px; height: auto; flex-shrink: 0; }
+.content-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 26px; }
+.content-row ol { flex: 1; margin-right: 26px; }
+.content-row img { width: 520px; height: auto; flex-shrink: 0; }
 
 
 /* -------------------------------------------------------------
@@ -391,15 +397,15 @@ a:hover, a:focus, a:active { color: var(--color-link-hover); }
 
 /* Featured computer-scientist spotlight (home page) */
 #spotlight-image {
-  --b: 4px;   /* border thickness */
-  --s: 100px; /* size of the corner */
-  --g: 14px;  /* the gap */
+  --b: 5px;   /* border thickness */
+  --s: 130px; /* size of the corner */
+  --g: 18px;  /* the gap */
   --c: var(--color-decor);
 
   float: left;
-  width: 560px;
-  margin-right: 30px;
-  margin-bottom: 30px;
+  width: 728px;
+  margin-right: 39px;
+  margin-bottom: 39px;
 
   padding: calc(var(--b) + var(--g));
   background-image:
@@ -419,7 +425,7 @@ a:hover, a:focus, a:active { color: var(--color-link-hover); }
   --_p: calc(var(--g) / 2);
   --_i: 0s;
 }
-#spotlight-title { color: var(--color-accent); font-size: 16pt; font-weight: 600; }
+#spotlight-title { color: var(--color-accent); font-size: 21pt; font-weight: 600; }
 
 /* Assignment countdown timer (AP page) */
 #countdown { font-weight: 600; }

@@ -29,6 +29,13 @@ window.AppState = {
   notes: '',
   canvas: null,
   stampSrcs: {},   // id → dataURL, kept outside history to avoid large JSON snapshots
+  fog: {
+    enabled:   false,
+    opacity:   0.5,   // in-app preview opacity (export is always solid)
+    feather:   24,    // reveal edge softness, image-space px
+    brushSize: 60,    // eraser diameter, screen-space px
+    reveals:   [],    // {type:'brush'|'rect'|'ellipse', ...} — cut holes in the fog
+  },
 };
 
 const App = {
@@ -52,6 +59,7 @@ const App = {
     window.IconPicker.init();
 
     this.loadFromLocalStorage();
+    this._updateFogUI();
     this.pushHistory();
     this.setTool('select');
     window.CanvasRenderer.render();
@@ -80,8 +88,9 @@ const App = {
   },
 
   _setupToolbar() {
-    // Tool buttons
-    document.querySelectorAll('.tool-btn').forEach(btn => {
+    // Tool buttons (only those that carry a data-tool; action buttons like
+    // undo/zoom/fog-toggle have their own dedicated handlers)
+    document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
       btn.addEventListener('click', () => this.setTool(btn.dataset.tool));
     });
 
@@ -199,6 +208,69 @@ const App = {
         window.CanvasRenderer.render();
       }
     });
+
+    // ---- Fog of war ----
+    document.getElementById('fog-toggle').addEventListener('click', () => this.toggleFog());
+
+    document.getElementById('fog-brush-size').addEventListener('input', e => {
+      window.AppState.fog.brushSize = parseInt(e.target.value);
+      document.getElementById('fog-brush-val').textContent = e.target.value;
+      window.CanvasRenderer.render();   // refresh the brush ring
+      this.autoSave();
+    });
+
+    document.getElementById('fog-feather').addEventListener('input', e => {
+      window.AppState.fog.feather = parseInt(e.target.value);
+      document.getElementById('fog-feather-val').textContent = e.target.value;
+      window.FogRenderer.markDirty();
+      window.CanvasRenderer.render();
+      this.autoSave();
+    });
+
+    document.getElementById('fog-opacity').addEventListener('input', e => {
+      window.AppState.fog.opacity = parseInt(e.target.value) / 100;
+      document.getElementById('fog-opacity-val').textContent = e.target.value + '%';
+      window.CanvasRenderer.render();
+      this.autoSave();
+    });
+
+    document.getElementById('fog-reset').addEventListener('click', () => {
+      const fog = window.AppState.fog;
+      if (!fog.reveals.length) { this.showToast('No revealed areas to clear.'); return; }
+      if (confirm('Re-cover the entire map with fog? This removes all erased areas.')) {
+        fog.reveals = [];
+        window.FogRenderer.markDirty();
+        this.pushHistory();
+        window.CanvasRenderer.render();
+        this.autoSave();
+        this.showToast('Fog reset.');
+      }
+    });
+  },
+
+  // Merge persisted fog data into AppState.fog (defensive against old files)
+  _applyFogData(f) {
+    f = f || {};
+    const fog = window.AppState.fog;
+    fog.enabled   = !!f.enabled;
+    fog.opacity   = typeof f.opacity   === 'number' ? f.opacity   : 0.5;
+    fog.feather   = typeof f.feather   === 'number' ? f.feather   : 24;
+    fog.brushSize = typeof f.brushSize === 'number' ? f.brushSize : 60;
+    fog.reveals   = Array.isArray(f.reveals) ? f.reveals : [];
+    window.FogRenderer.markDirty();
+    this._updateFogUI();
+  },
+
+  // Reflect current fog settings onto the toolbar controls
+  _updateFogUI() {
+    const fog = window.AppState.fog;
+    this._setFogEnabled(fog.enabled);
+    document.getElementById('fog-brush-size').value = fog.brushSize;
+    document.getElementById('fog-brush-val').textContent = fog.brushSize;
+    document.getElementById('fog-feather').value = fog.feather;
+    document.getElementById('fog-feather-val').textContent = fog.feather;
+    document.getElementById('fog-opacity').value = Math.round(fog.opacity * 100);
+    document.getElementById('fog-opacity-val').textContent = Math.round(fog.opacity * 100) + '%';
   },
 
   _setupFileHandlers() {
@@ -288,6 +360,7 @@ const App = {
 
   // ---- TOOLS ----
   setTool(tool) {
+    if (!tool) return;
     // Stamp opens the icon picker panel instead of switching modes
     if (tool === 'stamp') {
       if (!window.AppState.image) {
@@ -299,19 +372,33 @@ const App = {
     }
 
     const state = window.AppState;
+    const isFog = tool.startsWith('fog-');
+
+    // Fog tools need the fog layer active
+    if (isFog && !state.fog.enabled) this._setFogEnabled(true);
+    if (isFog) state.selectedId = null;
+
     state.activeTool = tool;
     state.inProgress = null;
 
     document.querySelectorAll('.tool-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.tool === tool);
     });
+    // #fog-toggle has no data-tool; its active state tracks fog.enabled
+    document.getElementById('fog-toggle').classList.toggle('active', state.fog.enabled);
 
     const cursors = {
       select: 'default', pan: 'grab', text: 'text', arrow: 'crosshair',
       line: 'crosshair', circle: 'crosshair', rect: 'crosshair',
       freehand: 'crosshair', marker: 'crosshair',
+      'fog-brush': 'crosshair', 'fog-rect': 'crosshair', 'fog-ellipse': 'crosshair',
     };
     state.canvas.style.cursor = cursors[tool] || 'default';
+
+    // Swap the annotation option bar for the fog option bar
+    document.getElementById('tool-options').style.display = isFog ? 'none' : 'flex';
+    document.getElementById('fog-options').style.display  = isFog ? 'flex' : 'none';
+    document.getElementById('fog-brush-opt').style.display = tool === 'fog-brush' ? 'flex' : 'none';
 
     // Show/hide context-sensitive options
     document.getElementById('fill-option').style.display     = ['circle','rect'].includes(tool)   ? 'flex' : 'none';
@@ -319,6 +406,27 @@ const App = {
     this._syncTextOptionsVisibility();
 
     window.CanvasRenderer.render();
+  },
+
+  // ---- FOG OF WAR ----
+  _setFogEnabled(on) {
+    const state = window.AppState;
+    state.fog.enabled = on;
+    document.getElementById('fog-toggle').classList.toggle('active', on);
+    document.getElementById('fog-tools').style.display = on ? 'flex' : 'none';
+  },
+
+  toggleFog() {
+    const state = window.AppState;
+    const on = !state.fog.enabled;
+    this._setFogEnabled(on);
+    if (!on && state.activeTool.startsWith('fog-')) {
+      this.setTool('select');   // also re-renders
+    } else {
+      window.CanvasRenderer.render();
+    }
+    this.autoSave();
+    this.showToast(on ? 'Fog of war ON' : 'Fog of war OFF');
   },
 
   _updateToolOptionsUI() {
@@ -724,6 +832,7 @@ const App = {
       annotations:   state.annotations,
       notes:         state.notes,
       markerCounter: state.markerCounter,
+      fogReveals:    state.fog.reveals,
     });
     this._updateUndoRedoBtns();
   },
@@ -745,7 +854,9 @@ const App = {
     state.annotations   = snap.annotations;
     state.notes         = snap.notes;
     state.markerCounter = snap.markerCounter;
+    state.fog.reveals   = snap.fogReveals || [];
     state.selectedId    = null;
+    window.FogRenderer.markDirty();
     this._syncTextOptionsVisibility();
     this.syncMarkdown();
     this.updateAnnotationList();
@@ -784,6 +895,7 @@ const App = {
         markerCounter: state.markerCounter,
         imageData:     state.imageData,
         stampSrcs:     state.stampSrcs,
+        fog:           state.fog,
       });
       localStorage.setItem('pbp-annotator-v1', payload);
     } catch (err) {
@@ -801,6 +913,7 @@ const App = {
       window.AppState.notes         = data.notes         || '';
       window.AppState.markerCounter = data.markerCounter || 0;
       window.AppState.stampSrcs     = data.stampSrcs     || {};
+      this._applyFogData(data.fog);
 
       if (data.imageData) {
         const img = new Image();
@@ -832,6 +945,7 @@ const App = {
       notes:         state.notes,
       markerCounter: state.markerCounter,
       imageData:     state.imageData,
+      fog:           state.fog,
       markdown:      document.getElementById('markdown-editor').value,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -855,6 +969,7 @@ const App = {
         state.markerCounter = data.markerCounter || 0;
         state.selectedId    = null;
         state.stampSrcs     = data.stampSrcs     || {};
+        this._applyFogData(data.fog);
 
         const restoreUI = () => {
           if (data.markdown) {

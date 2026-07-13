@@ -15,12 +15,17 @@ const Export = {
   // -------------------------------------------------------------------------
   _renderViewport() {
     const src = window.AppState.canvas;
-    // Ensure the canvas is freshly drawn before we copy it
+    // Render once in export mode so the fog of war renders as solid black
+    // (in-app it is semi-transparent), then copy the canvas.
+    window.CanvasRenderer._exportMode = true;
     window.CanvasRenderer.render();
     const off = document.createElement('canvas');
     off.width  = src.width;
     off.height = src.height;
     off.getContext('2d').drawImage(src, 0, 0);
+    // Restore the live, semi-transparent view
+    window.CanvasRenderer._exportMode = false;
+    window.CanvasRenderer.render();
     return off;
   },
 

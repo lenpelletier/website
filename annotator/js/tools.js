@@ -11,6 +11,7 @@ const Tools = {
   panStartPanX: 0, panStartPanY: 0,
   isSpacePanning: false,
   lastFreehandPoint: null,
+  _hoverX: null, _hoverY: null,   // screen-space cursor, for the fog brush ring
 
   // Touch / pinch state
   _pinching: false,
@@ -55,6 +56,9 @@ const Tools = {
       case 'circle':
       case 'rect':
       case 'freehand': this._drawDown(x, y, img); break;
+      case 'fog-brush':
+      case 'fog-rect':
+      case 'fog-ellipse': this._fogDown(img); break;
       // 'pan' is handled above via the isPanning branch
     }
   },
@@ -63,6 +67,7 @@ const Tools = {
     const state = window.AppState;
     if (!state.image) return;
     const { x, y } = this._pos(e);
+    this._hoverX = x; this._hoverY = y;
 
     if (this.isPanning) {
       state.pan.x = this.panStartPanX + (x - this.panStartX);
@@ -78,6 +83,9 @@ const Tools = {
         state.canvas.style.cursor = hit ? 'move' : 'default';
       } else if (state.activeTool === 'pan') {
         state.canvas.style.cursor = 'grab';
+      } else if (state.activeTool === 'fog-brush') {
+        // Redraw so the brush ring follows the cursor
+        window.CanvasRenderer.render();
       }
     }
 
@@ -91,6 +99,9 @@ const Tools = {
       case 'circle':
       case 'rect':     this._drawMove(img); break;
       case 'freehand': this._freehandMove(img); break;
+      case 'fog-brush':
+      case 'fog-rect':
+      case 'fog-ellipse': this._fogMove(img); break;
     }
   },
 
@@ -114,6 +125,9 @@ const Tools = {
       case 'circle':
       case 'rect':     this._drawUp(x, y); break;
       case 'freehand': this._freehandUp(); break;
+      case 'fog-brush':
+      case 'fog-rect':
+      case 'fog-ellipse': this._fogUp(); break;
     }
   },
 
@@ -384,6 +398,74 @@ const Tools = {
     window.CanvasRenderer.render();
   },
 
+  // ---- FOG OF WAR ----
+  _fogDown(img) {
+    const state = window.AppState;
+    const fr    = window.FogRenderer;
+    switch (state.activeTool) {
+      case 'fog-brush': {
+        // brushSize is a screen-space diameter; store an image-space radius
+        const size = Math.max(0.5, (state.fog.brushSize || 60) / state.zoom / 2);
+        fr._inProgress = { type: 'brush', size, points: [{ x: img.x, y: img.y }] };
+        this.lastFreehandPoint = { x: img.x, y: img.y };
+        break;
+      }
+      case 'fog-rect':
+        fr._inProgress = { type: 'rect', x1: img.x, y1: img.y, x2: img.x, y2: img.y };
+        break;
+      case 'fog-ellipse':
+        fr._inProgress = { type: 'ellipse', cx: img.x, cy: img.y, rx: 0, ry: 0, _ax: img.x, _ay: img.y };
+        break;
+    }
+    window.CanvasRenderer.render();
+  },
+
+  _fogMove(img) {
+    const state = window.AppState;
+    const fp    = window.FogRenderer._inProgress;
+    if (!fp) return;
+    switch (state.activeTool) {
+      case 'fog-brush': {
+        const last = this.lastFreehandPoint;
+        if (last && Math.hypot(img.x - last.x, img.y - last.y) < 1) return;
+        fp.points.push({ x: img.x, y: img.y });
+        this.lastFreehandPoint = { x: img.x, y: img.y };
+        break;
+      }
+      case 'fog-rect':
+        fp.x2 = img.x; fp.y2 = img.y;
+        break;
+      case 'fog-ellipse':
+        fp.cx = (fp._ax + img.x) / 2; fp.cy = (fp._ay + img.y) / 2;
+        fp.rx = Math.abs(img.x - fp._ax) / 2; fp.ry = Math.abs(img.y - fp._ay) / 2;
+        break;
+    }
+    window.CanvasRenderer.render();
+  },
+
+  _fogUp() {
+    const state = window.AppState;
+    const fr    = window.FogRenderer;
+    const fp    = fr._inProgress;
+    if (!fp) return;
+    fr._inProgress = null;
+
+    let valid = false;
+    if      (fp.type === 'brush')   valid = fp.points.length >= 1;
+    else if (fp.type === 'rect')    valid = Math.abs(fp.x2 - fp.x1) > 2 && Math.abs(fp.y2 - fp.y1) > 2;
+    else if (fp.type === 'ellipse') valid = fp.rx > 1 && fp.ry > 1;
+
+    if (valid) {
+      if (fp.type === 'ellipse') { delete fp._ax; delete fp._ay; }
+      state.fog.reveals.push(fp);
+      fr.markDirty();
+      window.App.pushHistory();
+      window.App.autoSave();
+    }
+    this.lastFreehandPoint = null;
+    window.CanvasRenderer.render();
+  },
+
   // ---- WHEEL ----
   onWheel(e) {
     e.preventDefault();
@@ -458,7 +540,7 @@ const Tools = {
     if (e.key === ' ') {
       this.isSpacePanning = false;
       const state = window.AppState;
-      const cursors = { select:'default', pan:'grab', text:'text', arrow:'crosshair', line:'crosshair', circle:'crosshair', rect:'crosshair', freehand:'crosshair', marker:'crosshair', stamp:'crosshair' };
+      const cursors = { select:'default', pan:'grab', text:'text', arrow:'crosshair', line:'crosshair', circle:'crosshair', rect:'crosshair', freehand:'crosshair', marker:'crosshair', stamp:'crosshair', 'fog-brush':'crosshair', 'fog-rect':'crosshair', 'fog-ellipse':'crosshair' };
       if (state.canvas) state.canvas.style.cursor = cursors[state.activeTool] || 'default';
     }
   },

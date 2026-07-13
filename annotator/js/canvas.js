@@ -60,6 +60,7 @@ const CanvasRenderer = {
   cssWidth: 0,
   cssHeight: 0,
   _stampImages: {},
+  _exportMode: false,   // when true, fog renders at full (solid) opacity
 
   init(canvasEl) {
     this.canvas = canvasEl;
@@ -140,6 +141,18 @@ const CanvasRenderer = {
     const { x: imgX, y: imgY } = this.imageToScreen(0, 0);
     ctx.drawImage(state.image, imgX, imgY, state.image.width * state.zoom, state.image.height * state.zoom);
 
+    // Fog of war — over the base image, under the annotations
+    const fog = state.fog;
+    if (fog && fog.enabled && window.FogRenderer) {
+      const fc = window.FogRenderer.getFogCanvas(true);
+      if (fc) {
+        ctx.save();
+        ctx.globalAlpha = this._exportMode ? 1 : fog.opacity;
+        ctx.drawImage(fc, imgX, imgY, state.image.width * state.zoom, state.image.height * state.zoom);
+        ctx.restore();
+      }
+    }
+
     // Annotations
     for (const ann of state.annotations) {
       if (!ann.visible) continue;
@@ -155,6 +168,20 @@ const CanvasRenderer = {
     if (state.selectedId) {
       const ann = state.annotations.find(a => a.id === state.selectedId);
       if (ann) this.drawSelection(ctx, ann, state.zoom, state.pan);
+    }
+
+    // Fog brush cursor ring
+    if (!this._exportMode && state.activeTool === 'fog-brush' && fog && fog.enabled &&
+        window.Tools && window.Tools._hoverX != null) {
+      const r = (fog.brushSize || 60) / 2;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.arc(window.Tools._hoverX, window.Tools._hoverY, r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
     }
   },
 

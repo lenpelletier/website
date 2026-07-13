@@ -808,6 +808,64 @@ body {
 #font-family-select:focus { border-color: var(--accent); }
 #font-family-select option { background: var(--bg-panel); }
 
+/* ===== FOG OF WAR ===== */
+
+/* Toggle button gets a dim "storm-cloud" active tint distinct from tools */
+#fog-toggle.active {
+  background: #4a4a70;
+  border-color: #8888c0;
+  color: #fff;
+}
+
+#fog-tools { display: flex; align-items: center; gap: 3px; }
+
+#fog-options {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.fog-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 90px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  cursor: pointer;
+  outline: none;
+}
+.fog-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 1px solid var(--accent-h);
+  cursor: pointer;
+}
+.fog-slider::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 1px solid var(--accent-h);
+  cursor: pointer;
+}
+.fog-val {
+  color: var(--text);
+  font-size: 11px;
+  min-width: 30px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 800px) {
+  .fog-slider { width: 110px; height: 6px; }
+  .fog-slider::-webkit-slider-thumb { width: 20px; height: 20px; }
+  .fog-slider::-moz-range-thumb { width: 20px; height: 20px; }
+}
+
 /* Outline / shadow color pickers */
 #outline-color-picker, #shadow-color-picker {
   width: 22px; height: 22px;

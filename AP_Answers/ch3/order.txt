@@ -1,7 +1,0 @@
-# One filename per line, in the order they should appear on the page.
-# Lines starting with # are ignored. Files not listed here are added at the
-# end, alphabetically. Delete a line to leave that file out entirely.
-
-Temperature.java
-ConvertTime.java
-GuessMyNumber.java

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ch3</title>
+<style>
+:root {
+  --bg: #101a24;
+  --surface: #16222f;
+  --edge: #253546;
+  --text: #d5dfe9;
+  --dim: #6d8398;
+  --keyword: #f472b6;
+  --type: #45d6e0;
+  --string: #9fd39a;
+  --number: #e6b877;
+  --comment: #64798e;
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 1rem; }
+body {
+  margin: 0;
+  padding: clamp(1rem, 4vw, 3rem) clamp(0.75rem, 4vw, 3rem);
+  background: var(--bg);
+  color: var(--text);
+  font: 400 15px/1.6 ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  -webkit-text-size-adjust: 100%;
+}
+main { max-width: 68rem; margin: 0 auto; }
+.unit { position: relative; margin: 0 0 clamp(1.5rem, 4vw, 2.5rem); }
+.unit + .unit { border-top: 1px solid var(--edge); padding-top: clamp(1.5rem, 4vw, 2.5rem); }
+pre {
+  margin: 0;
+  padding: 1.1rem 5.5rem 1.1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  overflow-x: auto;
+  tab-size: 4;
+}
+code { font: inherit; white-space: pre; }
+.copy {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.6rem;
+  padding: 0.25rem 0.6rem;
+  font: inherit;
+  font-size: 0.78em;
+  color: var(--dim);
+  background: transparent;
+  border: 1px solid var(--edge);
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0.55;
+}
+.unit + .unit .copy { top: calc(clamp(1.5rem, 4vw, 2.5rem) + 0.55rem); }
+.copy:hover, .copy:focus-visible { opacity: 1; color: var(--type); border-color: var(--type); }
+.copy:focus-visible { outline: 2px solid var(--type); outline-offset: 2px; }
+.copy[data-done] { color: var(--string); border-color: var(--string); opacity: 1; }
+.k { color: var(--keyword); }
+.t { color: var(--type); }
+.m { color: var(--text); }
+.s { color: var(--string); }
+.n { color: var(--number); }
+.c { color: var(--comment); font-style: italic; }
+.a { color: var(--type); opacity: 0.8; }
+@media print {
+  body { background: #fff; color: #111; font-size: 10.5pt; padding: 0; }
+  pre { background: #fff; border: 1px solid #bbb; break-inside: avoid; }
+  .unit + .unit { border-top: 0; }
+  .copy { display: none; }
+  .k { color: #000; font-weight: 600; }
+  .t, .a { color: #333; }
+  .s, .n { color: #444; }
+  .c { color: #666; }
+}
+</style>
+</head>
+<body>
+<main>
+<section class="unit">
+<pre><button class="copy" type="button">Copy</button><code><span class="k">import</span> java.util.<span class="t">Scanner</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Temperature</span> {
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="m">main</span> (<span class="t">String</span>[] args) {
+        
+        <span class="t">Scanner</span> in = <span class="k">new</span> <span class="m">Scanner</span>(<span class="t">System</span>.in);
+        
+        <span class="t">System</span>.out.<span class="m">print</span>(<span class="s">&quot;Enter a temperature in celsius: &quot;</span>);
+        <span class="k">double</span> cTemp = in.<span class="m">nextInt</span>();
+        <span class="k">double</span> fTemp = cTemp * <span class="n">9.0</span> / <span class="n">5</span> + <span class="n">32</span>;
+        <span class="t">System</span>.out.<span class="m">println</span>(cTemp + <span class="s">&quot; c = &quot;</span> + fTemp + <span class="s">&quot; F&quot;</span>);
+        <span class="t">System</span>.out.<span class="m">printf</span>(<span class="s">&quot;%.1f c = %.1f F&quot;</span>, cTemp, fTemp);
+        
+    }
+}
+</code></pre>
+</section>
+<section class="unit">
+<pre><button class="copy" type="button">Copy</button><code><span class="k">import</span> java.util.<span class="t">Scanner</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">ConvertTime</span> {
+    
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="m">main</span> (<span class="t">String</span>[] args) {
+        
+        <span class="c">//CONSTANTS</span>
+        <span class="k">final</span> <span class="k">double</span> <span class="t">SECONDS_IN_HOUR</span> = <span class="n">3600</span>;
+        <span class="k">final</span> <span class="k">double</span> <span class="t">SECONDS_IN_MINUTE</span> = <span class="n">60</span>;
+        
+        <span class="c">//READ INPUT</span>
+        <span class="t">Scanner</span> in = <span class="k">new</span> <span class="m">Scanner</span>(<span class="t">System</span>.in);
+        <span class="t">System</span>.out.<span class="m">print</span>(<span class="s">&quot;Enter an amount of seconds: &quot;</span>);
+        <span class="k">int</span> originalSeconds = in.<span class="m">nextInt</span>();
+        
+        <span class="c">//TIME CALCULATE</span>
+        <span class="k">int</span> seconds = originalSeconds;
+        <span class="k">int</span> hours   = seconds / <span class="t">SECONDS_IN_HOUR</span>;   <span class="c">//How many hours are there?</span>
+        seconds     = seconds % <span class="t">SECONDS_IN_HOUR</span>;   <span class="c">//How many seconds are left over?</span>
+        <span class="k">int</span> minutes = seconds / <span class="t">SECONDS_IN_MINUTE</span>; <span class="c">//How many minutes are there?</span>
+        seconds     = seconds % <span class="t">SECONDS_IN_MINUTE</span>; <span class="c">//How many seconds are left over after that?</span>
+    
+        <span class="c">//OUTPUT</span>
+        <span class="t">System</span>.out.<span class="m">println</span>(originalSeconds + <span class="s">&quot; seconds = &quot;</span> + hours + <span class="s">&quot; hours, &quot;</span> + minutes + <span class="s">&quot; minutes, and &quot;</span> + seconds + <span class="s">&quot; seconds.&quot;</span>);
+        <span class="t">System</span>.out.<span class="m">printf</span>(<span class="s">&quot;%d seconds = %d hours, %d minutes, and %d seconds.&quot;</span>, originalSeconds, hours, minutes, seconds);                   
+    }
+}
+</code></pre>
+</section>
+<section class="unit">
+<pre><button class="copy" type="button">Copy</button><code><span class="k">import</span> java.util.<span class="t">Scanner</span>;
+<span class="k">import</span> java.util.<span class="t">Random</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">GuessMyNumber</span> {
+    
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="m">main</span> (<span class="t">String</span>[] args) {
+        
+        <span class="c">// pick a random number</span>
+        <span class="t">Random</span> random = <span class="k">new</span> <span class="m">Random</span>();
+        <span class="k">int</span> randomNumber = random.<span class="m">nextInt</span>(<span class="n">100</span>) + <span class="n">1</span>;
+        
+        <span class="c">// Get input</span>
+        <span class="t">System</span>.out.<span class="m">println</span>(<span class="s">&quot;I&#x27;m thinking of a number between 1 and 100&quot;</span>);
+        <span class="t">System</span>.out.<span class="m">println</span>(<span class="s">&quot;(including both). Can you guess what it is?&quot;</span>);
+        <span class="t">System</span>.out.<span class="m">print</span>(<span class="s">&quot;Type a number: &quot;</span>);
+        <span class="t">Scanner</span> in = <span class="k">new</span> <span class="m">Scanner</span>(<span class="t">System</span>.in);
+        <span class="k">int</span> guess = in.<span class="m">nextInt</span>();
+        
+        <span class="c">// Output</span>
+        <span class="t">System</span>.out.<span class="m">println</span>(<span class="s">&quot;Your guess is: &quot;</span> + guess);
+        <span class="t">System</span>.out.<span class="m">println</span>(<span class="s">&quot;The number I was thinking of is: &quot;</span> + randomNumber);
+        <span class="t">System</span>.out.<span class="m">println</span>(<span class="s">&quot;You were off by: &quot;</span> + (randomNumber - guess));    
+    }
+}
+</code></pre>
+</section>
+</main>
+<script>
+document.querySelectorAll('.copy').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var code = btn.parentElement.querySelector('code').innerText;
+    var done = function () {
+      btn.dataset.done = '1';
+      btn.textContent = 'Copied';
+      setTimeout(function () {
+        delete btn.dataset.done;
+        btn.textContent = 'Copy';
+      }, 1500);
+    };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code).then(done, fallback);
+    } else {
+      fallback();
+    }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = code;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { btn.textContent = 'Select and copy'; }
+      document.body.removeChild(ta);
+    }
+  });
+});
+</script>
+</body>
+</html>

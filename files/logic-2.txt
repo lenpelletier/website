@@ -1,0 +1,113 @@
+public boolean makeBricks(int small, int big, int goal) {
+  int maxBigBricks = goal/5;
+        
+  // Use as many big bricks as possible
+  int usedBigBricks = Math.min(maxBigBricks, big);
+        
+  // Calculate the remaining goal after using big bars
+  int remainingGoal = goal - usedBigBricks * 5;
+        
+  // If the remaining goal can be satisfied with the available small bars, 
+  // return true
+  return remainingGoal <= small;
+} 
+
+
+
+public int loneSum(int a, int b, int c) {
+  int sum = 0;
+  if (a != b && a != c) sum += a;
+  if (b != a && b != c) sum += b;
+  if (c != a && c != b) sum += c;
+  return sum;
+}
+
+
+
+public int luckySum(int a, int b, int c) {
+  if (a == 13) return 0;
+  else if (b == 13) return a;
+  else if (c == 13) return a + b;
+  else return a + b + c;
+}
+
+
+
+public int noTeenSum(int a, int b, int c) {
+  return fixTeen(a) + fixTeen(b) + fixTeen(c);
+}
+
+public int fixTeen(int n) {
+  if ( (n == 13 || n == 14) || (n >= 17 && n <= 19) ) return 0;
+  else return n;
+}
+
+
+
+
+public int roundSum(int a, int b, int c) {
+  return round10(a) + round10(b) + round10(c);
+}
+
+public int round10(int num) {
+  int a = num % 10;
+  if (a < 5) a = 0;
+  else a = 10;
+  return (num/10)*10 + a;
+}
+
+
+
+
+public boolean closeFar(int a, int b, int c) {
+  int abdist = Math.abs(a-b);
+  int acdist = Math.abs(a-c);
+  int bcdist = Math.abs(b-c);
+  if (abdist <= 1)
+    return bcdist >= 2 && acdist >=2;
+  else if (acdist <= 1 )
+    return abdist >= 2 && bcdist >=2;
+  else
+    return false;
+}
+
+
+
+public int blackjack(int a, int b) {
+  if (a > 21 && b > 21) 
+    return 0;
+  if (a > 21 || b > 21)
+    return Math.min(a,b);
+  return Math.max(a, b);
+}
+
+
+
+public boolean evenlySpaced(int a, int b, int c) {
+  int small  = Math.min(Math.min(a,b), c);
+  int large  = Math.max(Math.max(a,b), c);
+  int medium = a+b+c-small-large; // Cheng's method!
+  return large-medium == medium-small;
+}
+
+
+
+public int makeChocolate(int small, int big, int goal) {
+  int maxBigBars = goal/5;
+        
+  // Use as many big bars as possible
+  int usedBigBars = Math.min(maxBigBars, big);
+        
+  // Calculate the remaining goal after using big bars
+  int remainingGoal = goal - usedBigBars * 5;
+        
+  // If the remaining goal can be satisfied with the available small bars, return the number of small bars to use
+  if (remainingGoal <= small) {
+      return remainingGoal;
+  }
+        
+  // It's not possible to reach the goal
+  return -1;
+}
+
+

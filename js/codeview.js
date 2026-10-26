@@ -19,7 +19,7 @@
     "max-width:100%; height:auto; border-radius:6px;" +
     "box-shadow:0 8px 30px rgba(0,0,0,0.6);";
   // Images are rendered at 2x, so show them at half size for crisp text.
-  img.onload = function () { img.style.width = img.naturalWidth / 2 + "px"; };
+  img.onload = function () { img.style.width = img.naturalWidth / 1.5 + "px"; };
 
   overlay.appendChild(img);
   document.body.appendChild(overlay);

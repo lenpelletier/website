@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>maxTriple Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>maxTriple: biggest of first, middle and last</h1>
+  <p class="sub">Given an array of ints of odd length, look at the first, middle and last values and return the largest. The array will be length 1 or more. Step through <code>maxTriple</code>: each candidate is tested against the other two with <code>&gt;=</code>. The first one that is at least as big as both wins.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "maxTriple",
+  wide: true,
+  code: [
+    "public int maxTriple(int[] a) {",
+    "  if (a.length == 1)",
+    "    return a[0];",
+    "  else if (a[0] >= a[a.length/2] && a[0] >= a[a.length - 1])",
+    "    return a[0];",
+    "  else if (a[a.length/2] >= a[0] && a[a.length/2] >= a[a.length - 1])",
+    "    return a[a.length/2];",
+    "  else",
+    "    return a[a.length - 1];",
+    "}"
+  ],
+  inputs: [{ id: "a", kind: "array", value: [1, 5, 3], width: 200 }],
+  presets: [[[1, 2, 3]], [[1, 5, 3]], [[5, 2, 3]], [[1, 2, 3, 1, 1]], [[1, 7, 3, 1, 5]], [[5, 1, 3, 7, 1]], [[5, 1, 7, 3, 7, 8, 1]], [[5, 1, 7, 9, 7, 8, 1]], [[5, 1, 7, 3, 7, 8, 9]], [[2, 2, 5, 1, 1]], [[3]]],
+  validate([a]) {
+    if (!a.length || a.length % 2 === 0) return `<code>a</code> needs an odd number of values — the problem promises an odd length of 1 or more.`;
+  },
+  legend: [
+    ["outer", "the candidate being tested"],
+    ["inner", "the other two"],
+    ["match", "the largest"]
+  ],
+  trace([a], T) {
+    const n = a.length, m = Math.floor(n / 2), L = n - 1;
+    let cand = -1, others = [], win = -1;
+    T.view = () => {
+      const A = T.arr("a", a);
+      A.top(0, "first ▼", "muted").top(m, "middle ▼", "muted").top(L, "last ▼", "muted");
+      others.forEach(k => A.at(k, "win2"));
+      if (cand >= 0) A.at(cand, "win outer");
+      if (win >= 0) A.at(win, "hit");
+      return [A];
+    };
+    T.vars.a = a;
+    T.push(0, `Call <code>maxTriple(${T.fmt(a)})</code>. <code>a.length/2</code> is ${m} (the middle) and <code>a.length - 1</code> is ${L} (the last).`);
+    const one = n === 1, c0 = ["a.length == 1", `${n} == 1 → ${one}`, one];
+    if (one) { T.push(1, `There's only one value, so it's the first, middle and last all at once.`, { chk: [c0] }); win = 0; T.ret(2, `<code>return a[0]</code> → ${a[0]}.`, a[0], { chk: [c0] }); return; }
+    T.push(1, `<code>${n} == 1</code> is <b>false</b>.`, { chk: [c0] });
+    const f = a[0], mid = a[m], l = a[L];
+    cand = 0; others = [m, L];
+    const t1 = f >= mid, t1b = f >= l, ok1 = t1 && t1b;
+    const c1 = ["a[0] &gt;= a[a.length/2]", `${f} >= ${mid} → ${t1}`, t1], c1b = ["a[0] &gt;= a[a.length - 1]", t1 ? `${f} >= ${l} → ${t1b}` : "(skipped)", t1 ? t1b : undefined];
+    T.push(3, ok1 ? `The first value, ${f}, is at least as big as both others.` : `The first value, ${f}, is smaller than ${!t1 ? `the middle (${mid})` : `the last (${l})`}.`, { chk: [c0, c1, c1b] });
+    if (ok1) { win = 0; cand = -1; others = []; T.ret(4, `<code>return a[0]</code> → ${f}.`, f, { chk: [c0, c1, c1b] }); return; }
+    cand = m; others = [0, L];
+    const t2 = mid >= f, t2b = mid >= l, ok2 = t2 && t2b;
+    const c2 = ["a[a.length/2] &gt;= a[0]", `${mid} >= ${f} → ${t2}`, t2], c2b = ["a[a.length/2] &gt;= a[a.length - 1]", t2 ? `${mid} >= ${l} → ${t2b}` : "(skipped)", t2 ? t2b : undefined];
+    T.push(5, ok2 ? `The middle value, ${mid}, is at least as big as both others.` : `The middle value, ${mid}, is smaller than ${!t2 ? `the first (${f})` : `the last (${l})`}.`, { chk: [c0, c2, c2b] });
+    if (ok2) { win = m; cand = -1; others = []; T.ret(6, `<code>return a[${m}]</code> → ${mid}.`, mid, { chk: [c0, c2, c2b] }); return; }
+    win = L; cand = -1; others = [];
+    T.ret(8, `Neither the first nor the middle won, so the last value must be the largest. <code>return a[${L}]</code> → ${l}.`, l, { chk: [c0, c2, c2b] });
+  }
+});
+</script>
+</body>
+</html>

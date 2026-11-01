@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sum2 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>sum2: add the first two</h1>
+  <p class="sub">Given an array of ints, return the sum of the first 2 elements. If the array is shorter than 2, just add up the elements that exist, returning 0 for an empty array. Step through <code>sum2</code>: the length decides which <code>return</code> runs, so the code never reaches for a box that isn't there.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "sum2",
+  code: [
+    "public int sum2(int[] nums) {",
+    "  if (nums.length == 0)",
+    "    return 0;",
+    "  else if (nums.length == 1)",
+    "    return nums[0];",
+    "  else",
+    "    return nums[0] + nums[1];",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 3], width: 200 }],
+  presets: [[[1, 2, 3]], [[1, 1]], [[1, 1, 1, 1]], [[1, 2]], [[1]], [[]], [[4, 5, 6]], [[4]]],
+  legend: [
+    ["outer", "added"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let take = 0;
+    T.view = () => { const A = T.arr("nums", nums); A.cls(0, take, "win outer"); return [A]; };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>sum2(${T.fmt(nums)})</code>.`);
+    const c1 = ["nums.length == 0", `${n} == 0 → ${n === 0}`, n === 0];
+    if (n === 0) { T.push(1, `The array is empty — nothing to add.`, { chk: [c1] }); T.ret(2, `<code>return 0</code>.`, 0, { chk: [c1] }); return; }
+    T.push(1, `<code>${n} == 0</code> is <b>false</b>. Try the <code>else if</code>.`, { chk: [c1] });
+    const c2 = ["nums.length == 1", `${n} == 1 → ${n === 1}`, n === 1];
+    if (n === 1) { T.push(3, `There's only one element.`, { chk: [c1, c2] }); take = 1; T.ret(4, `<code>return nums[0]</code> → ${nums[0]}.`, nums[0], { chk: [c1, c2] }); return; }
+    T.push(3, `<code>${n} == 1</code> is <b>false</b>, so there are at least 2 elements. Go to the <code>else</code>.`, { chk: [c1, c2] });
+    take = 2;
+    T.ret(6, `<code>nums[0] + nums[1]</code> → <code>${nums[0]} + ${nums[1]}</code> = ${nums[0] + nums[1]}.${n > 2 ? " Anything after index 1 is ignored." : ""}`, nums[0] + nums[1], { chk: [c1, c2] });
+  }
+});
+</script>
+</body>
+</html>

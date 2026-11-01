@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>makeLast Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>makeLast: double length, last value at the end</h1>
+  <p class="sub">Given an int array, return a new array with double the length, where the last element is the same as the original's last element and all the other elements are 0. The original will be length 1 or more. Step through <code>makeLast</code>: a new int array is already full of 0s, so only one box needs to be set. (The array here happens to be named <code>i</code>.)</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "makeLast",
+  code: [
+    "public int[] makeLast(int[] nums) {",
+    "   int[] i = new int[nums.length*2];",
+    "   i[i.length-1] = nums[nums.length-1];",
+    "   return i;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [4, 5, 6], width: 200 }],
+  chk: false,
+  presets: [[[4, 5, 6]], [[1, 2]], [[3]], [[0]], [[7, 7, 7]], [[3, 1, 4]], [[1, 2, 3, 4]], [[1, 2, 3, 0]], [[2, 4]]],
+  validate([nums]) {
+    if (!nums.length) return `<code>nums</code> needs at least 1 value — an empty array has no last element.`;
+  },
+  legend: [
+    ["outer", "the last element of <code>nums</code>"],
+    ["match", "just filled in"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let a = null, step = 0;
+    T.view = () => {
+      const N = T.arr("nums", nums), list = [N];
+      if (step === 2) N.at(n - 1, "win outer").top(n - 1, "length-1 ▼");
+      if (a) { const A = T.arr("i", a); if (step === 2) A.at(2 * n - 1, "new").top(2 * n - 1, "i.length-1 ▼"); list.push(A); }
+      return list;
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>makeLast(${T.fmt(nums)})</code>.`);
+    a = new Array(2 * n).fill(0); T.vars.i = a; step = 1;
+    T.push(1, `<code>nums.length*2</code> is ${2 * n}. <code>new int[${2 * n}]</code> makes ${2 * n} boxes, every one already 0.`);
+    a[2 * n - 1] = nums[n - 1]; T.vars.i = a; step = 2;
+    T.push(2, `<code>i[${2 * n - 1}] = nums[${n - 1}]</code> → ${nums[n - 1]}. Each array uses its own <code>.length-1</code> to find its last box.`);
+    step = 3;
+    T.ret(3, `<code>return i</code> → <code>${T.fmt(a)}</code>.`, a.slice());
+  }
+});
+</script>
+</body>
+</html>

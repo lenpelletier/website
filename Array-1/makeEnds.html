@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>makeEnds Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>makeEnds: first and last</h1>
+  <p class="sub">Given an array of ints, return a new array of length 2 containing the first and last elements of the original. The original will be length 1 or more. Step through <code>makeEnds</code>: whatever the length, the last element is at <code>nums.length-1</code>.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "makeEnds",
+  code: [
+    "public int[] makeEnds(int[] nums) {",
+    "  int[] a = new int[2];",
+    "",
+    "  a[0] = nums[0];",
+    "  a[1] = nums[nums.length-1];",
+    "",
+    "  return a;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 3, 4], width: 220 }],
+  chk: false,
+  presets: [[[1, 2, 3]], [[1, 2, 3, 4]], [[7, 4, 6, 2]], [[1, 2, 2, 2, 2, 2, 2, 3]], [[7, 4]], [[7]], [[5, 2, 9]], [[2, 3, 4, 1]]],
+  validate([nums]) {
+    if (!nums.length) return `<code>nums</code> needs at least 1 value — <code>nums[0]</code> doesn't exist in an empty array.`;
+  },
+  legend: [
+    ["outer", "copied from"],
+    ["match", "just filled in"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let a = null, step = 0;
+    T.view = () => {
+      const N = T.arr("nums", nums), list = [N];
+      if (step === 2) N.at(0, "win outer").top(0, "0 ▼");
+      if (step === 3) N.at(n - 1, "win outer").top(n - 1, "length-1 ▼");
+      if (a) { const A = T.arr("a", a); if (step === 2) A.at(0, "new"); if (step === 3) A.at(1, "new"); list.push(A); }
+      return list;
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>makeEnds(${T.fmt(nums)})</code>.`);
+    a = [0, 0]; T.vars.a = a; step = 1;
+    T.push(1, `<code>new int[2]</code>: two boxes of 0.`);
+    a[0] = nums[0]; T.vars.a = a; step = 2;
+    T.push(3, `<code>a[0] = nums[0]</code> → ${nums[0]}.`);
+    a[1] = nums[n - 1]; T.vars.a = a; step = 3;
+    T.push(4, `<code>nums.length-1</code> is ${n - 1}, so <code>a[1] = nums[${n - 1}]</code> → ${nums[n - 1]}.${n === 1 ? " With one box, the first and last are the same value." : ""}`);
+    step = 4;
+    T.ret(6, `<code>return a</code> → <code>${T.fmt(a)}</code>.`, a.slice());
+  }
+});
+</script>
+</body>
+</html>

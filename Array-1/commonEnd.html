@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>commonEnd Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>commonEnd: same first or same last?</h1>
+  <p class="sub">Given 2 arrays of ints, <code>a</code> and <code>b</code>, return true if they have the same first element or the same last element. Both arrays will be length 1 or more. Step through <code>commonEnd</code>: the arrays can be different lengths, so each one finds its own last index with <code>.length-1</code>.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "commonEnd",
+  code: [
+    "public boolean commonEnd(int[] a, int[] b) {",
+    "  return (a[a.length-1] == b[b.length-1] || a[0] == b[0]);",
+    "}"
+  ],
+  inputs: [{ id: "a", kind: "array", value: [1, 2, 3], width: 160 }, { id: "b", kind: "array", value: [7, 3], width: 160 }],
+  presets: [[[1, 2, 3], [7, 3]], [[1, 2, 3], [7, 3, 2]], [[1, 2, 3], [1, 3]], [[1, 2, 3], [1]], [[1, 2, 3], [2]], [[1], [1]], [[5], [6]]],
+  validate([a, b]) {
+    if (!a.length || !b.length) return `Both arrays need at least 1 value — an empty array has no first or last element.`;
+  },
+  legend: [
+    ["inner", "the last elements"],
+    ["outer", "the first elements"],
+    ["match", "equal"]
+  ],
+  trace([a, b], T) {
+    let stage = 0;
+    const lastEq = a[a.length - 1] === b[b.length - 1], firstEq = a[0] === b[0];
+    T.view = () => {
+      const A = T.arr("a", a), B = T.arr("b", b);
+      if (stage >= 1) { const c = lastEq ? "hit inner" : "win2 inner"; A.at(a.length - 1, c).bot(a.length - 1, "▲ a.length-1"); B.at(b.length - 1, c).bot(b.length - 1, "▲ b.length-1"); }
+      if (stage >= 2) { const c = firstEq ? "hit outer" : "win outer"; A.at(0, c).top(0, "0 ▼"); B.at(0, c).top(0, "0 ▼"); }
+      return [A, B];
+    };
+    T.vars.a = a; T.vars.b = b;
+    T.push(0, `Call <code>commonEnd(${T.fmt(a)}, ${T.fmt(b)})</code>.`);
+    stage = 1;
+    const chk = [["a[a.length-1] == b[b.length-1]", `${a[a.length - 1]} == ${b[b.length - 1]} → ${lastEq}`, lastEq]];
+    if (lastEq) {
+      chk.push(["a[0] == b[0]", "(skipped)"]);
+      T.ret(1, `The last elements, <code>a[${a.length - 1}]</code> and <code>b[${b.length - 1}]</code>, are both ${a[a.length - 1]}. <code>||</code> doesn't need the second test → <b>true</b>.`, true, { chk });
+      return;
+    }
+    T.push(1, `The last elements are different: <code>a[${a.length - 1}]</code> is ${a[a.length - 1]}, <code>b[${b.length - 1}]</code> is ${b[b.length - 1]}. Try the other side of the <code>||</code>.`, { chk });
+    stage = 2;
+    chk.push(["a[0] == b[0]", `${a[0]} == ${b[0]} → ${firstEq}`, firstEq]);
+    T.ret(1, firstEq ? `The first elements are both ${a[0]} → <b>true</b>.` : `The first elements are different too (${a[0]} and ${b[0]}) → <b>false</b>.`, firstEq, { chk });
+  }
+});
+</script>
+</body>
+</html>

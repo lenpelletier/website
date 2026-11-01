@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>double23 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>double23: two 2s or two 3s?</h1>
+  <p class="sub">Given an int array, return true if it contains 2 twice or 3 twice. The array will be length 0, 1 or 2. Step through <code>double23</code>: arrays shorter than 2 can't hold anything twice. Otherwise both elements must be equal <em>and</em> be a 2 (or a 3).</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "double23",
+  wide: true,
+  code: [
+    "public boolean double23(int[] n) {",
+    "  if (n.length < 2)",
+    "    return false;",
+    "  else",
+    "    return (n[0] == n[1] && n[0] == 2) || (n[0] == n[1] && n[0] == 3);",
+    "}"
+  ],
+  inputs: [{ id: "n", kind: "array", value: [2, 2], width: 120 }],
+  presets: [[[2, 2]], [[3, 3]], [[2, 3]], [[3, 2]], [[4, 5]], [[2]], [[3]], [[]], [[3, 4]]],
+  validate([n]) {
+    if (n.length > 2) return `<code>n</code> can have at most 2 values — the problem promises length 0, 1 or 2.`;
+  },
+  legend: [
+    ["outer", "<code>n[0]</code>"],
+    ["inner", "<code>n[1]</code>"],
+    ["match", "a matching pair"]
+  ],
+  trace([n], T) {
+    let look = false, hit = false;
+    T.view = () => { const A = T.arr("n", n); if (look) { A.at(0, hit ? "hit outer" : "win outer").at(1, hit ? "hit inner" : "win2 inner"); } return [A]; };
+    T.vars.n = n;
+    T.push(0, `Call <code>double23(${T.fmt(n)})</code>.`);
+    const short = n.length < 2, c1 = ["n.length &lt; 2", `${n.length} < 2 → ${short}`, short];
+    if (short) { T.push(1, `There aren't two elements, so nothing can appear twice.`, { chk: [c1] }); T.ret(2, `<code>return false</code>.`, false, { chk: [c1] }); return; }
+    T.push(1, `<code>${n.length} &lt; 2</code> is <b>false</b>. Go to the <code>else</code>.`, { chk: [c1] });
+    look = true;
+    const eq = n[0] === n[1], two = eq && n[0] === 2, three = eq && n[0] === 3, r = two || three;
+    hit = r;
+    const chk = [c1,
+      ["n[0] == n[1] &amp;&amp; n[0] == 2", eq ? `${n[0]} == ${n[1]}, ${n[0]} == 2 → ${two}` : `${n[0]} == ${n[1]} → false`, two],
+      ["n[0] == n[1] &amp;&amp; n[0] == 3", two ? "(skipped)" : eq ? `${n[0]} == ${n[1]}, ${n[0]} == 3 → ${three}` : `${n[0]} == ${n[1]} → false`, two ? undefined : three]];
+    T.ret(4, !eq ? `${n[0]} and ${n[1]} are different, so neither half of the <code>||</code> can be true → <b>false</b>.` : r ? `Both elements are ${n[0]} → <b>true</b>.` : `Both elements are ${n[0]}, but that's not a 2 or a 3 → <b>false</b>.`, r, { chk });
+  }
+});
+</script>
+</body>
+</html>

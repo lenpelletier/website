@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>no23 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>no23: no 2s and no 3s?</h1>
+  <p class="sub">Given an int array of length 2, return true if it does not contain a 2 or a 3. Step through <code>no23</code>: it asks the same question as has23 — "is there a 2 or a 3?" — inside <code>!( … )</code>, which flips the answer.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "no23",
+  code: [
+    "public boolean no23(int[] nums)  {",
+    "  return !(nums[0] == 2 || nums[0] == 3 || nums[1] == 2 || nums[1] == 3);",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [4, 5], width: 120 }],
+  presets: [[[4, 5]], [[4, 2]], [[3, 5]], [[1, 9]], [[2, 9]], [[1, 3]], [[1, 1]], [[2, 2]], [[3, 3]], [[7, 8]], [[8, 7]]],
+  validate([nums]) {
+    if (nums.length !== 2) return `<code>nums</code> must have exactly 2 values — the problem promises length 2.`;
+  },
+  legend: [
+    ["outer", "the box being tested"],
+    ["bad", "a 2 or a 3"]
+  ],
+  trace([nums], T) {
+    let at = -1, hit = false;
+    T.view = () => { const A = T.arr("nums", nums); if (at >= 0) A.at(at, hit ? "miss outer" : "win outer").top(at, `nums[${at}] ▼`); return [A]; };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>no23(${T.fmt(nums)})</code>.`);
+    const tests = [[0, 2], [0, 3], [1, 2], [1, 3]], chk = [];
+    let found = false;
+    for (let k = 0; k < 4 && !found; k++) {
+      const [i, v] = tests[k], ok = nums[i] === v;
+      at = i; hit = ok;
+      chk.push([`nums[${i}] == ${v}`, `${nums[i]} == ${v} → ${ok}`, ok]);
+      if (ok) { found = true; for (let j = k + 1; j < 4; j++) chk.push([`nums[${tests[j][0]}] == ${tests[j][1]}`, "(skipped)"]); }
+      T.push(1, ok ? `<code>nums[${i}]</code> is ${v}, so the inside of the parentheses is <b>true</b>.${k < 3 ? " The rest is skipped." : ""}` : `<code>nums[${i}] == ${v}</code> is false.`, { chk: chk.slice() });
+    }
+    at = -1;
+    const r = !found;
+    chk.push(["!( … )", String(r), r]);
+    T.ret(1, found ? `The <code>!</code> flips <b>true</b> to <b>false</b>: the array does contain a 2 or a 3.` : `Nothing inside was true, so the parentheses are <b>false</b> — and <code>!</code> flips that to <b>true</b>.`, r, { chk });
+  }
+});
+</script>
+</body>
+</html>

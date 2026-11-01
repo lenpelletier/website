@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>has23 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>has23: is there a 2 or a 3?</h1>
+  <p class="sub">Given an int array of length 2, return true if it contains a 2 or a 3. Step through <code>has23</code>: four tests joined by <code>||</code>. Java checks them left to right and stops at the first one that's true.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "has23",
+  code: [
+    "public boolean has23(int[] n) {",
+    "  return n[0] == 2 || n[1] == 2 || n[0] == 3 || n[1] == 3;",
+    "}"
+  ],
+  inputs: [{ id: "n", kind: "array", value: [4, 3], width: 120 }],
+  presets: [[[2, 5]], [[4, 3]], [[4, 5]], [[2, 2]], [[3, 2]], [[3, 3]], [[7, 7]], [[3, 9]], [[9, 5]]],
+  validate([n]) {
+    if (n.length !== 2) return `<code>n</code> must have exactly 2 values — the problem promises length 2.`;
+  },
+  legend: [
+    ["outer", "the box being tested"],
+    ["match", "a 2 or a 3"]
+  ],
+  trace([n], T) {
+    let at = -1, hit = false;
+    T.view = () => { const A = T.arr("n", n); if (at >= 0) A.at(at, hit ? "hit outer" : "win outer").top(at, `n[${at}] ▼`); return [A]; };
+    T.vars.n = n;
+    T.push(0, `Call <code>has23(${T.fmt(n)})</code>.`);
+    const tests = [[0, 2], [1, 2], [0, 3], [1, 3]], chk = [];
+    for (let k = 0; k < 4; k++) {
+      const [i, v] = tests[k], ok = n[i] === v;
+      at = i; hit = ok;
+      chk.push([`n[${i}] == ${v}`, `${n[i]} == ${v} → ${ok}`, ok]);
+      if (ok) {
+        for (let j = k + 1; j < 4; j++) chk.push([`n[${tests[j][0]}] == ${tests[j][1]}`, "(skipped)"]);
+        T.ret(1, `<code>n[${i}]</code> is ${v}, so the whole <code>||</code> is <b>true</b>.${k < 3 ? " The remaining tests are skipped." : ""}`, true, { chk });
+        return;
+      }
+      T.push(1, `<code>n[${i}] == ${v}</code> is false.${k < 3 ? " Try the next test." : ""}`, { chk: chk.slice() });
+    }
+    at = -1;
+    T.ret(1, `All four tests are false — no 2 and no 3. <code>return false</code>.`, false, { chk });
+  }
+});
+</script>
+</body>
+</html>

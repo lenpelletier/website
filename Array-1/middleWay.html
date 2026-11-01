@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>middleWay Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>middleWay: the two middles</h1>
+  <p class="sub">Given 2 int arrays, <code>a</code> and <code>b</code>, each of length 3, return a new array of length 2 containing their middle elements. Step through <code>middleWay</code>: in a length-3 array the middle element is always at index 1.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "middleWay",
+  code: [
+    "public int[] middleWay(int[] a, int[] b) {",
+    "  int[] c = new int[2];",
+    "  c[0] = a[1];",
+    "  c[1] = b[1];",
+    "  return c;",
+    "}"
+  ],
+  inputs: [{ id: "a", kind: "array", value: [1, 2, 3], width: 140 }, { id: "b", kind: "array", value: [4, 5, 6], width: 140 }],
+  chk: false,
+  presets: [[[1, 2, 3], [4, 5, 6]], [[7, 7, 7], [3, 8, 0]], [[5, 2, 9], [1, 4, 5]], [[1, 9, 7], [4, 8, 8]], [[1, 2, 3], [3, 1, 4]], [[1, 2, 3], [4, 1, 1]]],
+  validate([a, b]) {
+    if (a.length !== 3 || b.length !== 3) return `Both arrays must have exactly 3 values — the problem promises length 3.`;
+  },
+  legend: [
+    ["outer", "from <code>a</code>"],
+    ["inner", "from <code>b</code>"],
+    ["match", "just filled in"]
+  ],
+  trace([a, b], T) {
+    let c = null, step = 0;
+    T.view = () => {
+      const A = T.arr("a", a), B = T.arr("b", b), list = [A, B];
+      if (step === 2) A.at(1, "win outer").top(1, "a[1] ▼");
+      if (step === 3) B.at(1, "win2 inner").top(1, "b[1] ▼");
+      if (c) { const C = T.arr("c", c); if (step === 2) C.at(0, "new"); if (step === 3) C.at(1, "new"); list.push(C); }
+      return list;
+    };
+    T.vars.a = a; T.vars.b = b;
+    T.push(0, `Call <code>middleWay(${T.fmt(a)}, ${T.fmt(b)})</code>.`);
+    c = [0, 0]; T.vars.c = c; step = 1;
+    T.push(1, `<code>new int[2]</code>: two boxes of 0.`);
+    c[0] = a[1]; T.vars.c = c; step = 2;
+    T.push(2, `<code>c[0] = a[1]</code> → ${a[1]}, the middle of <code>a</code>.`);
+    c[1] = b[1]; T.vars.c = c; step = 3;
+    T.push(3, `<code>c[1] = b[1]</code> → ${b[1]}, the middle of <code>b</code>.`);
+    step = 4;
+    T.ret(4, `<code>return c</code> → <code>${T.fmt(c)}</code>.`, c.slice());
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>plusTwo Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>plusTwo: join two pairs</h1>
+  <p class="sub">Given 2 int arrays, each of length 2, return a new array of length 4 containing all their elements. Step through <code>plusTwo</code>: <code>a</code>'s values go in boxes 0 and 1 of the new array, and <code>b</code>'s go in boxes 2 and 3.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "plusTwo",
+  code: [
+    "public int[] plusTwo(int[] a, int[] b) {",
+    "  int[] c = new int[4];",
+    "  c[0] = a[0];",
+    "  c[1] = a[1];",
+    "  c[2] = b[0];",
+    "  c[3] = b[1];",
+    "  return c;",
+    "}"
+  ],
+  inputs: [{ id: "a", kind: "array", value: [1, 2], width: 110 }, { id: "b", kind: "array", value: [3, 4], width: 110 }],
+  chk: false,
+  presets: [[[1, 2], [3, 4]], [[4, 4], [2, 2]], [[9, 2], [3, 4]]],
+  validate([a, b]) {
+    if (a.length !== 2 || b.length !== 2) return `Both arrays must have exactly 2 values — the problem promises length 2.`;
+  },
+  legend: [
+    ["outer", "from <code>a</code>"],
+    ["inner", "from <code>b</code>"],
+    ["match", "just filled in"]
+  ],
+  trace([a, b], T) {
+    let c = null, to = -1;
+    T.view = () => {
+      const A = T.arr("a", a), B = T.arr("b", b), list = [A, B];
+      if (to >= 0 && to < 2) A.at(to, "win outer").top(to, `a[${to}] ▼`);
+      if (to >= 2) B.at(to - 2, "win2 inner").top(to - 2, `b[${to - 2}] ▼`);
+      if (c) { const C = T.arr("c", c); C.cls(0, Math.min(to, 2), "win"); if (to > 2) C.cls(2, to, "win2"); if (to >= 0) C.at(to, "new"); list.push(C); }
+      return list;
+    };
+    T.vars.a = a; T.vars.b = b;
+    T.push(0, `Call <code>plusTwo(${T.fmt(a)}, ${T.fmt(b)})</code>.`);
+    c = [0, 0, 0, 0]; T.vars.c = c;
+    T.push(1, `<code>new int[4]</code>: room for all four values.`);
+    [[0, "a", 0], [1, "a", 1], [2, "b", 0], [3, "b", 1]].forEach(([k, src, j]) => {
+      c[k] = (src === "a" ? a : b)[j]; to = k; T.vars.c = c;
+      T.push(2 + k, `<code>c[${k}] = ${src}[${j}]</code> → ${c[k]}.`);
+    });
+    to = 4;
+    T.ret(6, `<code>return c</code> → <code>${T.fmt(c)}</code>.`, c.slice());
+  }
+});
+</script>
+</body>
+</html>

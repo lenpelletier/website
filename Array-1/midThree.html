@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>midThree Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>midThree: the middle three</h1>
+  <p class="sub">Given an array of ints of odd length, return a new array of length 3 containing the elements from the middle. The array will be length 3 or more. Step through <code>midThree</code>: in an odd-length array, <code>nums.length/2</code> is exactly the middle box, and the answer is that box plus one neighbour on each side.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "midThree",
+  code: [
+    "public int[] midThree(int[] nums) {",
+    "  int[] a = new int[3];",
+    "  a[0] = nums[nums.length/2 - 1];",
+    "  a[1] = nums[nums.length/2];",
+    "  a[2] = nums[nums.length/2 + 1];",
+    "  return a;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [8, 6, 7, 5, 3, 0, 9], width: 220 }],
+  chk: false,
+  presets: [[[1, 2, 3, 4, 5]], [[8, 6, 7, 5, 3, 0, 9]], [[1, 2, 3]]],
+  validate([nums]) {
+    if (nums.length < 3 || nums.length % 2 === 0) return `<code>nums</code> needs an odd number of values (3 or more) — the problem promises an odd length.`;
+  },
+  legend: [
+    ["outer", "copied from"],
+    ["match", "just filled in"]
+  ],
+  trace([nums], T) {
+    const n = nums.length, h = Math.floor(n / 2);
+    let a = null, to = -1;
+    T.view = () => {
+      const N = T.arr("nums", nums), list = [N];
+      N.bot(h, "▲ length/2", "muted");
+      if (to >= 0 && to < 3) N.at(h - 1 + to, "win outer").top(h - 1 + to, ["length/2 - 1 ▼", "length/2 ▼", "length/2 + 1 ▼"][to]);
+      if (a) { const A = T.arr("a", a); if (to >= 0 && to < 3) A.at(to, "new"); list.push(A); }
+      return list;
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>midThree(${T.fmt(nums)})</code>. <code>nums.length/2</code> is ${n}/2 → ${h} (int division drops the .5), the middle box.`);
+    a = [0, 0, 0]; T.vars.a = a;
+    T.push(1, `<code>new int[3]</code>: three boxes of 0.`);
+    [[" - 1", -1], ["", 0], [" + 1", 1]].forEach(([txt, d], k) => {
+      a[k] = nums[h + d]; to = k; T.vars.a = a;
+      T.push(2 + k, `<code>a[${k}] = nums[nums.length/2${txt}]</code> → <code>nums[${h + d}]</code> = ${nums[h + d]}.`);
+    });
+    to = -1;
+    T.ret(5, `<code>return a</code> → <code>${T.fmt(a)}</code>.`, a.slice());
+  }
+});
+</script>
+</body>
+</html>

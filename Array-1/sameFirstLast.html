@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sameFirstLast Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>sameFirstLast: same value at both ends?</h1>
+  <p class="sub">Given an array of ints, return true if the array is length 1 or more and the first element equals the last element. Step through <code>sameFirstLast</code>: the empty array is handled first, because <code>nums[0]</code> doesn't exist when there are no boxes.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "sameFirstLast",
+  code: [
+    "public boolean sameFirstLast(int[] nums) {",
+    "  if (nums.length == 0) {",
+    "    return false;",
+    "  }",
+    "  if (nums[0] == nums[nums.length-1]) {",
+    "    return true;",
+    "  } else {",
+    "    return false;",
+    "  }",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 3, 1], width: 240 }],
+  presets: [[[1, 2, 3]], [[1, 2, 3, 1]], [[1, 2, 1]], [[7]], [[]], [[1, 2, 3, 4, 5, 1]], [[1, 2, 3, 4, 5, 13]], [[13, 2, 3, 4, 5, 13]], [[7, 7]]],
+  legend: [
+    ["outer", "<code>nums[0]</code>"],
+    ["inner", "<code>nums[nums.length-1]</code>"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let look = false;
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      if (look) A.at(0, "win outer").top(0, "0 ▼").at(n - 1, n === 1 ? "win outer" : "win2 inner").bot(n - 1, "▲ length-1");
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>sameFirstLast(${T.fmt(nums)})</code>.`);
+    const e = n === 0, c1 = ["nums.length == 0", `${n} == 0 → ${e}`, e];
+    if (e) { T.push(1, `The array is empty — it has no first or last element.`, { chk: [c1] }); T.ret(2, `<code>return false</code>.`, false, { chk: [c1] }); return; }
+    T.push(1, `<code>${n} == 0</code> is <b>false</b>, so there's at least one box.`, { chk: [c1] });
+    look = true;
+    const eq = nums[0] === nums[n - 1], c2 = ["nums[0] == nums[nums.length-1]", `${nums[0]} == ${nums[n - 1]} → ${eq}`, eq];
+    T.push(4, `<code>nums.length-1</code> is ${n - 1}. Compare <code>nums[0]</code> (${nums[0]}) with <code>nums[${n - 1}]</code> (${nums[n - 1]}).${n === 1 ? " With one box, it's comparing the box to itself." : ""}`, { chk: [c1, c2] });
+    if (eq) T.ret(5, `They're equal. <code>return true</code>.`, true, { chk: [c1, c2] });
+    else T.ret(7, `They're different. <code>return false</code>.`, false, { chk: [c1, c2] });
+  }
+});
+</script>
+</body>
+</html>

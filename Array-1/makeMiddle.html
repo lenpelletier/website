@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>makeMiddle Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>makeMiddle: the middle two</h1>
+  <p class="sub">Given an array of ints of even length, return a new array of length 2 containing the middle two elements. The original will be length 2 or more. Step through <code>makeMiddle</code>: in an even-length array, <code>nums.length/2</code> is the first box of the second half, so the middle pair is that box and the one just before it.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "makeMiddle",
+  code: [
+    "public int[] makeMiddle(int[] nums) {",
+    "   int[] middle = new int[2];",
+    "   middle[0] = nums[nums.length/2 - 1];",
+    "   middle[1] = nums[nums.length/2];",
+    "   return middle;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [7, 1, 2, 3, 4, 9], width: 220 }],
+  chk: false,
+  presets: [[[1, 2, 3, 4]], [[7, 1, 2, 3, 4, 9]], [[1, 2]], [[5, 2, 4, 7]], [[9, 0, 4, 3, 9, 1]]],
+  validate([nums]) {
+    if (nums.length < 2 || nums.length % 2) return `<code>nums</code> needs an even number of values (2 or more) — the problem promises an even length.`;
+  },
+  legend: [
+    ["outer", "copied from"],
+    ["match", "just filled in"]
+  ],
+  trace([nums], T) {
+    const n = nums.length, h = n / 2;
+    let m = null, step = 0;
+    T.view = () => {
+      const N = T.arr("nums", nums), list = [N];
+      if (step >= 1) N.bot(h, "▲ length/2", "muted");
+      if (step === 2) N.at(h - 1, "win outer").top(h - 1, "length/2 - 1 ▼");
+      if (step === 3) N.at(h, "win outer").top(h, "length/2 ▼");
+      if (m) { const M = T.arr("middle", m); if (step === 2) M.at(0, "new"); if (step === 3) M.at(1, "new"); list.push(M); }
+      return list;
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>makeMiddle(${T.fmt(nums)})</code>.`);
+    m = [0, 0]; T.vars.middle = m; step = 1;
+    T.push(1, `<code>new int[2]</code>: two boxes of 0. <code>nums.length/2</code> is ${n}/2 = ${h}.`);
+    m[0] = nums[h - 1]; T.vars.middle = m; step = 2;
+    T.push(2, `<code>nums.length/2 - 1</code> is ${h - 1}, so <code>middle[0] = nums[${h - 1}]</code> → ${nums[h - 1]}.`);
+    m[1] = nums[h]; T.vars.middle = m; step = 3;
+    T.push(3, `<code>middle[1] = nums[${h}]</code> → ${nums[h]}.`);
+    step = 4;
+    T.ret(4, `<code>return middle</code> → <code>${T.fmt(m)}</code>.`, m.slice());
+  }
+});
+</script>
+</body>
+</html>

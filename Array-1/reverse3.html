@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>reverse3 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>reverse3: three values backwards</h1>
+  <p class="sub">Given an array of ints of length 3, return a new array with the elements in reverse order, so <code>{1, 2, 3}</code> becomes <code>{3, 2, 1}</code>. Step through <code>reverse3</code>: box 0 of the new array gets the last value, and box 2 gets the first. The middle one stays in the middle.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "reverse3",
+  code: [
+    "public int[] reverse3(int[] nums) {",
+    "  int[] a = new int[3];",
+    "  a[0] = nums[2];",
+    "  a[1] = nums[1];",
+    "  a[2] = nums[0];",
+    "",
+    "  return a;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 3], width: 160 }],
+  chk: false,
+  presets: [[[1, 2, 3]], [[5, 11, 9]], [[7, 0, 0]], [[2, 1, 2]], [[1, 2, 1]], [[2, 11, 3]], [[0, 6, 5]], [[7, 2, 3]]],
+  validate([nums]) {
+    if (nums.length !== 3) return `<code>nums</code> must have exactly 3 values — the problem promises length 3.`;
+  },
+  legend: [
+    ["inner", "copied from"],
+    ["match", "just filled in"]
+  ],
+  trace([nums], T) {
+    let a = null, from = -1, to = -1;
+    T.view = () => {
+      const N = T.arr("nums", nums), list = [N];
+      if (from >= 0) N.at(from, "win2 inner").bot(from, `▲ nums[${from}]`);
+      if (a) { const A = T.arr("a", a); if (to >= 0) A.at(to, "new").top(to, `a[${to}] ▼`); list.push(A); }
+      return list;
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>reverse3(${T.fmt(nums)})</code>.`);
+    a = [0, 0, 0]; T.vars.a = a;
+    T.push(1, `<code>new int[3]</code>: a new array of three 0s.`);
+    [[2, 0, 2], [3, 1, 1], [4, 2, 0]].forEach(([line, t, f]) => {
+      a[t] = nums[f]; to = t; from = f; T.vars.a = a;
+      T.push(line, `<code>a[${t}] = nums[${f}]</code> → ${nums[f]}.`);
+    });
+    to = from = -1;
+    T.ret(6, `<code>return a</code> → <code>${T.fmt(a)}</code>.`, a.slice());
+  }
+});
+</script>
+</body>
+</html>

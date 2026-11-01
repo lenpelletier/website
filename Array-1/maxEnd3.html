@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>maxEnd3 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>maxEnd3: fill with the bigger end</h1>
+  <p class="sub">Given an array of ints of length 3, figure out which is larger, the first or last element, and set all the elements to that value. Step through <code>maxEnd3</code>: an <code>if</code>/<code>else</code> picks <code>biggest</code>, then three lines copy it into every box of a new array.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "maxEnd3",
+  code: [
+    "public int[] maxEnd3(int[] nums) {",
+    "  int[] a = new int[3];",
+    "  int biggest;",
+    "",
+    "  if (nums[0] > nums[2]) {",
+    "    biggest = nums[0];",
+    "  } else {",
+    "    biggest = nums[2];",
+    "  }",
+    "",
+    "  a[0] = biggest;",
+    "  a[1] = biggest;",
+    "  a[2] = biggest;",
+    "  return a;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [11, 5, 9], width: 160 }],
+  presets: [[[1, 2, 3]], [[11, 5, 9]], [[2, 11, 3]], [[11, 3, 3]], [[3, 11, 11]], [[2, 2, 2]], [[2, 11, 2]], [[0, 0, 1]]],
+  validate([nums]) {
+    if (nums.length !== 3) return `<code>nums</code> must have exactly 3 values — the problem promises length 3.`;
+  },
+  legend: [
+    ["outer", "<code>nums[0]</code>"],
+    ["inner", "<code>nums[2]</code>"],
+    ["match", "just filled in"]
+  ],
+  trace([nums], T) {
+    let a = null, look = false, to = -1;
+    T.view = () => {
+      const N = T.arr("nums", nums), list = [N];
+      if (look) N.at(0, "win outer").top(0, "0 ▼").at(2, "win2 inner").top(2, "2 ▼");
+      if (a) { const A = T.arr("a", a); if (to >= 0) A.at(to, "new"); list.push(A); }
+      return list;
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>maxEnd3(${T.fmt(nums)})</code>.`);
+    a = [0, 0, 0]; T.vars.a = a;
+    T.push(1, `<code>new int[3]</code>: a new array of three 0s.`);
+    T.push(2, `<code>int biggest;</code> declares a variable with no value yet. The <code>if</code>/<code>else</code> below gives it one either way.`);
+    look = true;
+    const first = nums[0] > nums[2], chk = [["nums[0] &gt; nums[2]", `${nums[0]} > ${nums[2]} → ${first}`, first]];
+    T.push(4, first ? `The first element is bigger.` : nums[0] === nums[2] ? `They're equal, so <code>&gt;</code> is false — but either one is the right answer.` : `The last element is bigger. Go to the <code>else</code>.`, { chk });
+    const big = first ? nums[0] : nums[2];
+    T.vars.biggest = big;
+    T.push(first ? 5 : 7, `<code>biggest = nums[${first ? 0 : 2}]</code> → ${big}.`, { chk });
+    look = false;
+    for (let k = 0; k < 3; k++) { a[k] = big; to = k; T.vars.a = a; T.push(10 + k, `<code>a[${k}] = biggest</code> → ${big}.`); }
+    to = -1;
+    T.ret(13, `<code>return a</code> → <code>${T.fmt(a)}</code>.`, a.slice());
+  }
+});
+</script>
+</body>
+</html>

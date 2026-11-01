@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>makePi Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>makePi: the first 3 digits of pi</h1>
+  <p class="sub">Return an int array of length 3 containing the first 3 digits of pi, <code>{3, 1, 4}</code>. Step through <code>makePi</code>: <code>new int[3]</code> creates three boxes that all start as 0, and each line fills one box by its index. There are no inputs — press Restart to watch it again.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "makePi",
+  code: [
+    "public int[] makePi() {",
+    "   int[] pi = new int[3];",
+    "    pi[0] = 3;",
+    "    pi[1] = 1;",
+    "    pi[2] = 4;",
+    "",
+    "   return pi;",
+    "}"
+  ],
+  inputs: [],
+  chk: false,
+  presets: [],
+  legend: [
+    ["match", "just filled in"]
+  ],
+  trace([], T) {
+    let pi = null, fresh = -1;
+    T.view = () => pi ? [(() => { const A = T.arr("pi", pi); if (fresh >= 0) A.at(fresh, "new").top(fresh, `pi[${fresh}] ▼`); return A; })()] : [];
+    T.push(0, `Call <code>makePi()</code>. It takes no parameters.`);
+    pi = [0, 0, 0]; T.vars.pi = pi;
+    T.push(1, `<code>new int[3]</code> makes an array with 3 boxes, indexes 0, 1 and 2. A new int array is filled with 0s.`);
+    [3, 1, 4].forEach((d, k) => { pi[k] = d; fresh = k; T.vars.pi = pi; T.push(2 + k, `<code>pi[${k}] = ${d}</code>.`); });
+    fresh = -1;
+    T.ret(6, `<code>return pi</code> → <code>[3, 1, 4]</code>.`, pi.slice());
+  }
+});
+</script>
+</body>
+</html>

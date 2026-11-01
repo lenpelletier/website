@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>frontPiece Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>frontPiece: the first two (if there are two)</h1>
+  <p class="sub">Given an int array of any length, return a new array of its first 2 elements. If the array is shorter than 2, use whatever elements are there. Step through <code>frontPiece</code>: a short array is already the right answer, so the method returns it as it is.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "frontPiece",
+  code: [
+    "public int[] frontPiece(int[] nums) {",
+    "  int[] a = new int[2];",
+    "  if (nums.length < 2)",
+    "    return nums;",
+    "  else {",
+    "    a[0] = nums[0];",
+    "    a[1] = nums[1];",
+    "    return a;",
+    "  }",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 3], width: 200 }],
+  presets: [[[1, 2, 3]], [[1, 2]], [[1]], [[]], [[6, 5, 0]], [[6, 5]], [[3, 1, 4, 1, 5]], [[6]]],
+  legend: [
+    ["outer", "copied from"],
+    ["match", "just filled in"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let a = null, to = -1, whole = false;
+    T.view = () => {
+      const N = T.arr("nums", nums), list = [N];
+      if (whole) N.cls(0, n, "hit").tag("returned", "match");
+      if (to >= 0) N.at(to, "win outer").top(to, `nums[${to}] ▼`);
+      if (a) { const A = T.arr("a", a); if (to >= 0) A.at(to, "new"); list.push(A); }
+      return list;
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>frontPiece(${T.fmt(nums)})</code>.`);
+    a = [0, 0]; T.vars.a = a;
+    T.push(1, `<code>new int[2]</code>: two boxes of 0, ready in case they're needed.`);
+    const short = n < 2, chk = [["nums.length &lt; 2", `${n} < 2 → ${short}`, short]];
+    if (short) {
+      T.push(2, `There are fewer than 2 elements, so the whole array is the answer.`, { chk });
+      whole = true;
+      T.ret(3, `<code>return nums</code> → <code>${T.fmt(nums)}</code>. The new array <code>a</code> is never used.`, nums.slice(), { chk });
+      return;
+    }
+    T.push(2, `<code>${n} &lt; 2</code> is <b>false</b>. Go to the <code>else</code>.`, { chk });
+    a[0] = nums[0]; to = 0; T.vars.a = a; T.push(5, `<code>a[0] = nums[0]</code> → ${nums[0]}.`, { chk });
+    a[1] = nums[1]; to = 1; T.vars.a = a; T.push(6, `<code>a[1] = nums[1]</code> → ${nums[1]}.`, { chk });
+    to = -1;
+    T.ret(7, `<code>return a</code> → <code>${T.fmt(a)}</code>.`, a.slice(), { chk });
+  }
+});
+</script>
+</body>
+</html>

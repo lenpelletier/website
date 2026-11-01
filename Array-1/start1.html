@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>start1 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>start1: how many start with 1?</h1>
+  <p class="sub">Start with 2 int arrays, <code>a</code> and <code>b</code>, of any length. Return how many of the arrays have 1 as their first element. Step through <code>start1</code>: each test checks the length first, so an empty array is never asked for its <code>[0]</code>.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "start1",
+  code: [
+    "public int start1(int[] a, int[] b) {",
+    "  int count = 0;",
+    "  if (a.length > 0 && a[0] == 1)",
+    "    count++;",
+    "  if (b.length > 0 && b[0] == 1)",
+    "    count++;",
+    "  return count;",
+    "}"
+  ],
+  inputs: [{ id: "a", kind: "array", value: [1, 2, 3], width: 140 }, { id: "b", kind: "array", value: [1, 3], width: 140 }],
+  presets: [[[1, 2, 3], [1, 3]], [[7, 2, 3], [1]], [[1, 2], []], [[], [1, 2]], [[7], []], [[7], [1]], [[1], [1]], [[7], [8]], [[], []], [[1, 3], [1]]],
+  legend: [
+    ["outer", "the first element being checked"],
+    ["match", "a 1 — counted"]
+  ],
+  trace([a, b], T) {
+    let at = null, hits = [];
+    T.view = () => {
+      const A = T.arr("a", a), B = T.arr("b", b);
+      hits.forEach(x => (x === "a" ? A : B).at(0, "hit"));
+      if (at === "a" && a.length) A.at(0, "outer").top(0, "a[0] ▼");
+      if (at === "b" && b.length) B.at(0, "outer").top(0, "b[0] ▼");
+      return [A, B];
+    };
+    T.vars.a = a; T.vars.b = b;
+    T.push(0, `Call <code>start1(${T.fmt(a)}, ${T.fmt(b)})</code>.`);
+    let c = 0; T.vars.count = 0;
+    T.push(1, `<code>count = 0</code>.`);
+    for (const [name, arr, line] of [["a", a, 2], ["b", b, 4]]) {
+      at = name;
+      const has = arr.length > 0, one = has && arr[0] === 1;
+      const chk = [[`${name}.length &gt; 0`, `${arr.length} > 0 → ${has}`, has], [`${name}[0] == 1`, has ? `${arr[0]} == 1 → ${one}` : "(skipped)", has ? one : undefined]];
+      T.push(line, !has ? `<code>${name}</code> is empty, so <code>&amp;&amp;</code> stops before <code>${name}[0]</code> can throw an exception.` : one ? `<code>${name}[0]</code> is 1.` : `<code>${name}[0]</code> is ${arr[0]}, not 1.`, { chk });
+      if (one) { c++; T.vars.count = c; hits.push(name); T.push(line + 1, `<code>count++</code> → ${c}.`, { chk }); }
+    }
+    at = null;
+    T.ret(6, `<code>return count</code> → <code>${c}</code>.`, c);
+  }
+});
+</script>
+</body>
+</html>

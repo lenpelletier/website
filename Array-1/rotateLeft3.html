@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rotateLeft3 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>rotateLeft3: rotate left by one</h1>
+  <p class="sub">Given an array of ints of length 3, return an array with the elements "rotated left", so <code>{1, 2, 3}</code> gives <code>{2, 3, 1}</code>. Step through <code>rotateLeft3</code>: the new array is declared on one line and created on the next. The boxes are filled in an unusual order — the first value goes to the <em>end</em> first.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "rotateLeft3",
+  code: [
+    "public int[] rotateLeft3(int[] nums) {",
+    "  int[] a;",
+    "  a = new int[3];",
+    "  a[2] = nums[0];",
+    "  a[1] = nums[2];",
+    "  a[0] = nums[1];",
+    "  return a;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 3], width: 160 }],
+  chk: false,
+  presets: [[[1, 2, 3]], [[5, 11, 9]], [[7, 0, 0]], [[1, 2, 1]], [[0, 0, 1]]],
+  validate([nums]) {
+    if (nums.length !== 3) return `<code>nums</code> must have exactly 3 values — the problem promises length 3.`;
+  },
+  legend: [
+    ["inner", "copied from"],
+    ["match", "just filled in"]
+  ],
+  trace([nums], T) {
+    let a = null, from = -1, to = -1;
+    T.view = () => {
+      const N = T.arr("nums", nums), list = [N];
+      if (from >= 0) N.at(from, "win2 inner").bot(from, `▲ nums[${from}]`);
+      if (a) { const A = T.arr("a", a); if (to >= 0) A.at(to, "new").top(to, `a[${to}] ▼`); list.push(A); }
+      return list;
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>rotateLeft3(${T.fmt(nums)})</code>.`);
+    T.vars.a = null;
+    T.push(1, `<code>int[] a;</code> declares the variable <code>a</code>, but no array exists yet — <code>a</code> is <code>null</code>.`);
+    a = [0, 0, 0]; T.vars.a = a;
+    T.push(2, `<code>a = new int[3]</code> creates the array: three boxes of 0.`);
+    [[3, 2, 0], [4, 1, 2], [5, 0, 1]].forEach(([line, t, f]) => {
+      a[t] = nums[f]; to = t; from = f; T.vars.a = a;
+      T.push(line, `<code>a[${t}] = nums[${f}]</code> → ${nums[f]}.${t === 2 ? " The first value moves to the end." : ""}`);
+    });
+    to = from = -1;
+    T.ret(6, `<code>return a</code> → <code>${T.fmt(a)}</code>. Every value moved one box to the left, and the first wrapped around to the end.`, a.slice());
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sum3 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>sum3: add up three values</h1>
+  <p class="sub">Given an array of ints of length 3, return the sum of all the elements. Step through <code>sum3</code>: with exactly three boxes, no loop is needed — just add <code>nums[0]</code>, <code>nums[1]</code> and <code>nums[2]</code>.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "sum3",
+  code: [
+    "public int sum3(int[] nums) {",
+    "  return nums[0] + nums[1] + nums[2];",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [5, 11, 2], width: 160 }],
+  chk: false,
+  presets: [[[1, 2, 3]], [[5, 11, 2]], [[7, 0, 0]], [[1, 2, 1]], [[1, 1, 1]], [[2, 7, 2]]],
+  validate([nums]) {
+    if (nums.length !== 3) return `<code>nums</code> must have exactly 3 values — the problem promises length 3.`;
+  },
+  legend: [
+    ["outer", "the value being added"],
+    ["match", "already added"]
+  ],
+  trace([nums], T) {
+    let k = -1;
+    T.view = () => { const A = T.arr("nums", nums); for (let j = 0; j < k; j++) A.at(j, "soft"); if (k >= 0 && k < 3) A.at(k, "win outer").top(k, `nums[${k}] ▼`); return [A]; };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>sum3(${T.fmt(nums)})</code>.`);
+    let s = nums[0]; k = 0;
+    T.push(1, `Java adds left to right. Start with <code>nums[0]</code> → ${s}.`);
+    k = 1; s += nums[1];
+    T.push(1, `<code>+ nums[1]</code>: ${nums[0]} + ${nums[1]} = ${s}.`);
+    k = 2; s += nums[2];
+    T.push(1, `<code>+ nums[2]</code>: ${s - nums[2]} + ${nums[2]} = ${s}.`);
+    k = 3;
+    T.ret(1, `<code>return</code> → <code>${s}</code>.`, s);
+  }
+});
+</script>
+</body>
+</html>

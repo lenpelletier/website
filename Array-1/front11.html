@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>front11 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>front11: the first of each</h1>
+  <p class="sub">Given 2 int arrays, <code>a</code> and <code>b</code>, of any length, return a new array with the first element of each. If either array is empty, ignore it. Step through <code>front11</code>: the answer can have 0, 1 or 2 boxes, so each branch makes a new array of the right size.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "front11",
+  code: [
+    "public int[] front11(int[] a, int[] b) {",
+    "  if (a.length == 0 && b.length == 0) {",
+    "    int[] c = new int[0];",
+    "    return c;",
+    "  } else if (a.length == 0) {",
+    "    int[] c = new int[1];",
+    "    c[0] = b[0];",
+    "    return c;",
+    "  } else if (b.length == 0) {",
+    "    int[] c = new int[1];",
+    "    c[0] = a[0];",
+    "    return c;",
+    "  } else {",
+    "    int[] c = new int[2];",
+    "    c[0] = a[0];",
+    "    c[1] = b[0];",
+    "    return c;",
+    "  }",
+    "}"
+  ],
+  inputs: [{ id: "a", kind: "array", value: [1, 2, 3], width: 130 }, { id: "b", kind: "array", value: [7, 9, 8], width: 130 }],
+  presets: [[[1, 2, 3], [7, 9, 8]], [[1], [2]], [[1, 7], []], [[], [2, 8]], [[], []], [[3], [1, 4, 1, 9]], [[1, 4, 1, 9], []]],
+  legend: [
+    ["outer", "from <code>a</code>"],
+    ["inner", "from <code>b</code>"],
+    ["match", "just filled in"]
+  ],
+  trace([a, b], T) {
+    let c = null, src = null, to = -1;
+    T.view = () => {
+      const A = T.arr("a", a), B = T.arr("b", b), list = [A, B];
+      if (src === "a") A.at(0, "win outer").top(0, "a[0] ▼");
+      if (src === "b") B.at(0, "win2 inner").top(0, "b[0] ▼");
+      if (c) { const C = T.arr("c", c); if (to >= 0) C.at(to, "new"); list.push(C); }
+      return list;
+    };
+    T.vars.a = a; T.vars.b = b;
+    T.push(0, `Call <code>front11(${T.fmt(a)}, ${T.fmt(b)})</code>.`);
+    const ea = a.length === 0, eb = b.length === 0;
+    const c1 = ["a.length == 0 &amp;&amp; b.length == 0", ea ? `true && ${eb} → ${ea && eb}` : "false && … → false", ea && eb];
+    const fill = (line, k, s) => { c[k] = (s === "a" ? a : b)[0]; to = k; src = s; T.vars.c = c; T.push(line, `<code>c[${k}] = ${s}[0]</code> → ${c[k]}.`); };
+    if (ea && eb) {
+      T.push(1, `Both arrays are empty.`, { chk: [c1] });
+      c = []; T.vars.c = c;
+      T.push(2, `<code>new int[0]</code>: an array with no boxes.`, { chk: [c1] });
+      T.ret(3, `<code>return c</code> → <code>[]</code>.`, [], { chk: [c1] });
+      return;
+    }
+    T.push(1, `They aren't both empty.`, { chk: [c1] });
+    const c2 = ["a.length == 0", `${a.length} == 0 → ${ea}`, ea];
+    if (ea) {
+      T.push(4, `Only <code>a</code> is empty, so the answer holds just b's first element.`, { chk: [c1, c2] });
+      c = [0]; T.vars.c = c; T.push(5, `<code>new int[1]</code>: one box.`);
+      fill(6, 0, "b"); to = -1; src = null;
+      T.ret(7, `<code>return c</code> → <code>${T.fmt(c)}</code>.`, c.slice());
+      return;
+    }
+    const c3 = ["b.length == 0", `${b.length} == 0 → ${eb}`, eb];
+    T.push(4, `<code>a</code> isn't empty.`, { chk: [c1, c2] });
+    if (eb) {
+      T.push(8, `<code>b</code> is empty, so the answer holds just a's first element.`, { chk: [c1, c2, c3] });
+      c = [0]; T.vars.c = c; T.push(9, `<code>new int[1]</code>: one box.`);
+      fill(10, 0, "a"); to = -1; src = null;
+      T.ret(11, `<code>return c</code> → <code>${T.fmt(c)}</code>.`, c.slice());
+      return;
+    }
+    T.push(8, `Neither array is empty. Go to the <code>else</code>.`, { chk: [c1, c2, c3] });
+    c = [0, 0]; T.vars.c = c; T.push(13, `<code>new int[2]</code>: two boxes.`);
+    fill(14, 0, "a"); fill(15, 1, "b"); to = -1; src = null;
+    T.ret(16, `<code>return c</code> → <code>${T.fmt(c)}</code>.`, c.slice());
+  }
+});
+</script>
+</body>
+</html>

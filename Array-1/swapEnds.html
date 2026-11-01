@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>swapEnds Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>swapEnds: swap the first and last</h1>
+  <p class="sub">Given an array of ints, swap the first and last elements and return the changed array. The array will be length 1 or more. Step through <code>swapEnds</code>: a swap needs a third place to hold a value. Without <code>temp</code>, the first value would be lost as soon as the last one is copied over it. This code changes the array it was given and returns it.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "swapEnds",
+  code: [
+    "public int[] swapEnds(int[] nums) {",
+    "  int temp = 0;",
+    "  temp = nums[0];",
+    "  nums[0] = nums[nums.length - 1];",
+    "  nums[nums.length - 1] = temp;",
+    "  return nums;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 3, 4], width: 220 }],
+  chk: false,
+  presets: [[[1, 2, 3, 4]], [[1, 2, 3]], [[8, 6, 7, 9, 5]], [[3, 1, 4, 1, 5, 9]], [[1, 2]], [[1]]],
+  validate([nums]) {
+    if (!nums.length) return `<code>nums</code> needs at least 1 value — <code>nums[0]</code> doesn't exist in an empty array.`;
+  },
+  legend: [
+    ["outer", "<code>nums[0]</code>"],
+    ["inner", "<code>nums[nums.length - 1]</code>"],
+    ["match", "just changed"]
+  ],
+  trace([nums], T) {
+    const n = nums.length, orig = nums.slice();
+    let fresh = -1, show = true;
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      if (show) A.at(0, "win outer").top(0, "0 ▼").at(n - 1, n === 1 ? "win outer" : "win2 inner").bot(n - 1, "▲ length - 1");
+      if (fresh >= 0) A.at(fresh, "new");
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>swapEnds(${T.fmt(orig)})</code>.`);
+    T.vars.temp = 0; T.push(1, `<code>temp = 0</code>.`);
+    T.vars.temp = nums[0]; T.push(2, `<code>temp = nums[0]</code> → ${nums[0]}. Save the first value before it gets overwritten.`);
+    nums[0] = nums[n - 1]; fresh = 0; T.vars.nums = nums;
+    T.push(3, `<code>nums[0] = nums[${n - 1}]</code> → ${nums[0]}. The first box now holds the last value${n > 1 ? " — the old first value only survives in <code>temp</code>" : ""}.`);
+    nums[n - 1] = orig[0]; fresh = n - 1; T.vars.nums = nums;
+    T.push(4, `<code>nums[${n - 1}] = temp</code> → ${orig[0]}. The saved first value goes into the last box.${n === 1 ? " (With one box, it's swapped with itself.)" : ""}`);
+    fresh = -1; show = false;
+    T.ret(5, `<code>return nums</code> → <code>${T.fmt(nums)}</code>.`, nums.slice());
+  }
+});
+</script>
+</body>
+</html>

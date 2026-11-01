@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hasBad Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>hasBad: "bad" at index 0 or 1?</h1>
+  <p class="sub">Given a string, return true if <code>"bad"</code> appears starting at index 0 or 1, such as in <code>"badxxx"</code> or <code>"xbadxx"</code> but not <code>"xxbadxx"</code>. The string may be any length, including 0. Step through <code>hasBad</code>: each test checks the length first, so <code>&amp;&amp;</code> skips any <code>substring</code> that would run past the end.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "hasBad",
+  wide: true,
+  code: [
+    "public boolean hasBad(String str) {",
+    "  if (str.length() >= 3 && str.substring(0,3).equals(\"bad\"))",
+    "    return true;",
+    "  if (str.length() >= 4 && str.substring(1,4).equals(\"bad\"))",
+    "    return true;",
+    "  return false;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "xbadxx" }],
+  presets: [["badxx"], ["xbadxx"], ["xxbadxx"], ["code"], ["bad"], ["ba"], ["xba"], ["xbad"], [""], ["badyy"]],
+  legend: [
+    ["outer", "the <code>substring</code> being checked"],
+    ["match", "letter matches"],
+    ["bad", "letter doesn't match"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let at = null, cmp = false;
+    T.view = () => {
+      const s = T.strip("str", str), list = [s];
+      if (at !== null) {
+        s.cut(at, at + 3, "win");
+        list.push(T.strip("", "bad").named('"bad"').shift(at));
+        if (cmp) for (let k = 0; k < 3; k++) {
+          const ok = str[at + k] === "bad"[k];
+          s.badge(at + k, ok ? "✓" : "✗", ok ? "ok" : "no").at(at + k, ok ? "hit" : "miss");
+        }
+      }
+      return list;
+    };
+    T.vars.str = str;
+    T.push(0, `Call <code>hasBad(${q(str)})</code>.`);
+    const test = (line, start) => {
+      const need = start + 3, long = n >= need, chk = [[`str.length() &gt;= ${need}`, `${n} >= ${need} → ${long}`, long]];
+      at = null; cmp = false;
+      if (!long) {
+        chk.push([".equals(\"bad\")", "(skipped)"]);
+        T.push(line, `<code>${n} &gt;= ${need}</code> is <b>false</b> — not enough room for <code>"bad"</code> starting at index ${start}. <code>&amp;&amp;</code> stops before <code>substring(${start},${need})</code> can throw an exception.`, { chk });
+        return [false, chk];
+      }
+      T.push(line, `<code>${n} &gt;= ${need}</code> is <b>true</b>, so there's room for 3 letters starting at index ${start}.`, { chk });
+      at = start;
+      const sub = str.substring(start, need);
+      T.push(line, `<code>str.substring(${start},${need})</code> → <code>${q(sub)}</code>.`, { chk });
+      cmp = true;
+      const eq = sub === "bad";
+      chk.push([".equals(\"bad\")", `${JSON.stringify(sub)} → ${eq}`, eq]);
+      T.push(line, `<code>${q(sub)}.equals("bad")</code> is <b>${eq}</b>.`, { chk });
+      return [eq, chk];
+    };
+    let [ok, chk] = test(1, 0);
+    if (ok) { T.ret(2, `<code>"bad"</code> is at index 0. <code>return true</code>.`, true, { chk }); return; }
+    [ok, chk] = test(3, 1);
+    if (ok) { T.ret(4, `<code>"bad"</code> is at index 1. <code>return true</code>.`, true, { chk }); return; }
+    at = null;
+    T.ret(5, `Neither index 0 nor index 1 starts <code>"bad"</code>. <code>return false</code>.`, false);
+  }
+});
+</script>
+</body>
+</html>

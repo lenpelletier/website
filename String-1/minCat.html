@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>minCat Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>minCat: trim to the same length, then join</h1>
+  <p class="sub">Given two strings, join them together and return the result. But if they are different lengths, leave characters off the <em>front</em> of the longer string until it's the same length as the shorter one, so <code>"Hello"</code> and <code>"Hi"</code> give <code>"loHi"</code>. Step through <code>minCat</code>: each string keeps only its last <code>min</code> characters.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "minCat",
+  code: [
+    "public String minCat(String a, String b) {",
+    "  int min = Math.min(a.length(), b.length());",
+    "  a = a.substring(a.length()-min);",
+    "  b = b.substring(b.length()-min);",
+    "  return a + b;",
+    "}"
+  ],
+  inputs: [{ id: "a", value: "Hello" }, { id: "b", value: "Hi" }],
+  chk: false,
+  presets: [["Hello", "Hi"], ["Hello", "java"], ["java", "Hello"], ["abc", "x"], ["x", "abc"], ["abc", ""], ["ab", "cd"]],
+  legend: [
+    ["outer", "kept from <code>a</code>"],
+    ["inner", "kept from <code>b</code>"],
+    ["bad", "trimmed off"]
+  ],
+  trace([a0, b0], T) {
+    const q = T.q, min = Math.min(a0.length, b0.length);
+    let a = a0, b = b0, stage = 0;
+    const ka = a0.length - min, kb = b0.length - min;
+    T.view = () => {
+      const list = [];
+      const A = T.strip(stage >= 2 ? "" : "a", a0), B = T.strip(stage >= 3 ? "" : "b", b0);
+      if (stage >= 2) A.named(`old a = ${JSON.stringify(a0)}`).cls(0, ka, "miss").cls(ka, a0.length, "win");
+      if (stage === 2) A.bot(ka, `▲ ${ka} to the end`);
+      if (stage >= 3) B.named(`old b = ${JSON.stringify(b0)}`).cls(0, kb, "miss").cls(kb, b0.length, "win2");
+      if (stage === 3) B.bot(kb, `▲ ${kb} to the end`);
+      list.push(A, B);
+      if (stage >= 2) list.push(T.strip("a", a).cls(0, min, stage === 2 ? "win new" : "win"));
+      if (stage >= 3) list.push(T.strip("b", b).cls(0, min, stage === 3 ? "win2 new" : "win2"));
+      if (stage >= 4) list.push(T.cat(`a + b = ${JSON.stringify(a + b)}`, [[a, "win"], [b, "win2"]]));
+      return list;
+    };
+    T.vars.a = a; T.vars.b = b;
+    T.push(0, `Call <code>minCat(${q(a0)}, ${q(b0)})</code>.`);
+    stage = 1; T.vars.min = min;
+    T.push(1, `<code>Math.min(${a0.length}, ${b0.length})</code> picks the smaller length → <code>min = ${min}</code>. Both strings will end up this long.`);
+    stage = 2; a = a0.substring(ka); T.vars.a = a;
+    T.push(2, `<code>a.length()-min</code> is <code>${a0.length}-${min}</code> → <code>${ka}</code>. <code>a.substring(${ka})</code> keeps the last ${min} → <code>a = ${q(a)}</code>.${ka === 0 ? " Nothing is trimmed — a was already the shorter one." : ""}`);
+    stage = 3; b = b0.substring(kb); T.vars.b = b;
+    T.push(3, `<code>b.length()-min</code> is <code>${b0.length}-${min}</code> → <code>${kb}</code>. <code>b.substring(${kb})</code> keeps the last ${min} → <code>b = ${q(b)}</code>.${kb === 0 ? " Nothing is trimmed." : ""}`);
+    stage = 4;
+    T.ret(4, `<code>a + b</code> → <code>${q(a + b)}</code>.`, a + b);
+  }
+});
+</script>
+</body>
+</html>

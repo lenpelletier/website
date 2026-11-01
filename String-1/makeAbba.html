@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>makeAbba Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>makeAbba: a, b, b, a</h1>
+  <p class="sub">Given two strings, <code>a</code> and <code>b</code>, return the result of putting them together in the order abba, so <code>"Hi"</code> and <code>"Bye"</code> give <code>"HiByeByeHi"</code>. Step through <code>makeAbba</code>: Java joins the <code>+</code> pieces from left to right, one at a time.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "makeAbba",
+  code: [
+    "public String makeAbba(String a, String b) {",
+    "  return a + b + b + a;",
+    "}"
+  ],
+  inputs: [{ id: "a", value: "Hi" }, { id: "b", value: "Bye" }],
+  chk: false,
+  presets: [["Hi", "Bye"], ["Yo", "Alice"], ["What", "Up"], ["aaa", "bbb"], ["x", "y"], ["x", ""], ["", "y"], ["Bo", "Ya"], ["Ya", "Ya"]],
+  legend: [
+    ["outer", "<code>a</code>"],
+    ["inner", "<code>b</code>"],
+    ["match", "just joined on"]
+  ],
+  trace([a, b], T) {
+    const q = T.q, order = [[a, "win", "a"], [b, "win2", "b"], [b, "win2", "b"], [a, "win", "a"]];
+    let used = 0, fresh = -1;
+    T.view = () => {
+      const list = [T.strip("a", a).cls(0, a.length, "win"), T.strip("b", b).cls(0, b.length, "win2")];
+      if (used) {
+        const parts = order.slice(0, used);
+        const s = parts.map(p => p[0]).join("");
+        list.push(T.cat(`${parts.map(p => p[2]).join(" + ")} = ${JSON.stringify(s)}`, parts, fresh));
+      }
+      return list;
+    };
+    T.vars.a = a; T.vars.b = b;
+    T.push(0, `Call <code>makeAbba(${q(a)}, ${q(b)})</code>.`);
+    let s = a; used = 1; fresh = 0;
+    T.push(1, `Java reads <code>a + b + b + a</code> from left to right. It starts with <code>a</code> → <code>${q(s)}</code>.`);
+    const say = ["", "Add <code>b</code>", "Add <code>b</code> again", "Finish with <code>a</code>"];
+    for (let k = 1; k < 4; k++) {
+      s += order[k][0]; used = k + 1; fresh = k;
+      T.push(1, `${say[k]} → <code>${q(s)}</code>.${order[k][0] === "" ? " (It's empty, so nothing changes.)" : ""}`);
+    }
+    fresh = -1;
+    T.ret(1, `<code>return</code> → <code>${q(s)}</code>.`, s);
+  }
+});
+</script>
+</body>
+</html>

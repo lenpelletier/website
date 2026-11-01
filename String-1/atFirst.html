@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>atFirst Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>atFirst: first two, padded with @</h1>
+  <p class="sub">Given a string, return a string of length 2 made of its first 2 characters. If the string is shorter than 2, use <code>'@'</code> for the missing characters. Step through <code>atFirst</code>: an <code>if</code> / <code>else if</code> / <code>else</code> chain handles each possible length — 2 or more, exactly 1, or 0.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "atFirst",
+  code: [
+    "public String atFirst(String str) {",
+    "  if (str.length() >= 2)",
+    "    return str.substring(0,2);",
+    "  else if (str.length() == 1)",
+    "    return str + \"@\";",
+    "  else",
+    "    return \"@@\";",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "hello" }],
+  presets: [["hello"], ["hi"], ["h"], [""], ["kitten"], ["java"], ["j"]],
+  legend: [
+    ["outer", "taken from <code>str</code>"],
+    ["inner", "<code>'@'</code> filling in"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let res = null;
+    T.view = () => {
+      const s = T.strip("str", str), list = [s];
+      if (res === 2) { s.cut(0, 2, "win"); list.push(T.cat(`str.substring(0,2) = ${JSON.stringify(str.substring(0, 2))}`, [[str.substring(0, 2), "win"]])); }
+      if (res === 1) { s.at(0, "win"); list.push(T.cat(`str + "@" = ${JSON.stringify(str + "@")}`, [[str, "win"], ["@", "win2"]])); }
+      if (res === 0) list.push(T.cat(`"@@"`, [["@@", "win2"]]));
+      return list;
+    };
+    T.vars.str = str;
+    T.push(0, `Call <code>atFirst(${q(str)})</code>.`);
+    const c1 = ["str.length() &gt;= 2", `${n} >= 2 → ${n >= 2}`, n >= 2];
+    if (n >= 2) {
+      T.push(1, `<code>${n} &gt;= 2</code> is <b>true</b> — there are two real characters to take.`, { chk: [c1] });
+      res = 2;
+      T.ret(2, `<code>str.substring(0,2)</code> → <code>${q(str.substring(0, 2))}</code>.`, str.substring(0, 2), { chk: [c1] });
+      return;
+    }
+    T.push(1, `<code>${n} &gt;= 2</code> is <b>false</b>. Try the <code>else if</code>.`, { chk: [c1] });
+    const c2 = ["str.length() == 1", `${n} == 1 → ${n === 1}`, n === 1];
+    if (n === 1) {
+      T.push(3, `<code>${n} == 1</code> is <b>true</b> — one real character, one missing.`, { chk: [c1, c2] });
+      res = 1;
+      T.ret(4, `<code>str + "@"</code> fills the missing second spot → <code>${q(str + "@")}</code>.`, str + "@", { chk: [c1, c2] });
+      return;
+    }
+    T.push(3, `<code>${n} == 1</code> is <b>false</b>, so the string must be empty. Go to the <code>else</code>.`, { chk: [c1, c2] });
+    res = 0;
+    T.ret(6, `Both characters are missing. <code>return "@@"</code>.`, "@@", { chk: [c1, c2] });
+  }
+});
+</script>
+</body>
+</html>

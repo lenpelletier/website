@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>makeTags Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>makeTags: wrap a word in HTML tags</h1>
+  <p class="sub">The web is built with HTML strings like <code>"&lt;i&gt;Yay&lt;/i&gt;"</code>, which draws <i>Yay</i> in italics. Given <code>tag</code> and <code>word</code> strings, return the HTML string with tags around the word. Step through <code>makeTags</code>: the angle brackets and the slash are written in the code as text, and <code>tag</code> is used twice.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "makeTags",
+  code: [
+    "public String makeTags(String tag, String word) {",
+    "  return \"<\" + tag + \">\" + word + \"</\" + tag + \">\";",
+    "}"
+  ],
+  inputs: [{ id: "tag", value: "i", width: 90 }, { id: "word", value: "Yay" }],
+  chk: false,
+  presets: [["i", "Yay"], ["i", "Hello"], ["cite", "Yay"], ["address", "here"], ["body", "Heart"], ["i", "i"], ["i", ""]],
+  legend: [
+    ["outer", "<code>tag</code>"],
+    ["match", "<code>word</code>"],
+    ["inner", "text written in the code"]
+  ],
+  trace([tag, word], T) {
+    const q = T.q;
+    const P = [["<", "win2"], [tag, "win"], [">", "win2"], [word, "soft"], ["</", "win2"], [tag, "win"], [">", "win2"]];
+    const names = ['"<"', "tag", '">"', "word", '"</"', "tag", '">"'];
+    let used = 0, fresh = [];
+    T.view = () => {
+      const list = [T.strip("tag", tag).cls(0, tag.length, "win"), T.strip("word", word).cls(0, word.length, "soft")];
+      if (used) {
+        const parts = P.slice(0, used), s = parts.map(p => p[0]).join("");
+        const r = T.cat(`${names.slice(0, used).join(" + ")} = ${JSON.stringify(s)}`, parts);
+        let k = 0;
+        parts.forEach(([t], j) => { if (fresh.includes(j)) r.cls(k, k + t.length, "new"); k += t.length; });
+        list.push(r);
+      }
+      return list;
+    };
+    T.vars.tag = tag; T.vars.word = word;
+    T.push(0, `Call <code>makeTags(${q(tag)}, ${q(word)})</code>.`);
+    let s = "<" + tag + ">"; used = 3; fresh = [0, 1, 2];
+    T.push(1, `The first three pieces, <code>"&lt;" + tag + "&gt;"</code>, make the opening tag → <code>${q(s)}</code>.`);
+    s += word; used = 4; fresh = [3];
+    T.push(1, `<code>+ word</code> puts the word after it → <code>${q(s)}</code>.`);
+    s += "</" + tag + ">"; used = 7; fresh = [4, 5, 6];
+    T.push(1, `<code>"&lt;/" + tag + "&gt;"</code> makes the closing tag. The <code>/</code> is what marks it as a closing tag → <code>${q(s)}</code>.`);
+    fresh = [];
+    T.ret(1, `<code>return</code> → <code>${q(s)}</code>.`, s);
+  }
+});
+</script>
+</body>
+</html>

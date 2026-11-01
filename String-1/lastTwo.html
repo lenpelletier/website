@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lastTwo Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>lastTwo: swap the last two characters</h1>
+  <p class="sub">Given a string of any length, return a new string where the last 2 characters, if present, are swapped, so <code>"coding"</code> gives <code>"codign"</code>. Step through <code>lastTwo</code>: everything before the last two stays put, and the last two are added back in reverse order.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "lastTwo",
+  code: [
+    "public String lastTwo(String str) {",
+    "  int len = str.length();",
+    "  if (len < 2)",
+    "    return str;",
+    "  String front = str.substring(0, len-2);",
+    "  char second = str.charAt(len-2);",
+    "  char last = str.charAt(len-1);",
+    "  return front + last + second;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "coding" }],
+  presets: [["coding"], ["cat"], ["ab"], ["a"], [""], ["kitten"], ["hello"]],
+  legend: [
+    ["match", "<code>front</code> = <code>str.substring(0, len-2)</code>"],
+    ["outer", "<code>second</code> = <code>str.charAt(len-2)</code>"],
+    ["inner", "<code>last</code> = <code>str.charAt(len-1)</code>"]
+  ],
+  trace([str], T) {
+    const q = T.q, len = str.length;
+    let stage = 0;
+    T.view = () => {
+      const s = T.strip("str", str), list = [s];
+      if (stage === 1) s.cls(0, len, "soft");
+      if (stage >= 2) s.cls(0, len - 2, "soft");
+      if (stage === 2) s.cut(0, len - 2, "soft");
+      if (stage >= 3) s.at(len - 2, "win").top(len - 2, "len-2 ▼");
+      if (stage >= 4) s.at(len - 1, "win2").bot(len - 1, "▲ len-1");
+      if (stage >= 2) list.push(T.strip("front", str.substring(0, len - 2)).cls(0, len - 2, stage === 2 ? "soft new" : "soft"));
+      if (stage >= 5) list.push(T.cat(`front + last + second = ${JSON.stringify(str.substring(0, len - 2) + str[len - 1] + str[len - 2])}`, [[str.substring(0, len - 2), "soft"], [str[len - 1], "win2"], [str[len - 2], "win"]]));
+      return list;
+    };
+    T.vars.str = str;
+    T.push(0, `Call <code>lastTwo(${q(str)})</code>.`);
+    T.vars.len = len;
+    T.push(1, `<code>len = ${len}</code>.`);
+    const short = len < 2, chk = [["len &lt; 2", `${len} < 2 → ${short}`, short]];
+    if (short) {
+      T.push(2, `<code>${len} &lt; 2</code> is <b>true</b> — there aren't two characters to swap.`, { chk });
+      stage = 1;
+      T.ret(3, `<code>return str</code> unchanged → <code>${q(str)}</code>.`, str, { chk });
+      return;
+    }
+    T.push(2, `<code>${len} &lt; 2</code> is <b>false</b>.`, { chk });
+    const front = str.substring(0, len - 2);
+    stage = 2; T.vars.front = front;
+    T.push(4, `<code>str.substring(0, ${len - 2})</code> is everything before the last two → <code>front = ${q(front)}</code>.`, { chk });
+    stage = 3; T.vars.second = T.c(str[len - 2]);
+    T.push(5, `<code>second = str.charAt(${len - 2})</code> → <code>'${T.esc(str[len - 2])}'</code>, the second-to-last character.`, { chk });
+    stage = 4; T.vars.last = T.c(str[len - 1]);
+    T.push(6, `<code>last = str.charAt(${len - 1})</code> → <code>'${T.esc(str[len - 1])}'</code>, the last character.`, { chk });
+    stage = 5;
+    const ans = front + str[len - 1] + str[len - 2];
+    T.ret(7, `<code>front + last + second</code> puts the last two back the other way round → <code>${q(ans)}</code>. Because <code>front</code> is a String, the <code>char</code>s are added as letters.`, ans, { chk });
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>frontAgain Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>frontAgain: same two at the front and back?</h1>
+  <p class="sub">Given a string, return true if the first 2 characters also appear at the end of the string, as in <code>"edited"</code>. Step through <code>frontAgain</code>: after making sure there are 2 characters, it cuts off the first two and the last two and compares them with <code>.equals</code>.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "frontAgain",
+  code: [
+    "public boolean frontAgain(String str) {",
+    "  int len = str.length();",
+    "  if (len < 2)",
+    "    return false;",
+    "  return str.substring(0,2).equals(str.substring(len-2));",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "edited" }],
+  presets: [["edited"], ["edit"], ["ed"], ["jj"], ["jjj"], ["jjjj"], ["jjjk"], ["x"], [""], ["java"], ["javaja"]],
+  legend: [
+    ["outer", "<code>str.substring(0,2)</code>"],
+    ["inner", "<code>str.substring(len-2)</code>"],
+    ["match", "letters match"],
+    ["bad", "letters don't match"]
+  ],
+  trace([str], T) {
+    const q = T.q, len = str.length;
+    let stage = 0;
+    T.view = () => {
+      const s = T.strip("str", str), list = [s];
+      if (stage >= 1) {
+        s.cls(0, 2, "win").top(0, "front ▼", "outer");
+        s.cls(len - 2, len, "win2").bot(len - 2, "▲ back");
+        list.push(T.strip("str.substring(0,2)", str.substring(0, 2)).cls(0, 2, "win"));
+        const b = T.strip(`str.substring(${len - 2})`, str.substring(len - 2)).cls(0, 2, "win2");
+        if (stage >= 2) for (let k = 0; k < 2; k++) { const ok = str[k] === str[len - 2 + k]; b.badge(k, ok ? "✓" : "✗", ok ? "ok" : "no"); }
+        list.push(b);
+      }
+      return list;
+    };
+    T.vars.str = str;
+    T.push(0, `Call <code>frontAgain(${q(str)})</code>.`);
+    T.vars.len = len;
+    T.push(1, `<code>len = ${len}</code>.`);
+    const short = len < 2, chk = [["len &lt; 2", `${len} < 2 → ${short}`, short]];
+    if (short) {
+      T.push(2, `<code>${len} &lt; 2</code> is <b>true</b> — not even two characters at the front.`, { chk });
+      T.ret(3, `<code>return false</code>.`, false, { chk });
+      return;
+    }
+    T.push(2, `<code>${len} &lt; 2</code> is <b>false</b>.`, { chk });
+    stage = 1;
+    const f = str.substring(0, 2), b = str.substring(len - 2);
+    T.push(4, `<code>str.substring(0,2)</code> → <code>${q(f)}</code> and <code>str.substring(${len - 2})</code> → <code>${q(b)}</code>.${len < 4 ? " The two pieces overlap, which is allowed." : ""}`, { chk });
+    stage = 2;
+    const eq = f === b;
+    T.ret(4, `<code>${q(f)}.equals(${q(b)})</code> → <b>${eq}</b>.`, eq, { chk: [...chk, [".equals(…)", `${JSON.stringify(f)} vs ${JSON.stringify(b)} → ${eq}`, eq]] });
+  }
+});
+</script>
+</body>
+</html>

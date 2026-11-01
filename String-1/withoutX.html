@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>withoutX Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>withoutX: remove an x at either end</h1>
+  <p class="sub">Given a string, if the first or last character is <code>'x'</code>, return the string without those x's; otherwise return it unchanged. Step through <code>withoutX</code>: the front x is removed first, and then the <em>new</em> string's last character is checked — that's why each check also makes sure the string isn't empty.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "withoutX",
+  wide: true,
+  code: [
+    "public String withoutX(String str) {",
+    "  if (str.length() > 0 && str.charAt(0) == 'x')",
+    "    str = str.substring(1);",
+    "  if (str.length() > 0 && str.charAt(str.length()-1) == 'x')",
+    "    str = str.substring(0, str.length()-1);",
+    "  return str;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "xHix" }],
+  presets: [["xHix"], ["xHi"], ["Hxix"], ["Hi"], ["xxHi"], ["Hix"], ["xaxbx"], ["xx"], ["x"], [""], ["Hello"]],
+  legend: [
+    ["outer", "the character being checked"],
+    ["bad", "removed"]
+  ],
+  trace([orig], T) {
+    const q = T.q;
+    let str = orig, look = null, removed = null, olds = [];
+    T.view = () => {
+      const list = olds.map(([label, text, cut]) => T.strip("", text).named(label).at(cut, "miss"));
+      const s = T.strip("str", str);
+      if (look !== null) s.at(look, "win outer").top(look, look === 0 ? "0 ▼" : "length-1 ▼");
+      list.push(s);
+      return list;
+    };
+    T.vars.str = str;
+    T.push(0, `Call <code>withoutX(${q(orig)})</code>.`);
+    const n1 = str.length, front = n1 > 0 && str[0] === "x";
+    const c1 = [["str.length() &gt; 0", `${n1} > 0 → ${n1 > 0}`, n1 > 0], ["str.charAt(0) == 'x'", n1 > 0 ? `'${str[0]}' == 'x' → ${front}` : "(skipped)", n1 > 0 ? front : undefined]];
+    look = n1 > 0 ? 0 : null;
+    T.push(1, n1 === 0 ? `The string is empty, so <code>&amp;&amp;</code> stops before <code>charAt(0)</code>.` : front ? `The first character is <code>'x'</code>.` : `The first character is <code>'${T.esc(str[0])}'</code>, not <code>'x'</code>.`, { chk: c1 });
+    look = null;
+    if (front) {
+      olds.push([`str was ${JSON.stringify(str)}`, str, 0]);
+      str = str.substring(1); T.vars.str = str;
+      T.push(2, `<code>str = str.substring(1)</code> drops it → <code>${q(str)}</code>.`, { chk: c1 });
+    }
+    const n2 = str.length, back = n2 > 0 && str[n2 - 1] === "x";
+    const c2 = [["str.length() &gt; 0", `${n2} > 0 → ${n2 > 0}`, n2 > 0], ["str.charAt(str.length()-1) == 'x'", n2 > 0 ? `'${str[n2 - 1]}' == 'x' → ${back}` : "(skipped)", n2 > 0 ? back : undefined]];
+    look = n2 > 0 ? n2 - 1 : null;
+    T.push(3, n2 === 0
+      ? `${front ? "Removing that x left nothing, so " : ""}the string is empty — <code>&amp;&amp;</code> stops before <code>charAt</code> can throw an exception.`
+      : back ? `The last character, index ${n2 - 1}, is <code>'x'</code>.` : `The last character, index ${n2 - 1}, is <code>'${T.esc(str[n2 - 1])}'</code>, not <code>'x'</code>.`, { chk: c2 });
+    look = null;
+    if (back) {
+      olds.push([`str was ${JSON.stringify(str)}`, str, n2 - 1]);
+      str = str.substring(0, n2 - 1); T.vars.str = str;
+      T.push(4, `<code>str = str.substring(0, ${n2 - 1})</code> keeps everything before the last box → <code>${q(str)}</code>.`, { chk: c2 });
+    }
+    T.ret(5, `<code>return str</code> → <code>${q(str)}</code>.`, str);
+  }
+});
+</script>
+</body>
+</html>

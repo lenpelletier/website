@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>right2 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>right2: rotate right by 2</h1>
+  <p class="sub">Given a string, return a "rotated right 2" version where the last 2 characters are moved to the start. The string length will be at least 2. Step through <code>right2</code>: the mirror image of left2 — cut off the last 2 with <code>len-2</code>, then put them in front.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "right2",
+  code: [
+    "public String right2(String str) {",
+    "  int len = str.length();",
+    "  String end = str.substring(len-2);",
+    "  String rest = str.substring(0, len-2);",
+    "  return end + rest;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "Hello" }],
+  chk: false,
+  presets: [["Hello"], ["java"], ["Hi"], ["code"], ["cat"], ["12345"]],
+  validate([str]) {
+    if (str.length < 2) return `<code>str</code> needs at least 2 characters — <code>len-2</code> would be negative and <code>substring</code> would throw an exception.`;
+  },
+  legend: [
+    ["outer", "<code>end</code> = <code>str.substring(len-2)</code>"],
+    ["inner", "<code>rest</code> = <code>str.substring(0, len-2)</code>"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length, end = str.substring(n - 2), rest = str.substring(0, n - 2);
+    let stage = 0;
+    T.view = () => {
+      const s = T.strip("str", str), list = [s];
+      if (stage >= 2) s.cls(n - 2, n, "win");
+      if (stage >= 3) s.cls(0, n - 2, "win2");
+      if (stage === 2) s.cut(n - 2, n, "win");
+      if (stage === 3) s.cut(0, n - 2, "win2");
+      if (stage >= 2) list.push(T.strip("end", end).cls(0, 2, stage === 2 ? "win new" : "win"));
+      if (stage >= 3) list.push(T.strip("rest", rest).cls(0, rest.length, stage === 3 ? "win2 new" : "win2"));
+      if (stage >= 4) list.push(T.cat(`end + rest = ${JSON.stringify(end + rest)}`, [[end, "win"], [rest, "win2"]]));
+      return list;
+    };
+    T.vars.str = str;
+    T.push(0, `Call <code>right2(${q(str)})</code>.`);
+    stage = 1; T.vars.len = n;
+    T.push(1, `<code>len = ${n}</code>, so <code>len-2</code> is <code>${n - 2}</code>: the index where the last two characters start.`);
+    stage = 2; T.vars.end = end;
+    T.push(2, `<code>str.substring(${n - 2})</code> goes from index ${n - 2} to the end → <code>end = ${q(end)}</code>.`);
+    stage = 3; T.vars.rest = rest;
+    T.push(3, `<code>str.substring(0, ${n - 2})</code> takes everything before index ${n - 2} → <code>rest = ${q(rest)}</code>.`);
+    stage = 4;
+    T.ret(4, `<code>end + rest</code> puts the end at the front → <code>${q(end + rest)}</code>.`, end + rest);
+  }
+});
+</script>
+</body>
+</html>

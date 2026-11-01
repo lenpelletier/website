@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>withoutX2 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>withoutX2: remove x from the first two spots</h1>
+  <p class="sub">Given a string, if one or both of the first 2 characters is <code>'x'</code>, return the string without those x's; otherwise return it unchanged. Step through <code>withoutX2</code>: like deFront, it builds <code>ans</code> by checking index 0 and index 1 separately, then adds the rest of the string untouched.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "withoutX2",
+  code: [
+    "public String withoutX2(String str) {",
+    "  String ans = \"\";",
+    "  if (str.length() > 0 && str.charAt(0) != 'x')",
+    "    ans += str.charAt(0);",
+    "  if (str.length() > 1 && str.charAt(1) != 'x')",
+    "    ans += str.charAt(1);",
+    "  if (str.length() > 2)",
+    "    ans += str.substring(2);",
+    "  return ans;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "xHi" }],
+  presets: [["xHi"], ["Hxi"], ["Hi"], ["xxHi"], ["Hix"], ["xaxb"], ["xx"], ["x"], [""], ["Hello"], ["Hexllo"]],
+  legend: [
+    ["outer", "the character being checked"],
+    ["match", "kept in <code>ans</code>"],
+    ["bad", "an x, dropped"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let ans = "", look = null, kept = [], gone = [], added = 0, rest = false;
+    T.view = () => {
+      const s = T.strip("str", str);
+      kept.forEach(k => s.at(k, "soft")); gone.forEach(k => s.at(k, "miss"));
+      if (look !== null) s.at(look, "win outer").top(look, `index ${look} ▼`);
+      if (rest) s.cut(2, n, "soft");
+      const a = T.strip("ans", ans);
+      if (added) a.cls(ans.length - added, ans.length, "new");
+      return [s, a];
+    };
+    T.vars.str = str;
+    T.push(0, `Call <code>withoutX2(${q(str)})</code>.`);
+    T.vars.ans = "";
+    T.push(1, `<code>ans = ""</code>.`);
+    const step = (i, line) => {
+      const has = n > i, keep = has && str[i] !== "x";
+      const chk = [[`str.length() &gt; ${i}`, `${n} > ${i} → ${has}`, has], [`str.charAt(${i}) != 'x'`, has ? `'${str[i]}' != 'x' → ${keep}` : "(skipped)", has ? keep : undefined]];
+      added = 0; look = has ? i : null;
+      T.push(line, !has
+        ? `<code>${n} &gt; ${i}</code> is <b>false</b> — there is no index ${i}.`
+        : keep ? `Index ${i} is <code>'${T.esc(str[i])}'</code>, not an x, so keep it.` : `Index ${i} is an <code>'x'</code>, so it's left out.`, { chk });
+      if (keep) {
+        ans += str[i]; added = 1; kept.push(i); T.vars.ans = ans;
+        T.push(line + 1, `<code>ans += str.charAt(${i})</code> → <code>${q(ans)}</code>.`, { chk });
+      } else if (has) gone.push(i);
+      look = null; added = 0;
+    };
+    step(0, 2);
+    step(1, 4);
+    const more = n > 2, chk = [["str.length() &gt; 2", `${n} > 2 → ${more}`, more]];
+    if (more) {
+      T.push(6, `<code>${n} &gt; 2</code> is <b>true</b>. Everything after the first two is kept as is — even any x's.`, { chk });
+      rest = true; ans += str.substring(2); added = n - 2; T.vars.ans = ans;
+      T.push(7, `<code>ans += str.substring(2)</code> → <code>${q(ans)}</code>.`, { chk });
+      added = 0; rest = false;
+      for (let k = 2; k < n; k++) kept.push(k);
+    } else {
+      T.push(6, `<code>${n} &gt; 2</code> is <b>false</b> — nothing comes after the first two.`, { chk });
+    }
+    T.ret(8, `<code>return ans</code> → <code>${q(ans)}</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

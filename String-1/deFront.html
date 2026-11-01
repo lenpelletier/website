@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>deFront Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>deFront: drop the first two, except a and b</h1>
+  <p class="sub">Given a string, return a version without the first 2 characters — except keep the first character if it is <code>'a'</code>, and keep the second character if it is <code>'b'</code>. The string may be any length. Step through <code>deFront</code>: <code>ans</code> starts empty, each of the first two spots gets its own check, and the rest of the string is added at the end.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "deFront",
+  code: [
+    "public String deFront(String str) {",
+    "  String ans = \"\";",
+    "  if (str.length() > 0 && str.charAt(0) == 'a')",
+    "    ans += \"a\";",
+    "  if (str.length() > 1 && str.charAt(1) == 'b')",
+    "    ans += \"b\";",
+    "  if (str.length() > 2)",
+    "    ans += str.substring(2);",
+    "  return ans;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "away" }],
+  presets: [["Hello"], ["java"], ["away"], ["axy"], ["abc"], ["xby"], ["ab"], ["ax"], ["axb"], ["aaa"], ["xbc"], ["bbb"], ["xz"], ["a"], [""]],
+  legend: [
+    ["outer", "the character being checked"],
+    ["match", "kept in <code>ans</code>"],
+    ["bad", "dropped"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let ans = "", look = null, kept = [], gone = [], added = 0, rest = false;
+    T.view = () => {
+      const s = T.strip("str", str);
+      kept.forEach(k => s.at(k, "soft")); gone.forEach(k => s.at(k, "miss"));
+      if (look !== null) s.at(look, "win outer").top(look, `index ${look} ▼`);
+      if (rest) s.cut(2, n, "soft");
+      const a = T.strip("ans", ans);
+      if (added) a.cls(ans.length - added, ans.length, "new");
+      return [s, a];
+    };
+    T.vars.str = str;
+    T.push(0, `Call <code>deFront(${q(str)})</code>.`);
+    T.vars.ans = "";
+    T.push(1, `<code>ans = ""</code>. Kept characters will be added to it.`);
+    const step = (i, ch, line) => {
+      const has = n > i, hit = has && str[i] === ch;
+      const chk = [[`str.length() &gt; ${i}`, `${n} > ${i} → ${has}`, has], [`str.charAt(${i}) == '${ch}'`, has ? `'${str[i]}' == '${ch}' → ${hit}` : "(skipped)", has ? hit : undefined]];
+      added = 0; look = has ? i : null;
+      T.push(line, !has
+        ? `<code>${n} &gt; ${i}</code> is <b>false</b> — there is no index ${i}, so <code>&amp;&amp;</code> stops before <code>charAt(${i})</code> can throw an exception.`
+        : hit
+          ? `Index ${i} is <code>'${ch}'</code>, so it's kept.`
+          : `Index ${i} is <code>'${T.esc(str[i])}'</code>, not <code>'${ch}'</code>, so it's dropped.`, { chk });
+      if (hit) {
+        ans += ch; added = 1; kept.push(i); T.vars.ans = ans;
+        T.push(line + 1, `<code>ans += "${ch}"</code> → <code>${q(ans)}</code>.`, { chk });
+      } else if (has) gone.push(i);
+      look = null; added = 0;
+    };
+    step(0, "a", 2);
+    step(1, "b", 4);
+    const more = n > 2, chk = [["str.length() &gt; 2", `${n} > 2 → ${more}`, more]];
+    if (more) {
+      T.push(6, `<code>${n} &gt; 2</code> is <b>true</b>, so there's more after the first two.`, { chk });
+      rest = true; ans += str.substring(2); added = n - 2; T.vars.ans = ans;
+      T.push(7, `<code>ans += str.substring(2)</code> adds everything from index 2 on → <code>${q(ans)}</code>.`, { chk });
+      added = 0; rest = false;
+      for (let k = 2; k < n; k++) kept.push(k);
+    } else {
+      T.push(6, `<code>${n} &gt; 2</code> is <b>false</b> — nothing comes after the first two.`, { chk });
+    }
+    T.ret(8, `<code>return ans</code> → <code>${q(ans)}</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

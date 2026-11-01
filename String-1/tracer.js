@@ -9,12 +9,18 @@
   "use strict";
 
   // CodingBat order and problem ids (for prev / next and the CodingBat link).
-  // Only the problems in the answer key are listed.
   const PROBLEMS = [
-    ["helloName", "p171896"], ["makeOutWord", "p184030"], ["firstHalf", "p172267"],
-    ["nonStart", "p143825"], ["theEnd", "p162477"], ["endsLy", "p103895"],
-    ["middleThree", "p115863"], ["lastChars", "p138183"], ["seeColor", "p199216"],
-    ["extraFront", "p172063"], ["startWord", "p141494"]
+    ["helloName", "p171896"], ["makeAbba", "p161056"], ["makeTags", "p147483"],
+    ["makeOutWord", "p184030"], ["extraEnd", "p108853"], ["firstTwo", "p163411"],
+    ["firstHalf", "p172267"], ["withoutEnd", "p130896"], ["comboString", "p168564"],
+    ["nonStart", "p143825"], ["left2", "p197720"], ["right2", "p130781"],
+    ["theEnd", "p162477"], ["withouEnd2", "p174254"], ["middleTwo", "p137729"],
+    ["endsLy", "p103895"], ["nTwice", "p174148"], ["twoChar", "p144623"],
+    ["middleThree", "p115863"], ["hasBad", "p139075"], ["atFirst", "p139076"],
+    ["lastChars", "p138183"], ["conCat", "p132118"], ["lastTwo", "p194786"],
+    ["seeColor", "p199216"], ["frontAgain", "p196652"], ["minCat", "p105745"],
+    ["extraFront", "p172063"], ["without2", "p142247"], ["deFront", "p110141"],
+    ["startWord", "p141494"], ["withoutX", "p151940"], ["withoutX2", "p151359"]
   ];
 
   // ---------- Syntax highlighting (Monokai) ----------
@@ -69,6 +75,8 @@
     badge(i, text, kind) { this.g[i] = { text, kind: kind || "ok" }; return this; },
     tag(text, color) { this.tags.push({ text, color: color || "" }); return this; },
     named(label) { this.label = label; return this; },
+    // mark the boxes str.substring(a, b) takes, with "▲ a" under the start and "▲ b stop" under the end
+    cut(a, b, name) { return this.cls(a, b, name).bot(a, `▲ ${a}`).bot(b, `▲ ${b} stop`, "muted"); },
     shift(n) { this.off = n; return this; }   // indent the row by n blank boxes (to line strings up)
   };
 
@@ -153,6 +161,13 @@
         vars: {}, view: null,
         c: ch => new Ch(ch),
         strip: (name, text) => new Strip(name, text),
+        // a string built from pieces [[text, cls], ...]; piece number `fresh` is marked as just added
+        cat(label, parts, fresh) {
+          const s = new Strip("", parts.map(p => p[0]).join("")).named(label);
+          let k = 0;
+          parts.forEach(([t, c], j) => { if (c) s.cls(k, k + t.length, c); if (j === fresh) s.cls(k, k + t.length, "new"); k += t.length; });
+          return s;
+        },
         fmt, esc,
         q: v => esc(fmt(v)),            // formatted + escaped, for narration
         push(line, msg, o) {

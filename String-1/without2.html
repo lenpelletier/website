@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>without2 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>without2: drop a repeated front pair</h1>
+  <p class="sub">Given a string, if the same 2 characters appear at both its beginning and end, return the string without them at the beginning, so <code>"HelloHe"</code> gives <code>"lloHe"</code>. The pairs may overlap, so <code>"Hi"</code> gives <code>""</code>. Otherwise return the string unchanged. Step through <code>without2</code>: the length check guards the two <code>substring</code> calls, just like in frontAgain.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "without2",
+  wide: true,
+  code: [
+    "public String without2(String str) {",
+    "  int len = str.length();",
+    "  if (len >= 2 && str.substring(0,2).equals(str.substring(len-2)))",
+    "    return str.substring(2);",
+    "  return str;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "HelloHe" }],
+  presets: [["HelloHe"], ["HelloHi"], ["Hi"], ["Chocolate"], ["xxx"], ["xx"], ["x"], [""], ["Fruits"]],
+  legend: [
+    ["outer", "<code>str.substring(0,2)</code>"],
+    ["inner", "<code>str.substring(len-2)</code>"],
+    ["bad", "removed"]
+  ],
+  trace([str], T) {
+    const q = T.q, len = str.length;
+    let stage = 0, eq = false;
+    T.view = () => {
+      const s = T.strip("str", str), list = [s];
+      if (stage === 1) {
+        s.cls(0, 2, "win").top(0, "front ▼", "outer").cls(len - 2, len, "win2").bot(len - 2, "▲ back");
+        const b = T.strip(`str.substring(${len - 2})`, str.substring(len - 2)).cls(0, 2, "win2");
+        for (let k = 0; k < 2; k++) { const ok = str[k] === str[len - 2 + k]; b.badge(k, ok ? "✓" : "✗", ok ? "ok" : "no"); }
+        list.push(T.strip("str.substring(0,2)", str.substring(0, 2)).cls(0, 2, "win"), b);
+      }
+      if (stage === 2) { s.cls(0, 2, "miss").cls(2, len, "soft").bot(2, "▲ 2 to the end"); list.push(T.strip("str.substring(2)", str.substring(2)).cls(0, len - 2, "new")); }
+      if (stage === 3) s.cls(0, len, "soft");
+      return list;
+    };
+    T.vars.str = str;
+    T.push(0, `Call <code>without2(${q(str)})</code>.`);
+    T.vars.len = len;
+    T.push(1, `<code>len = ${len}</code>.`);
+    const long = len >= 2, chk = [["len &gt;= 2", `${len} >= 2 → ${long}`, long]];
+    if (!long) {
+      chk.push([".equals(…)", "(skipped)"]);
+      T.push(2, `<code>${len} &gt;= 2</code> is <b>false</b>, so <code>&amp;&amp;</code> stops — there's no 2-character pair to look for.`, { chk });
+    } else {
+      const f = str.substring(0, 2), b = str.substring(len - 2);
+      eq = f === b;
+      chk.push([".equals(…)", `${JSON.stringify(f)} vs ${JSON.stringify(b)} → ${eq}`, eq]);
+      stage = 1;
+      T.push(2, `<code>${len} &gt;= 2</code> is true. Compare the first two, <code>${q(f)}</code>, with the last two, <code>${q(b)}</code> → <b>${eq}</b>.${len < 4 && eq ? " (They overlap, which is allowed.)" : ""}`, { chk });
+    }
+    if (eq) {
+      stage = 2;
+      T.ret(3, `The pair is at both ends. <code>str.substring(2)</code> leaves off the first two → <code>${q(str.substring(2))}</code>.`, str.substring(2), { chk });
+    } else {
+      stage = 3;
+      T.ret(4, `<code>return str</code> unchanged → <code>${q(str)}</code>.`, str, { chk });
+    }
+  }
+});
+</script>
+</body>
+</html>

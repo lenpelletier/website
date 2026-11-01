@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>comboString Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>comboString: short + long + short</h1>
+  <p class="sub">Given 2 strings, <code>a</code> and <code>b</code>, return a string of the form short+long+short, with the shorter string on the outside and the longer string on the inside. The strings will not be the same length, but they may be empty. Step through <code>comboString</code>: one length comparison decides which string goes on the outside.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "comboString",
+  code: [
+    "public String comboString(String a, String b) {",
+    "  if (a.length() < b.length())",
+    "    return a + b + a;",
+    "  else",
+    "    return b + a + b;",
+    "}"
+  ],
+  inputs: [{ id: "a", value: "Hello" }, { id: "b", value: "hi" }],
+  presets: [["Hello", "hi"], ["hi", "Hello"], ["aaa", "b"], ["b", "aaa"], ["aaa", ""], ["", "bb"], ["aaa", "1234"], ["bb", "a"]],
+  legend: [
+    ["outer", "the shorter string"],
+    ["inner", "the longer string"]
+  ],
+  trace([a, b], T) {
+    const q = T.q;
+    let res = null;
+    T.view = () => {
+      const A = T.strip("a", a), B = T.strip("b", b), list = [A, B];
+      if (res) {
+        const [sh, lo, shN, loN] = res;
+        (shN === "a" ? A : B).cls(0, sh.length, "win"); (loN === "a" ? A : B).cls(0, lo.length, "win2");
+        list.push(T.cat(`${shN} + ${loN} + ${shN} = ${JSON.stringify(sh + lo + sh)}`, [[sh, "win"], [lo, "win2"], [sh, "win"]]));
+      }
+      return list;
+    };
+    T.vars.a = a; T.vars.b = b;
+    T.push(0, `Call <code>comboString(${q(a)}, ${q(b)})</code>.`);
+    const aShort = a.length < b.length, chk = [["a.length() &lt; b.length()", `${a.length} < ${b.length} → ${aShort}`, aShort]];
+    if (aShort) {
+      T.push(1, `<code>${a.length} &lt; ${b.length}</code> is <b>true</b>, so <code>a</code> is the short one.`, { chk });
+      res = [a, b, "a", "b"];
+      T.ret(2, `<code>a + b + a</code> → <code>${q(a + b + a)}</code>.`, a + b + a, { chk });
+    } else {
+      T.push(1, `<code>${a.length} &lt; ${b.length}</code> is <b>false</b>, so <code>b</code> is the short one. Go to the <code>else</code>.${a.length === b.length ? " (They're the same length, which CodingBat never tests, so b just ends up outside.)" : ""}`, { chk });
+      res = [b, a, "b", "a"];
+      T.ret(4, `<code>b + a + b</code> → <code>${q(b + a + b)}</code>.`, b + a + b, { chk });
+    }
+  }
+});
+</script>
+</body>
+</html>

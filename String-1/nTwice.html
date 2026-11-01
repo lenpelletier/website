@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nTwice Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>nTwice: first n and last n</h1>
+  <p class="sub">Given a string and an int <code>n</code>, return a string made of the first <code>n</code> and last <code>n</code> characters of the string. The string length will be at least <code>n</code>. Step through <code>nTwice</code>: <code>substring(0, n)</code> takes the front, and <code>str.length()-n</code> is where the last <code>n</code> characters begin.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "nTwice",
+  code: [
+    "public String nTwice(String str, int n) {",
+    "  String front = str.substring(0, n);",
+    "  String back = str.substring(str.length()-n);",
+    "  return front + back;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "Hello" }, { id: "n", kind: "int", value: 2 }],
+  chk: false,
+  presets: [["Hello", 2], ["Chocolate", 3], ["Chocolate", 1], ["Chocolate", 0], ["Hello", 4], ["Code", 4], ["Code", 2]],
+  validate([str, n]) {
+    if (n < 0 || n > str.length) return `<code>n</code> must be between 0 and ${str.length} (the length of <code>str</code>) — otherwise <code>substring</code> would throw an exception.`;
+  },
+  legend: [
+    ["outer", "<code>front</code> = <code>str.substring(0, n)</code>"],
+    ["inner", "<code>back</code> = <code>str.substring(str.length()-n)</code>"]
+  ],
+  trace([str, n], T) {
+    const q = T.q, len = str.length, front = str.substring(0, n), back = str.substring(len - n);
+    let stage = 0;
+    T.view = () => {
+      const s = T.strip("str", str), list = [s];
+      if (stage === 1) s.cut(0, n, "win");
+      if (stage === 2) { s.cls(0, n, "win"); s.cut(len - n, len, "win2"); }
+      if (stage >= 3) s.cls(0, n, "win").cls(len - n, len, "win2");
+      if (stage >= 1) list.push(T.strip("front", front).cls(0, n, stage === 1 ? "win new" : "win"));
+      if (stage >= 2) list.push(T.strip("back", back).cls(0, n, stage === 2 ? "win2 new" : "win2"));
+      if (stage >= 3) list.push(T.cat(`front + back = ${JSON.stringify(front + back)}`, [[front, "win"], [back, "win2"]]));
+      return list;
+    };
+    T.vars.str = str; T.vars.n = n;
+    T.push(0, `Call <code>nTwice(${q(str)}, ${n})</code>.`);
+    stage = 1; T.vars.front = front;
+    T.push(1, n ? `<code>str.substring(0, ${n})</code> takes the first ${n} box${n === 1 ? "" : "es"} → <code>front = ${q(front)}</code>.` : `<code>str.substring(0, 0)</code> starts and stops at the same place → <code>front = ""</code>.`);
+    stage = 2; T.vars.back = back;
+    T.push(2, `<code>str.length()-n</code> is <code>${len}-${n}</code> → <code>${len - n}</code>. <code>str.substring(${len - n})</code> goes from there to the end → <code>back = ${q(back)}</code>.${2 * n > len ? " The two pieces overlap, so some letters get used twice." : ""}`);
+    stage = 3;
+    T.ret(3, `<code>front + back</code> → <code>${q(front + back)}</code>.`, front + back);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>twoChar Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>twoChar: two characters from an index</h1>
+  <p class="sub">Given a string and an index, return a string of length 2 starting at that index. If the index is too big or too small for 2 characters to fit, use the first 2 characters instead. The string length will be at least 2. Step through <code>twoChar</code>: a bad index is simply replaced with 0, so one <code>return</code> handles both cases.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "twoChar",
+  code: [
+    "public String twoChar(String str, int index) {",
+    "  //an index is bad if there aren't 2 chars starting there",
+    "  if (index < 0 || index + 2 > str.length())",
+    "    index = 0;",
+    "  return str.substring(index, index+2);",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "java" }, { id: "index", kind: "int", value: 2 }],
+  presets: [["java", 0], ["java", 2], ["java", 3], ["java", 4], ["java", -1], ["Hello", 0], ["Hello", 1], ["Hello", 3], ["Hello", 4], ["Hi", 0]],
+  validate([str]) {
+    if (str.length < 2) return `<code>str</code> needs at least 2 characters — even index 0 needs 2 characters to fit.`;
+  },
+  legend: [
+    ["outer", "<code>str.substring(index, index+2)</code>"],
+    ["bad", "where the bad index pointed"]
+  ],
+  trace([str, index0], T) {
+    const q = T.q, n = str.length;
+    let index = index0, stage = 0, badAt = null;
+    T.view = () => {
+      const s = T.strip("str", str), list = [s];
+      if (badAt !== null && badAt >= 0 && badAt <= n + 1) s.top(badAt, `${badAt} ✗`, "bad");
+      if (stage === 0 && index >= 0 && index <= n + 1) s.top(index, `index=${index} ▼`).cls(index, Math.min(index + 2, n + 2), "win");
+      if (stage === 2) {
+        s.cut(index, index + 2, "win").top(index, `index=${index} ▼`);
+        list.push(T.strip(`str.substring(${index}, ${index + 2})`, str.substring(index, index + 2)).cls(0, 2, "new"));
+      }
+      return list;
+    };
+    T.vars.str = str; T.vars.index = index;
+    T.push(0, `Call <code>twoChar(${q(str)}, ${index})</code>.`);
+    const neg = index < 0, past = index + 2 > n, bad = neg || past;
+    const chk = [["index &lt; 0", `${index} < 0 → ${neg}`, neg]];
+    chk.push(["index + 2 &gt; str.length()", neg ? "(skipped)" : `${index + 2} > ${n} → ${past}`, neg ? undefined : past]);
+    T.push(2, neg
+      ? `<code>${index} &lt; 0</code> is <b>true</b> — there's no box at a negative index. <code>||</code> only needs one true side, so it stops there.`
+      : past
+        ? `<code>${index} &lt; 0</code> is false, but <code>index + 2</code> is <code>${index + 2}</code>, which is more than the length ${n}. The second box would be past the end.`
+        : `<code>${index} &lt; 0</code> is false, and <code>index + 2</code> is <code>${index + 2}</code>, which isn't more than ${n}. Both boxes fit, so the index is fine.`, { chk });
+    if (bad) {
+      badAt = index; index = 0; T.vars.index = 0;
+      T.push(3, `<code>index = 0</code>. Use the first two characters instead.`, { chk });
+    }
+    stage = 2;
+    const ans = str.substring(index, index + 2);
+    T.ret(4, `<code>str.substring(${index}, ${index + 2})</code> takes boxes ${index} and ${index + 1} → <code>${q(ans)}</code>.`, ans, { chk });
+  }
+});
+</script>
+</body>
+</html>

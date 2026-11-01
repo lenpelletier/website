@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>firstTwo Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>firstTwo: the first two characters</h1>
+  <p class="sub">Given a string, return the string made of its first two characters, so <code>"Hello"</code> gives <code>"He"</code>. If the string is shorter than 2, return whatever there is. Step through <code>firstTwo</code>: the length check comes first, because <code>substring(0,2)</code> on a shorter string would throw an exception.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "firstTwo",
+  code: [
+    "public String firstTwo(String str) {",
+    "  if (str.length() < 2)",
+    "    return str;",
+    "  return str.substring(0,2);",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "Hello" }],
+  presets: [["Hello"], ["abcdefg"], ["ab"], ["a"], [""], ["Kitten"], ["hi"], ["hiya"]],
+  legend: [
+    ["outer", "<code>str.substring(0,2)</code>"],
+    ["match", "returned as is"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let stage = 0;
+    T.view = () => {
+      const s = T.strip("str", str), list = [s];
+      if (stage === 1) s.cls(0, n, "soft");
+      if (stage === 2) { s.cut(0, 2, "win").cls(2, n, "done"); list.push(T.strip("str.substring(0,2)", str.substring(0, 2)).cls(0, 2, "new")); }
+      return list;
+    };
+    T.vars.str = str;
+    T.push(0, `Call <code>firstTwo(${q(str)})</code>.`);
+    const short = n < 2, chk = [["str.length() &lt; 2", `${n} < 2 → ${short}`, short]];
+    if (short) {
+      T.push(1, `<code>${n} &lt; 2</code> is <b>true</b> — there aren't two characters to take.`, { chk });
+      stage = 1;
+      T.ret(2, `Return whatever is there: <code>return str</code> → <code>${q(str)}</code>.`, str, { chk });
+      return;
+    }
+    T.push(1, `<code>${n} &lt; 2</code> is <b>false</b>, so there are at least two characters.`, { chk });
+    stage = 2;
+    T.ret(3, `<code>str.substring(0,2)</code> takes boxes 0 and 1, stopping before index 2 → <code>${q(str.substring(0, 2))}</code>.`, str.substring(0, 2), { chk });
+  }
+});
+</script>
+</body>
+</html>

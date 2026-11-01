@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>withouEnd2 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>withouEnd2: drop both ends, any length</h1>
+  <p class="sub">Given a string, return a version without both the first and last character. The string may be any length, including 0. Step through <code>withouEnd2</code>: it's withoutEnd with a safety check — strings shorter than 2 have nothing left once both ends are gone, so they return <code>""</code> before <code>substring</code> can throw an exception.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "withouEnd2",
+  code: [
+    "public String withouEnd2(String str) {",
+    "  if (str.length() < 2)",
+    "    return \"\";",
+    "  return str.substring(1, str.length()-1);",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "Hello" }],
+  presets: [["Hello"], ["abc"], ["ab"], ["a"], [""], ["coldy"], ["java code"]],
+  legend: [
+    ["outer", "<code>str.substring(1, str.length()-1)</code>"],
+    ["bad", "left off"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let stage = 0;
+    T.view = () => {
+      const s = T.strip("str", str), list = [s];
+      if (stage === 1) s.cls(0, n, "miss");
+      if (stage === 2) { s.cut(1, n - 1, "win").at(0, "miss").at(n - 1, "miss"); list.push(T.strip(`str.substring(1, ${n - 1})`, str.substring(1, n - 1)).cls(0, n - 2, "new")); }
+      return list;
+    };
+    T.vars.str = str;
+    T.push(0, `Call <code>withouEnd2(${q(str)})</code>.`);
+    const short = n < 2, chk = [["str.length() &lt; 2", `${n} < 2 → ${short}`, short]];
+    if (short) {
+      stage = 1;
+      T.push(1, `<code>${n} &lt; 2</code> is <b>true</b>. ${n ? "The only character is both the first and the last, so removing the ends removes everything." : "There's nothing to remove."}`, { chk });
+      T.ret(2, `<code>return ""</code>.`, "", { chk });
+      return;
+    }
+    T.push(1, `<code>${n} &lt; 2</code> is <b>false</b>, so there are two separate ends to remove.`, { chk });
+    stage = 2;
+    const ans = str.substring(1, n - 1);
+    T.ret(3, `<code>str.substring(1, ${n - 1})</code> starts after the first box and stops just before the last one → <code>${q(ans)}</code>.`, ans, { chk });
+  }
+});
+</script>
+</body>
+</html>

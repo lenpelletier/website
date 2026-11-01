@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>withoutEnd Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>withoutEnd: drop the first and last characters</h1>
+  <p class="sub">Given a string, return a version without the first and last character, so <code>"Hello"</code> gives <code>"ell"</code>. The string length will be at least 2. Step through <code>withoutEnd</code>: starting at index 1 skips the first character, and stopping at <code>str.length()-1</code> leaves off the last one.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "withoutEnd",
+  code: [
+    "public String withoutEnd(String str) {",
+    "  return str.substring(1, str.length()-1);",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "Hello" }],
+  chk: false,
+  presets: [["Hello"], ["java"], ["coding"], ["code"], ["ab"], ["Chocolate!"], ["kitten"], ["woohoo"]],
+  validate([str]) {
+    if (str.length < 2) return `<code>str</code> needs at least 2 characters — otherwise <code>substring(1, str.length()-1)</code> would end before it starts and throw an exception.`;
+  },
+  legend: [
+    ["outer", "<code>str.substring(1, str.length()-1)</code>"],
+    ["bad", "left off"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length, ans = str.substring(1, n - 1);
+    let stage = 0;
+    T.view = () => {
+      const s = T.strip("str", str), list = [s];
+      if (stage >= 1) s.cut(1, n - 1, "win").at(0, "miss").at(n - 1, "miss");
+      if (stage >= 1) list.push(T.strip(`str.substring(1, ${n - 1})`, ans).cls(0, ans.length, "new"));
+      return list;
+    };
+    T.vars.str = str;
+    T.push(0, `Call <code>withoutEnd(${q(str)})</code>.`);
+    stage = 1;
+    T.ret(1, `<code>str.length()-1</code> is <code>${n - 1}</code>, the index of the last box. <code>str.substring(1, ${n - 1})</code> starts after the first box and stops just before the last one → <code>${q(ans)}</code>.${n === 2 ? " With only 2 characters, nothing is left in between." : ""}`, ans);
+  }
+});
+</script>
+</body>
+</html>

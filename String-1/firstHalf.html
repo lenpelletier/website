@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>firstHalf Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>firstHalf: the front half of a string</h1>
+  <p class="sub">Given a string of even length, return the first half. So <code>"WooHoo"</code> gives <code>"Woo"</code>. Step through <code>firstHalf</code>: <code>str.length()/2</code> is the index where the second half begins, and <code>substring(0, …)</code> stops just before it.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "firstHalf",
+  code: [
+    "public String firstHalf(String str) {",
+    "  return str.substring(0, str.length()/2);",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "WooHoo" }],
+  chk: false,
+  presets: [["WooHoo"], ["HelloThere"], ["abcdef"], ["ab"], [""], ["0123456789"], ["kitten"], ["abc"]],
+  legend: [
+    ["outer", "<code>str.substring(0, str.length()/2)</code>"],
+    ["inner", "index <code>str.length()/2</code>, where the second half starts"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length, half = Math.floor(n / 2), ans = str.substring(0, half);
+    let stage = 0;
+    T.view = () => {
+      const s = T.strip("str", str);
+      if (stage >= 1) s.bot(half, "▲ length/2");
+      if (stage >= 1 && half < n) s.at(half, "inner");
+      if (stage >= 2) s.cls(0, half, "win").cls(half, n, "done");
+      const list = [s];
+      if (stage >= 2) list.push(T.strip("str.substring(0, " + half + ")", ans).cls(0, half, "new"));
+      return list;
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>firstHalf(${q(str)})</code>.`);
+    stage = 1;
+    T.push(1, n % 2 === 0
+      ? `<code>str.length()</code> is ${n}, so <code>str.length()/2</code> is <code>${half}</code>. ${n ? `The second half starts at index ${half}.` : "An empty string has no halves at all."}`
+      : `<code>str.length()</code> is ${n}, so <code>str.length()/2</code> is <code>${n}/2</code> → <code>${half}</code>. Dividing two <code>int</code>s throws away the remainder. (CodingBat only uses even lengths; with an odd one the middle letter goes to the second half.)`);
+    stage = 2;
+    T.ret(1, n
+      ? `<code>str.substring(0, ${half})</code> takes boxes 0 to ${half - 1}, stopping just before index ${half} → <code>${q(ans)}</code>.`
+      : `<code>str.substring(0, 0)</code> starts and stops at the same place → <code>""</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

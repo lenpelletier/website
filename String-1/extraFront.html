@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>extraFront Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>extraFront: three copies of the front</h1>
+  <p class="sub">Given a string, return a new string made of 3 copies of the first 2 characters. If the string is shorter than 2, use whatever is there. Step through <code>extraFront</code>: a long string is cut down to its first 2 characters, and then <code>str</code> is repeated three times.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "extraFront",
+  code: [
+    "public String extraFront(String str) {",
+    "  if (str.length() > 2) {",
+    "    str = str.substring(0, 2);",
+    "  }",
+    "  return str + str + str;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "Hello" }],
+  presets: [["Hello"], ["ab"], ["H"], [""], ["Candy"], ["Code"]],
+  legend: [
+    ["outer", "<code>str.substring(0, 2)</code>"],
+    ["inner", "copies of <code>str</code>"],
+    ["match", "new value of <code>str</code>"]
+  ],
+  trace([orig], T) {
+    const q = T.q;
+    let str = orig, cut = false, fresh = false, ans = null;
+    T.view = () => {
+      const list = [];
+      if (cut) list.push(T.strip("", orig).named(`old str = ${JSON.stringify(orig)}`).cls(0, 2, "win").cls(2, orig.length, "done").bot(0, "▲ 0").bot(2, "▲ 2 stop", "muted"));
+      const s = T.strip("str", str);
+      if (fresh) s.cls(0, str.length, "new");
+      list.push(s);
+      if (ans !== null) {
+        const r = T.strip("", ans).named(`str + str + str = ${JSON.stringify(ans)}`);
+        const L = str.length;
+        r.cls(0, L, "win2").cls(2 * L, 3 * L, "win2");   // shade copies 1 and 3 so the middle copy stands apart
+        if (L) r.top(0, "1st", "inner").top(L, "2nd", "muted").top(2 * L, "3rd", "inner");
+        list.push(r);
+      }
+      return list;
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>extraFront(${q(orig)})</code>.`);
+    const n = orig.length, long = n > 2, chk = [["str.length() &gt; 2", `${n} > 2 → ${long}`, long]];
+    if (long) {
+      T.push(1, `<code>${n} &gt; 2</code> is <b>true</b> — more than 2 characters, so cut it down.`, { chk });
+      cut = true; fresh = true; str = orig.substring(0, 2); T.vars.str = str;
+      T.push(2, `<code>str.substring(0, 2)</code> takes boxes 0 and 1 → <code>${q(str)}</code>. Storing it back in <code>str</code> replaces the old value.`, { chk });
+      fresh = false;
+    } else {
+      T.push(1, `<code>${n} &gt; 2</code> is <b>false</b>. ${n === 2 ? "It's already exactly 2 characters" : n === 1 ? "There's only 1 character, so use it as is" : "The string is empty, so there's nothing to cut"}.`, { chk });
+    }
+    ans = str + str + str;
+    T.ret(4, str.length
+      ? `<code>str + str + str</code> is <code>${q(str)} + ${q(str)} + ${q(str)}</code> → <code>${q(ans)}</code>.`
+      : `<code>"" + "" + ""</code> → <code>""</code>. Three copies of nothing is still nothing.`, ans);
+  }
+});
+</script>
+</body>
+</html>

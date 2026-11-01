@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>endsLy Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>endsLy: does it end in "ly"?</h1>
+  <p class="sub">Given a string, return true if it ends in <code>"ly"</code>. Step through <code>endsLy</code>: it first makes sure there are at least 2 characters, then cuts off the last two with <code>substring(len-2)</code> and compares them to <code>"ly"</code> with <code>.equals</code>.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "endsLy",
+  code: [
+    "public boolean endsLy(String str) {",
+    "  int len = str.length();",
+    "  if (len < 2)",
+    "    return false;",
+    "  return \"ly\".equals(str.substring(len-2));",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "oddly" }],
+  presets: [["oddly"], ["y"], ["oddy"], ["oddl"], ["olydd"], ["ly"], [""], ["falsey"], ["evenly"]],
+  legend: [
+    ["outer", "<code>str.substring(len-2)</code>"],
+    ["match", "matches <code>\"ly\"</code>"],
+    ["bad", "doesn't match"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let stage = 0;
+    const tail = n >= 2 ? str.substring(n - 2) : "";
+    T.view = () => {
+      const s = T.strip("str", str);
+      const list = [s];
+      if (stage >= 1) {
+        s.cls(n - 2, n, "win").bot(n - 2, "▲ len-2");
+        list.push(T.strip("", "ly").named(`"ly"`).shift(n - 2));
+      }
+      if (stage >= 2) for (let k = 0; k < 2; k++) {
+        const ok = str[n - 2 + k] === "ly"[k];
+        s.badge(n - 2 + k, ok ? "✓" : "✗", ok ? "ok" : "no").at(n - 2 + k, ok ? "hit" : "miss");
+      }
+      return list;
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>endsLy(${q(str)})</code>.`);
+    T.vars.len = n;
+    T.push(1, `<code>len = ${n}</code>.`);
+    const short = n < 2, c1 = [["len &lt; 2", `${n} < 2 → ${short}`, short]];
+    if (short) {
+      T.push(2, `<code>${n} &lt; 2</code> is <b>true</b>. A string this short can't end in two letters — and <code>substring(len-2)</code> would ask for a negative index.`, { chk: c1 });
+      T.ret(3, `<code>return false</code>.`, false, { chk: c1 });
+      return;
+    }
+    T.push(2, `<code>${n} &lt; 2</code> is <b>false</b>, so there are at least 2 characters to look at.`, { chk: c1 });
+    stage = 1;
+    T.push(4, `<code>len-2</code> is <code>${n - 2}</code>. <code>str.substring(${n - 2})</code> goes from there to the end: the last two boxes → <code>${q(tail)}</code>.`, { chk: c1 });
+    stage = 2;
+    const eq = tail === "ly";
+    T.ret(4, `<code>"ly".equals(${q(tail)})</code> compares the two strings letter by letter → <b>${eq}</b>.`, eq,
+      { chk: [...c1, ['"ly".equals(…)', `${JSON.stringify(tail)} → ${eq}`, eq]] });
+  }
+});
+</script>
+</body>
+</html>

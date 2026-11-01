@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>middleThree Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>middleThree: the three middle characters</h1>
+  <p class="sub">Given a string of odd length, return the string of length 3 from its middle, so <code>"Candy"</code> gives <code>"and"</code>. The string will be at least length 3. Step through <code>middleThree</code>: <code>str.length()/2</code> lands exactly on the middle box, and the answer is that box plus one neighbour on each side.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "middleThree",
+  code: [
+    "public String middleThree(String str) {",
+    "  int mid = str.length() / 2;",
+    "  return str.substring(mid-1, mid+2);",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "Candy" }],
+  chk: false,
+  presets: [["Candy"], ["and"], ["solving"], ["Hi yet Hi"], ["java yet java"], ["Chocolate"], ["XabcxyzabcX"], ["abcd"]],
+  validate([str]) {
+    if (str.length < 3) return `<code>str</code> needs at least 3 characters — with fewer, <code>mid-1</code> or <code>mid+2</code> would fall outside the string and <code>substring</code> would throw an exception.`;
+  },
+  legend: [
+    ["outer", "index <code>mid</code>"],
+    ["match", "<code>str.substring(mid-1, mid+2)</code>"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length, mid = Math.floor(n / 2), ans = str.substring(mid - 1, mid + 2);
+    let stage = 0;
+    T.view = () => {
+      const s = T.strip("str", str);
+      if (stage >= 1) s.top(mid, "mid ▼").at(mid, "outer");
+      if (stage >= 2) s.cls(mid - 1, mid + 2, "soft").bot(mid - 1, "▲ mid-1").bot(mid + 2, "▲ mid+2 stop", "muted");
+      const list = [s];
+      if (stage >= 2) list.push(T.strip(`str.substring(${mid - 1}, ${mid + 2})`, ans).cls(0, 3, "new"));
+      return list;
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>middleThree(${q(str)})</code>.`);
+    stage = 1; T.vars.mid = mid;
+    T.push(1, n % 2
+      ? `<code>str.length() / 2</code> is <code>${n} / 2</code> → <code>${mid}</code> (integer division drops the remainder). With an odd length, that's the exact middle: ${mid} boxes on each side.`
+      : `<code>str.length() / 2</code> is <code>${n} / 2</code> → <code>${mid}</code>. With an even length there is no single middle box, so this is the box just right of centre. (CodingBat only uses odd lengths.)`);
+    stage = 2;
+    T.ret(2, `<code>mid-1</code> is ${mid - 1} and <code>mid+2</code> is ${mid + 2}. <code>str.substring(${mid - 1}, ${mid + 2})</code> takes boxes ${mid - 1}, ${mid} and ${mid + 1}, stopping before ${mid + 2} → <code>${q(ans)}</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

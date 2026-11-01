@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>theEnd Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>theEnd: first or last character</h1>
+  <p class="sub">Given a string, return a string made of its first character if <code>front</code> is true, or its last character if <code>front</code> is false. The string will be at least length 1. Step through <code>theEnd</code>: the last character is always at index <code>str.length()-1</code>, because indexes start at 0.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "theEnd",
+  code: [
+    "public String theEnd(String str, boolean front) {",
+    "  if (front)",
+    "    return str.substring(0,1);",
+    "  else",
+    "    return str.substring(str.length()-1);",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "Hello" }, { id: "front", kind: "bool", value: true }],
+  presets: [["Hello", true], ["Hello", false], ["oh", true], ["x", true], ["x", false], ["java", false], ["chocolate", false], ["1234", true], ["code", false]],
+  validate([str]) {
+    if (!str.length) return `<code>str</code> needs at least 1 character — an empty string has no first or last character, and <code>substring</code> would throw an exception.`;
+  },
+  legend: [
+    ["outer", "the character returned"]
+  ],
+  trace([str, front], T) {
+    const q = T.q, n = str.length;
+    let pick = null;
+    T.view = () => {
+      const s = T.strip("str", str);
+      if (pick !== null && front) s.at(0, "win outer").bot(0, "▲ 0").bot(1, "▲ 1 stop", "muted");
+      if (pick !== null && !front) s.at(n - 1, "win outer").bot(n - 1, "▲ length-1");
+      const list = [s];
+      if (pick !== null) list.push(T.strip(front ? "str.substring(0,1)" : `str.substring(${n - 1})`, str[pick]).at(0, "new"));
+      return list;
+    };
+
+    T.vars.str = str; T.vars.front = front;
+    T.push(0, `Call <code>theEnd(${q(str)}, ${front})</code>.`);
+    const chk = [["front", String(front), front]];
+    T.push(1, front ? `<code>front</code> is <b>true</b>, so we want the first character.` : `<code>front</code> is <b>false</b>, so skip to the <code>else</code> — we want the last character.`, { chk });
+    if (front) {
+      pick = 0;
+      T.ret(2, `<code>str.substring(0,1)</code> starts at index 0 and stops before index 1: just the first box → <code>${q(str[0])}</code>.`, str[0], { chk });
+    } else {
+      pick = n - 1;
+      T.ret(4, `<code>str.length()-1</code> is <code>${n}-1</code> → <code>${n - 1}</code>, the index of the last box. <code>str.substring(${n - 1})</code> goes from there to the end → <code>${q(str[n - 1])}</code>.`, str[n - 1], { chk });
+    }
+  }
+});
+</script>
+</body>
+</html>

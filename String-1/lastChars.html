@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lastChars Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>lastChars: first of one, last of the other</h1>
+  <p class="sub">Given two strings, <code>a</code> and <code>b</code>, return a new string made of the first character of <code>a</code> and the last character of <code>b</code>. If either string is empty, use <code>'@'</code> in its place. Step through <code>lastChars</code>: an empty string is swapped for <code>"@"</code> first, so the <code>substring</code> calls always have a box to take.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "lastChars",
+  code: [
+    "public String lastChars(String a, String b) {",
+    "  if (a.length() == 0)",
+    "    a = \"@\";",
+    "  if (b.length() == 0)",
+    "    b = \"@\";",
+    "  return a.substring(0,1) + b.substring(b.length()-1);",
+    "}"
+  ],
+  inputs: [{ id: "a", value: "last" }, { id: "b", value: "chars" }],
+  presets: [["last", "chars"], ["yo", "java"], ["hi", ""], ["", "hello"], ["", ""], ["kitten", "hi"], ["k", "zip"], ["kitten", ""]],
+  legend: [
+    ["outer", "<code>a.substring(0,1)</code>"],
+    ["inner", "<code>b.substring(b.length()-1)</code>"],
+    ["match", "just replaced with <code>\"@\"</code>"]
+  ],
+  trace([a0, b0], T) {
+    const q = T.q;
+    let a = a0, b = b0, newA = false, newB = false, pick = false, ans = null;
+    T.view = () => {
+      const A = T.strip("a", a), B = T.strip("b", b);
+      if (newA) A.at(0, "new");
+      if (newB) B.at(0, "new");
+      if (pick) { A.at(0, "win outer").bot(0, "▲ 0"); B.at(b.length - 1, "win2 inner").bot(b.length - 1, "▲ length-1"); }
+      const list = [A, B];
+      if (ans !== null) list.push(T.strip("", ans).named(`a.substring(0,1) + b.substring(${b.length - 1}) = ${JSON.stringify(ans)}`).at(0, "win").at(1, "win2"));
+      return list;
+    };
+
+    T.vars.a = a; T.vars.b = b;
+    T.push(0, `Call <code>lastChars(${q(a0)}, ${q(b0)})</code>.`);
+    const ea = a.length === 0, c1 = ["a.length() == 0", `${a.length} == 0 → ${ea}`, ea];
+    if (ea) {
+      T.push(1, `<code>a</code> is empty, so it has no first character.`, { chk: [c1] });
+      a = "@"; newA = true; T.vars.a = a;
+      T.push(2, `<code>a = "@"</code>. Now there's a box to take.`, { chk: [c1] });
+      newA = false;
+    } else T.push(1, `<code>a.length()</code> is ${a.length}, not 0. Keep <code>a</code> as it is.`, { chk: [c1] });
+    const eb = b.length === 0, c2 = ["b.length() == 0", `${b.length} == 0 → ${eb}`, eb];
+    if (eb) {
+      T.push(3, `<code>b</code> is empty, so it has no last character.`, { chk: [c1, c2] });
+      b = "@"; newB = true; T.vars.b = b;
+      T.push(4, `<code>b = "@"</code>.`, { chk: [c1, c2] });
+      newB = false;
+    } else T.push(3, `<code>b.length()</code> is ${b.length}, not 0. Keep <code>b</code> as it is.`, { chk: [c1, c2] });
+    pick = true;
+    const fa = a[0], lb = b[b.length - 1];
+    T.push(5, `<code>a.substring(0,1)</code> is the first box of <code>a</code> → <code>${q(fa)}</code>. <code>b.length()-1</code> is ${b.length - 1}, so <code>b.substring(${b.length - 1})</code> is the last box of <code>b</code> → <code>${q(lb)}</code>.`);
+    ans = fa + lb;
+    T.ret(5, `Join them: <code>${q(fa)} + ${q(lb)}</code> → <code>${q(ans)}</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

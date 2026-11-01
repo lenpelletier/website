@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nonStart Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>nonStart: join without the first letters</h1>
+  <p class="sub">Given two strings, join them together, but leave off the first character of each. The strings will be at least length 1. Step through <code>nonStart</code>: <code>substring(1)</code>, with only one number, starts at index 1 and goes all the way to the end.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "nonStart",
+  code: [
+    "public String nonStart(String a, String b) {",
+    "  return a.substring(1) + b.substring(1);",
+    "}"
+  ],
+  inputs: [{ id: "a", value: "Hello" }, { id: "b", value: "There" }],
+  chk: false,
+  presets: [["Hello", "There"], ["java", "code"], ["shotl", "java"], ["ab", "xy"], ["ab", "x"], ["x", "ac"], ["a", "b"], ["kit", "kat"], ["mart", "dart"]],
+  validate([a, b]) {
+    if (!a.length || !b.length) return `Both strings need at least 1 character — <code>"".substring(1)</code> starts past the end and throws an exception.`;
+  },
+  legend: [
+    ["outer", "<code>a.substring(1)</code>"],
+    ["inner", "<code>b.substring(1)</code>"],
+    ["bad", "first character, left off"]
+  ],
+  trace([a, b], T) {
+    const q = T.q, ra = a.substring(1), rb = b.substring(1), ans = ra + rb;
+    let stage = 0;
+    T.view = () => {
+      const A = T.strip("a", a), B = T.strip("b", b);
+      if (stage >= 1) A.at(0, "miss").cls(1, a.length, "win");
+      if (stage === 1) A.bot(1, "▲ 1 to the end");
+      if (stage >= 2) B.at(0, "miss").cls(1, b.length, "win2");
+      if (stage === 2) B.bot(1, "▲ 1 to the end");
+      const list = [A, B];
+      if (stage >= 1) list.push(T.strip("a.substring(1)", ra).cls(0, ra.length, stage === 1 ? "win new" : "win"));
+      if (stage >= 2) list.push(T.strip("b.substring(1)", rb).cls(0, rb.length, stage === 2 ? "win2 new" : "win2"));
+      if (stage >= 3) list.push(T.strip("", ans).named(`a.substring(1) + b.substring(1) = ${JSON.stringify(ans)}`).cls(0, ra.length, "win").cls(ra.length, ans.length, "win2"));
+      return list;
+    };
+
+    T.vars.a = a; T.vars.b = b;
+    T.push(0, `Call <code>nonStart(${q(a)}, ${q(b)})</code>.`);
+    stage = 1;
+    T.push(1, `<code>a.substring(1)</code> skips index 0 (<code>'${T.esc(a[0])}'</code>) and keeps the rest → <code>${q(ra)}</code>.${a.length === 1 ? " There is nothing after index 0, so it's empty." : ""}`);
+    stage = 2;
+    T.push(1, `<code>b.substring(1)</code> skips index 0 (<code>'${T.esc(b[0])}'</code>) and keeps the rest → <code>${q(rb)}</code>.${b.length === 1 ? " There is nothing after index 0, so it's empty." : ""}`);
+    stage = 3;
+    T.ret(1, `Join them: <code>${q(ra)} + ${q(rb)}</code> → <code>${q(ans)}</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

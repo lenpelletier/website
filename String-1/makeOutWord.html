@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>makeOutWord Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>makeOutWord: put a word in the middle</h1>
+  <p class="sub">Given an "out" string of length 4, such as <code>"&lt;&lt;&gt;&gt;"</code>, and a word, return a new string with the word in the middle of the out string, like <code>"&lt;&lt;word&gt;&gt;"</code>. Step through <code>makeOutWord</code>: <code>substring(i, j)</code> starts at index <code>i</code> and stops <em>just before</em> index <code>j</code>, so <code>(0,2)</code> and <code>(2,4)</code> split the out string cleanly in half.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "makeOutWord",
+  code: [
+    "public String makeOutWord(String out, String word) {",
+    "  String firstpart = out.substring(0,2);",
+    "  String secondpart = out.substring(2,4);",
+    "  return firstpart + word + secondpart;",
+    "}"
+  ],
+  inputs: [{ id: "out", value: "<<>>", width: 100 }, { id: "word", value: "Yay" }],
+  chk: false,
+  presets: [["<<>>", "Yay"], ["<<>>", "WooHoo"], ["[[]]", "word"], ["HHoo", "Hello"], ["abyz", "YAY"]],
+  validate([out]) {
+    if (out.length < 4) return `<code>out</code> needs at least 4 characters — <code>out.substring(2,4)</code> reads up to index 4, so a shorter string would throw an exception.`;
+  },
+  legend: [
+    ["outer", "<code>firstpart</code> = <code>out.substring(0,2)</code>"],
+    ["inner", "<code>secondpart</code> = <code>out.substring(2,4)</code>"],
+    ["match", "<code>word</code>"]
+  ],
+  trace([out, word], T) {
+    const q = T.q, w = word.length;
+    let stage = 0;
+    const fp = out.substring(0, 2), sp = out.substring(2, 4), ans = fp + word + sp;
+    T.view = () => {
+      const o = T.strip("out", out);
+      if (stage >= 1) o.cls(0, 2, "win");
+      if (stage >= 2) o.cls(2, 4, "win2");
+      if (stage === 1) o.bot(0, "▲ 0").bot(2, "▲ 2 stop", "muted");
+      if (stage === 2) o.bot(2, "▲ 2").bot(4, "▲ 4 stop", "muted");
+      const list = [o, T.strip("word", word).cls(0, w, "soft")];
+      if (stage >= 1) list.push(T.strip("firstpart", fp).cls(0, 2, stage === 1 ? "win new" : "win"));
+      if (stage >= 2) list.push(T.strip("secondpart", sp).cls(0, 2, stage === 2 ? "win2 new" : "win2"));
+      if (stage >= 3) list.push(T.strip("", ans).named(`firstpart + word + secondpart = ${JSON.stringify(ans)}`)
+        .cls(0, 2, "win").cls(2, 2 + w, "soft").cls(2 + w, 4 + w, "win2"));
+      return list;
+    };
+
+    T.vars.out = out; T.vars.word = word;
+    T.push(0, `Call <code>makeOutWord(${q(out)}, ${q(word)})</code>.`);
+    stage = 1; T.vars.firstpart = fp;
+    T.push(1, `<code>out.substring(0,2)</code> starts at index 0 and stops before index 2, so it takes boxes 0 and 1 → <code>firstpart = ${q(fp)}</code>.`);
+    stage = 2; T.vars.secondpart = sp;
+    T.push(2, `<code>out.substring(2,4)</code> starts at index 2 and stops before index 4, so it takes boxes 2 and 3 → <code>secondpart = ${q(sp)}</code>.${out.length > 4 ? ` The boxes after index 3 are never used.` : ""}`);
+    stage = 3;
+    T.ret(3, `Glue the three pieces together: <code>${q(fp)} + ${q(word)} + ${q(sp)}</code> → <code>${q(ans)}</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

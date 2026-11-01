@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>helloName Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>helloName: build a greeting</h1>
+  <p class="sub">Given a name, return a greeting like <code>"Hello Bob!"</code>. Step through <code>helloName</code>: the <code>+</code> operator glues strings together from left to right, so the answer is built in two joins.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "helloName",
+  code: [
+    "public String helloName(String name) {",
+    "  return \"Hello \" + name + \"!\";",
+    "}"
+  ],
+  inputs: [{ id: "name", value: "Bob" }],
+  chk: false,
+  presets: [["Bob"], ["Alice"], ["X"], ["Dolly"], ["Alpha"], ["Omega"], ["Goodbye"], ["ho ho ho"], ["xyz!"], ["Hello"]],
+  legend: [
+    ["outer", "from <code>name</code>"],
+    ["inner", "text written in the code"],
+    ["match", "just joined on"]
+  ],
+  trace([name], T) {
+    const q = T.q, H = "Hello ", n = name.length;
+    let built = null, added = null;
+    T.view = () => {
+      const out = [T.strip("name", name).cls(0, n, "win")];
+      if (built !== null) {
+        const r = T.strip("", built).named(built.length > H.length + n ? `"Hello " + name + "!" = ${JSON.stringify(built)}` : `"Hello " + name = ${JSON.stringify(built)}`);
+        r.cls(0, H.length, "win2").cls(H.length, H.length + n, "win").cls(H.length + n, built.length, "win2");
+        if (added) r.cls(added[0], added[1], "new");
+        out.push(r);
+      }
+      return out;
+    };
+
+    T.vars.name = name;
+    T.push(0, `Call <code>helloName(${q(name)})</code>.`);
+    built = H + name; added = [H.length, built.length];
+    T.push(1, `Java works left to right. First <code>"Hello " + name</code> joins the two strings → <code>${q(built)}</code>. The space inside <code>"Hello "</code> keeps the words apart.`);
+    built += "!"; added = [built.length - 1, built.length];
+    T.push(1, `Then <code>+ "!"</code> adds an exclamation mark to the end → <code>${q(built)}</code>.`);
+    added = null;
+    T.ret(1, `<code>return</code> → <code>${q(built)}</code>.`, built);
+  }
+});
+</script>
+</body>
+</html>

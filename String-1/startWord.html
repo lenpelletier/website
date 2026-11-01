@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>startWord Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>startWord: does it start with the word (any first letter)?</h1>
+  <p class="sub">Given a string and a non-empty word, return the front of the string if it starts with the word — except that the first character doesn't have to match. So <code>startWord("hippo", "xip")</code> gives <code>"hip"</code>. Otherwise return the empty string. Step through <code>startWord</code>: it compares everything <em>after</em> index 0 in both, using <code>substring</code> to skip the first letters.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "startWord",
+  wide: true,
+  code: [
+    "public String startWord(String str, String word) {",
+    "  if (word.length() > str.length())",
+    "    return \"\";",
+    "",
+    "  if (str.substring(1, word.length()).equals(word.substring(1)))",
+    "    return str.substring(0, word.length());",
+    "  else",
+    "    return \"\";",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "hippo" }, { id: "word", value: "xip", width: 100 }],
+  presets: [["hippo", "hi"], ["hippo", "xip"], ["hippo", "i"], ["hippo", "ix"], ["h", "ix"], ["", "i"], ["hip", "zi"], ["hip", "zip"], ["hip", "zig"], ["h", "z"], ["hippo", "xippo"], ["hippo", "xyz"], ["hippo", "hip"], ["kitten", "cit"], ["kit", "cit"]],
+  validate([str, word]) {
+    if (!word.length) return `<code>word</code> can't be empty — <code>str.substring(1, 0)</code> would start after it ends and throw an exception.`;
+  },
+  legend: [
+    ["outer", "<code>str.substring(1, word.length())</code>"],
+    ["inner", "<code>word.substring(1)</code>"],
+    ["match", "letters match"],
+    ["bad", "letters don't match"]
+  ],
+  trace([str, word], T) {
+    const q = T.q, n = str.length, w = word.length;
+    let stage = 0, ans = null;
+    T.view = () => {
+      const S = T.strip("str", str), W = T.strip("word", word);
+      if (stage === 3) S.cls(0, w, "soft").bot(0, "▲ 0").bot(w, `▲ ${w} stop`, "muted");
+      else if (stage >= 1) {
+        S.at(0, "done").cls(1, w, "win").bot(1, "▲ 1").bot(w, `▲ ${w} stop`, "muted");
+        W.at(0, "done").cls(1, w, "win2").bot(1, "▲ 1 to the end");
+      }
+      if (stage === 2) for (let k = 1; k < w; k++) {
+        const ok = str[k] === word[k];
+        S.at(k, ok ? "hit" : "miss"); W.badge(k, ok ? "✓" : "✗", ok ? "ok" : "no");
+      }
+      const list = [S, W];
+      if (ans !== null && ans.length) list.push(T.strip(`str.substring(0, ${w})`, ans).cls(0, w, "new"));
+      return list;
+    };
+
+    T.vars.str = str; T.vars.word = word;
+    T.push(0, `Call <code>startWord(${q(str)}, ${q(word)})</code>.`);
+    const tooLong = w > n, c1 = ["word.length() &gt; str.length()", `${w} > ${n} → ${tooLong}`, tooLong];
+    if (tooLong) {
+      T.ret(2, `<code>${w} &gt; ${n}</code> is <b>true</b> — the word is longer than the string, so it can't be at the front. <code>return ""</code>.`, "", { chk: [c1] });
+      return;
+    }
+    T.push(1, `<code>${w} &gt; ${n}</code> is <b>false</b>, so the word fits inside the string.`, { chk: [c1] });
+    stage = 1;
+    const a = str.substring(1, w), b = word.substring(1);
+    T.push(4, w === 1
+      ? `<code>str.substring(1, 1)</code> and <code>word.substring(1)</code> are both empty — a 1-letter word has nothing after its first letter.`
+      : `Skip index 0 in both. <code>str.substring(1, ${w})</code> → <code>${q(a)}</code> and <code>word.substring(1)</code> → <code>${q(b)}</code>. Both are ${w - 1} long.`, { chk: [c1] });
+    stage = 2;
+    const eq = a === b, c2 = [".equals(…)", `${JSON.stringify(a)} vs ${JSON.stringify(b)} → ${eq}`, eq];
+    T.push(4, eq
+      ? (w === 1 ? `Two empty strings are equal, so <code>.equals</code> is <b>true</b>. Any first letter is fine.` : `<code>${q(a)}.equals(${q(b)})</code> is <b>true</b> — after the first letter, everything matches.`)
+      : `<code>${q(a)}.equals(${q(b)})</code> is <b>false</b> — at least one letter is different.`, { chk: [c1, c2] });
+    if (eq) {
+      stage = 3; ans = str.substring(0, w);
+      T.ret(5, `Return the front of <code>str</code>, first letter included: <code>str.substring(0, ${w})</code> → <code>${q(ans)}</code>.`, ans, { chk: [c1, c2] });
+    } else {
+      ans = "";
+      T.ret(7, `<code>return ""</code>.`, "", { chk: [c1, c2] });
+    }
+  }
+});
+</script>
+</body>
+</html>

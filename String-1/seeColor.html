@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>seeColor Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>seeColor: does it start with red or blue?</h1>
+  <p class="sub">Given a string, if it begins with <code>"red"</code> or <code>"blue"</code> return that colour, otherwise return the empty string. Step through <code>seeColor</code>: each test checks the length <em>first</em>. If the string is too short, <code>&amp;&amp;</code> stops right there, so the <code>substring</code> call (which would throw an exception) never runs.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "seeColor",
+  wide: true,
+  code: [
+    "public String seeColor(String str) {",
+    "",
+    "  if (str.length() >= 3 && \"red\".equals(str.substring(0,3)))",
+    "    return \"red\";",
+    "  else if (str.length() >= 4 && \"blue\".equals(str.substring(0,4)))",
+    "    return \"blue\";",
+    "  else",
+    "    return \"\";",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "redxx" }],
+  presets: [["redxx"], ["xxred"], ["blueTimes"], ["NoColor"], ["red"], ["re"], ["blu"], ["blue"], ["a"], [""], ["xyzred"]],
+  legend: [
+    ["outer", "<code>str.substring(0, …)</code>"],
+    ["match", "letter matches"],
+    ["bad", "letter doesn't match"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let word = null, cmp = false;
+    T.view = () => {
+      const s = T.strip("str", str);
+      const list = [s];
+      if (word) {
+        const L = word.length;
+        s.cls(0, L, "win").bot(0, "▲ 0").bot(L, `▲ ${L} stop`, "muted");
+        list.push(T.strip("", word).named(JSON.stringify(word)));
+        if (cmp) for (let k = 0; k < L; k++) {
+          const ok = str[k] === word[k];
+          s.badge(k, ok ? "✓" : "✗", ok ? "ok" : "no").at(k, ok ? "hit" : "miss");
+        }
+      }
+      return list;
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>seeColor(${q(str)})</code>.`);
+    const chk = [];
+    const tryColor = (line, color) => {
+      const L = color.length, long = n >= L;
+      word = null; cmp = false;
+      chk.push([`str.length() &gt;= ${L}`, `${n} >= ${L} → ${long}`, long]);
+      if (!long) {
+        chk.push([`"${color}".equals(…)`, "(skipped)"]);
+        T.push(line, `<code>${n} &gt;= ${L}</code> is <b>false</b> — too short to hold <code>"${color}"</code>. <code>&amp;&amp;</code> stops here, so <code>str.substring(0,${L})</code> is never run (it would throw an exception).`, { chk: chk.slice() });
+        return false;
+      }
+      T.push(line, `<code>${n} &gt;= ${L}</code> is <b>true</b>, so it's safe to look at the first ${L} boxes.`, { chk: chk.slice() });
+      word = color;
+      const sub = str.substring(0, L);
+      T.push(line, `<code>str.substring(0,${L})</code> → <code>${q(sub)}</code>. Line it up with <code>"${color}"</code>.`, { chk: chk.slice() });
+      cmp = true;
+      const eq = sub === color;
+      chk.push([`"${color}".equals(…)`, `${JSON.stringify(sub)} → ${eq}`, eq]);
+      T.push(line, eq ? `<code>"${color}".equals(${q(sub)})</code> is <b>true</b> — every letter matches.` : `<code>"${color}".equals(${q(sub)})</code> is <b>false</b>.`, { chk: chk.slice() });
+      return eq;
+    };
+
+    if (tryColor(2, "red")) { T.ret(3, `The string starts with red. <code>return "red"</code>.`, "red", { chk }); return; }
+    chk.length = 0;
+    if (tryColor(4, "blue")) { T.ret(5, `The string starts with blue. <code>return "blue"</code>.`, "blue", { chk }); return; }
+    word = null;
+    T.ret(7, `Neither colour is at the front. <code>return ""</code>.`, "");
+  }
+});
+</script>
+</body>
+</html>

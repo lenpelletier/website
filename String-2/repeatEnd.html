@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>repeatEnd Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>repeatEnd: n copies of the last n letters</h1>
+  <p class="sub">Given a string and an int <code>n</code>, return a string made of <code>n</code> repetitions of the last <code>n</code> characters. Step through <code>repeatEnd</code>: it cuts the end off once with <code>substring(str.length()-n)</code>, then the loop just adds that same piece <code>n</code> times. (CodingBat promises <code>n</code> is between 0 and the length of the string.)</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "repeatEnd",
+  chk: false,
+  code: [
+    "public String repeatEnd(String str, int n) {",
+    "  String end = str.substring(str.length()-n);",
+    "  String newString = \"\";",
+    "",
+    "  for (int i = 0; i < n; i++) {",
+    "    newString += end;",
+    "  }",
+    "",
+    "  return newString;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "Hello" }, { id: "n", kind: "int", value: 3 }],
+  presets: [["Hello", 3], ["Hello", 2], ["Hello", 1], ["Hello", 0], ["abc", 3], ["1234", 2]],
+  validate([str, n]) {
+    if (n < 0 || n > str.length) return `<code>n</code> must be between 0 and <code>str.length()</code> (${str.length}). Otherwise <code>substring</code> would throw a <code>StringIndexOutOfBoundsException</code>.`;
+  },
+  legend: [
+    ["outer", "<code>end</code>, the last <code>n</code> letters"],
+    ["match", "the copy just added"]
+  ],
+  trace([str, n], T) {
+    const q = T.q, len = str.length, start = len - n;
+    let showEnd = false, end = null, ns = null, i = null, added = false;
+    T.view = () => {
+      const s = T.strip("str", str);
+      if (showEnd) s.cls(start, len, "win").top(start, `${start} ▼`);
+      const out = [s];
+      if (end !== null) out.push(T.strip("end", end));
+      if (ns !== null) {
+        const r = T.strip("newString", ns);
+        for (let c = 0; c * n < ns.length; c++) {
+          if (added && (c + 1) * n === ns.length) r.cls(c * n, ns.length, "new");
+          else if (c % 2 === 0) r.cls(c * n, (c + 1) * n, "soft");
+        }
+        out.push(r);
+      }
+      return out;
+    };
+
+    T.vars.str = str; T.vars.n = n;
+    T.push(0, `Call <code>repeatEnd(${q(str)}, ${n})</code>.`);
+    showEnd = true;
+    T.push(1, `<code>str.length() - n</code> is <code>${len} - ${n} = ${start}</code>. <code>substring(${start})</code> means "from index ${start} to the end".`);
+    end = str.substring(start); T.vars.end = end;
+    T.push(1, `<code>end = ${q(end)}</code> — the last ${n} letter${n === 1 ? "" : "s"}.`);
+    ns = ""; T.vars.newString = "";
+    T.push(2, `<code>newString = ""</code>.`);
+
+    for (i = 0; ; i++) {
+      T.vars.i = i; added = false;
+      if (i >= n) {
+        T.push(4, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${n}</code> is <b>false</b> — ${n ? `${n} cop${n === 1 ? "y has" : "ies have"} been added.` : "the loop never runs when n is 0."}`);
+        break;
+      }
+      T.push(4, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${n}</code> is <b>true</b>. Here <code>i</code> is just counting copies; it isn't used as an index.`);
+      ns += end; added = true; T.vars.newString = ns;
+      T.push(5, `<code>newString += end</code> → <code>${q(ns)}</code> (copy #${i + 1}).`);
+    }
+    delete T.vars.i; added = false;
+    T.ret(8, `<code>return newString</code> → <code>${q(ns)}</code>.`, ns);
+  }
+});
+</script>
+</body>
+</html>

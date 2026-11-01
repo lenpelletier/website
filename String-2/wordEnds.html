@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wordEnds Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>wordEnds: the letters around each word</h1>
+  <p class="sub">For each appearance of <code>word</code> in <code>str</code>, collect the character just before it and the character just after it (when they exist). A character can be used twice if it sits between two words. Step through <code>wordEnds</code>: instead of checking every index, it uses <code>indexOf(word, from)</code> to jump straight to the next appearance.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "wordEnds",
+  wide: true,
+  code: [
+    "public String wordEnds(String str, String word) {",
+    "  int w = word.length();",
+    "  int s = str.length();",
+    "  String ans = \"\";",
+    "",
+    "  int i = str.indexOf(word);",
+    "",
+    "  while(i >= 0) {                          //keep going until there are no more words",
+    "    if (i > 0) ans += str.charAt(i-1);     //get character before word",
+    "    if (s > i + w) ans += str.charAt(i+w); // get character after word",
+    "    i = str.indexOf(word, i+1);            //find next word",
+    "  }",
+    "  return ans;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "abcXY123XYijk" }, { id: "word", value: "XY", width: 100 }],
+  presets: [["abcXY123XYijk", "XY"], ["XY123XY", "XY"], ["XY1XY", "XY"], ["XYXY", "XY"], ["XY", "XY"], ["abc1xyz1i1j", "1"], ["aaa", "aa"]],
+  validate([str, word]) {
+    if (word.length === 0) return "<code>word</code> can't be empty — <code>indexOf(\"\", i+1)</code> always finds something, so the loop would never end.";
+  },
+  legend: [
+    ["outer", "the word found at <code>i</code>"],
+    ["inner", "the character being taken"],
+    ["match", "just added to <code>ans</code>"]
+  ],
+  trace([str, word], T) {
+    const q = T.q, s = str.length, w = word.length;
+    let i = null, from = null, words = [], take = null, ans = "", added = 0;
+    T.view = () => {
+      const S = T.strip("str", str);
+      words.forEach(k => S.cls(k, k + w, "soft"));
+      if (from !== null) S.bot(from, `▲ search from ${from}`, "muted");
+      if (i !== null && i >= 0) S.cls(i, i + w, "win").top(i, `i=${i} ▼`);
+      if (take !== null) S.at(take, "inner").bot(take, take < i ? "▲ i-1" : "▲ i+w");
+      const R = T.strip("ans", ans);
+      if (added) R.cls(ans.length - added, ans.length, "new");
+      return [S, T.strip("word", word), R];
+    };
+
+    T.vars.str = str; T.vars.word = word;
+    T.push(0, `Call <code>wordEnds(${q(str)}, ${q(word)})</code>.`);
+    T.vars.w = w; T.push(1, `<code>w = ${w}</code>.`);
+    T.vars.s = s; T.push(2, `<code>s = ${s}</code>.`);
+    T.vars.ans = ""; T.push(3, `<code>ans = ""</code>.`);
+    from = 0;
+    i = str.indexOf(word); T.vars.i = i;
+    T.push(5, i >= 0
+      ? `<code>str.indexOf(${q(word)})</code> searches from the start and finds the first appearance at index <code>${i}</code>.`
+      : `<code>str.indexOf(${q(word)})</code> → <code>-1</code>: the word isn't in the string at all.`);
+    from = null;
+
+    for (;;) {
+      added = 0; take = null;
+      if (i < 0) {
+        T.push(7, `<code>i &gt;= 0</code> → <code>${i} &gt;= 0</code> is <b>false</b> — no more appearances of the word.`);
+        break;
+      }
+      if (!words.includes(i)) words.push(i);
+      T.push(7, `<code>i &gt;= 0</code> → <code>${i} &gt;= 0</code> is <b>true</b>, so there's a word at index ${i}.`);
+      const hasBefore = i > 0;
+      const c1 = [["i &gt; 0", `${i} > 0 → ${hasBefore}`, hasBefore]];
+      if (hasBefore) {
+        take = i - 1;
+        ans += str[i - 1]; added = 1; T.vars.ans = ans;
+        T.push(8, `<code>${i} &gt; 0</code> is <b>true</b>, so there is a character before the word: <code>str.charAt(${i - 1})</code> is <code>'${T.esc(str[i - 1])}'</code>. <code>ans = ${q(ans)}</code>.`, { chk: c1 });
+      } else {
+        T.push(8, `<code>${i} &gt; 0</code> is <b>false</b> — the word is at the very front, so there's no character before it.`, { chk: c1 });
+      }
+      added = 0; take = null;
+      const hasAfter = s > i + w;
+      const c2 = [["s &gt; i + w", `${s} > ${i + w} → ${hasAfter}`, hasAfter]];
+      if (hasAfter) {
+        take = i + w;
+        ans += str[i + w]; added = 1; T.vars.ans = ans;
+        T.push(9, `<code>${s} &gt; ${i} + ${w}</code> is <b>true</b>, so there's a character after the word: <code>str.charAt(${i + w})</code> is <code>'${T.esc(str[i + w])}'</code>. <code>ans = ${q(ans)}</code>.`, { chk: c2 });
+      } else {
+        T.push(9, `<code>${s} &gt; ${i} + ${w}</code> is <b>false</b> — the word ends at the very end of the string, so there's no character after it.`, { chk: c2 });
+      }
+      added = 0; take = null;
+      from = i + 1;
+      const next = str.indexOf(word, i + 1);
+      const old = i;
+      i = next; T.vars.i = i;
+      T.push(10, next >= 0
+        ? `<code>str.indexOf(${q(word)}, ${old + 1})</code> starts searching one box after the last find and finds the next appearance at <code>${next}</code>.`
+        : `<code>str.indexOf(${q(word)}, ${old + 1})</code> searches from index ${old + 1} to the end and finds nothing → <code>-1</code>.`);
+      from = null;
+    }
+    T.ret(12, `<code>return ans</code> → <code>${q(ans)}</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

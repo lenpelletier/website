@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>repeatSeparator Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>repeatSeparator: words with a separator between</h1>
+  <p class="sub">Return a big string made of <code>count</code> copies of <code>word</code>, with <code>sep</code> between each one — but not after the last. Step through <code>repeatSeparator</code> and watch the <code>if</code> spot the final pass through the loop (<code>i == count-1</code>), when only the word is added.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "repeatSeparator",
+  code: [
+    "public String repeatSeparator(String word, String sep, int count) {",
+    "  String ans = \"\";",
+    "  for (int i = 0; i < count; i++) {",
+    "    if (i == count-1) ans += word;",
+    "    else ans += word + sep;",
+    "  }",
+    "  return ans;",
+    "}"
+  ],
+  inputs: [{ id: "word", value: "Word", width: 110 }, { id: "sep", value: "X", width: 80 }, { id: "count", kind: "int", value: 3 }],
+  presets: [["Word", "X", 3], ["This", "And", 2], ["This", "And", 1], ["Hi", "-n-", 2], ["AAA", "", 1], ["AAA", "", 0], ["A", "B", 5]],
+  validate([w, s, c]) {
+    if (c < 0) return "<code>count</code> can't be negative.";
+    if (c > 30) return "Please keep <code>count</code> at 30 or less for this animation.";
+  },
+  legend: [
+    ["match", "the piece just added"],
+    ["inner", "a <code>sep</code> inside <code>ans</code>"]
+  ],
+  trace([word, sep, count], T) {
+    const q = T.q;
+    let ans = "", added = 0, seps = [], i = null;
+    T.view = () => {
+      const r = T.strip("ans", ans);
+      seps.forEach(k => r.cls(k, k + sep.length, "win2"));
+      if (added) r.cls(ans.length - added, ans.length, "new");
+      return [T.strip("word", word), T.strip("sep", sep), r];
+    };
+
+    T.vars.word = word; T.vars.sep = sep; T.vars.count = count;
+    T.push(0, `Call <code>repeatSeparator(${q(word)}, ${q(sep)}, ${count})</code>.`);
+    T.vars.ans = "";
+    T.push(1, `<code>ans = ""</code>.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; added = 0;
+      if (i >= count) {
+        T.push(2, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${count}</code> is <b>false</b> — ${count ? `all ${count} word${count === 1 ? "" : "s"} added.` : "with count = 0 the loop never runs."}`);
+        break;
+      }
+      T.push(2, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${count}</code> is <b>true</b>.`);
+      const last = i === count - 1;
+      const chk = [["i == count-1", `${i} == ${count - 1} → ${last}`, last]];
+      if (last) {
+        ans += word; added = word.length; T.vars.ans = ans;
+        T.push(3, `<code>${i} == ${count - 1}</code> is <b>true</b> — this is the last word, so add just <code>word</code> with no separator after it. <code>ans = ${q(ans)}</code>.`, { chk });
+      } else {
+        T.push(3, `<code>${i} == ${count - 1}</code> is <b>false</b> — more words are coming, so go to the <code>else</code>.`, { chk });
+        seps.push(ans.length + word.length);
+        ans += word + sep; added = word.length + sep.length; T.vars.ans = ans;
+        T.push(4, `<code>ans += word + sep</code> adds <code>${q(word + sep)}</code>. <code>ans = ${q(ans)}</code>.`, { chk });
+      }
+    }
+    delete T.vars.i;
+    T.ret(6, `<code>return ans</code> → <code>${q(ans)}</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

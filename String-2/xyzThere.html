@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xyzThere Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>xyzThere: "xyz", but not ".xyz"</h1>
+  <p class="sub">Return true if <code>"xyz"</code> appears in the string, but not when it comes right after a period. Step through <code>xyzThere</code>: three early checks handle short strings and an "xyz" at the very front (which has nothing before it). Then the loop looks at each three-letter candidate <em>and</em> the one letter just before it.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "xyzThere",
+  code: [
+    "public boolean xyzThere(String str) {",
+    "",
+    "  if (str.length() < 3)  return false;",
+    "  if (str.length() == 3) return str.equals(\"xyz\");",
+    "  if (str.substring(0,3).equals(\"xyz\")) return true;",
+    "",
+    "  for (int i = 1; i < str.length()-2; i++) {",
+    "    String xyzCandidate = str.substring(i,i+3);",
+    "    String before = str.substring(i-1,i);",
+    "    if (xyzCandidate.equals(\"xyz\") && !before.equals(\".\"))",
+    "      return true;",
+    "  }",
+    "",
+    "  return false;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "abc.xyzxyz" }],
+  presets: [["abcxyz"], ["abc.xyz"], ["xyz.abc"], ["abc.xyzxyz"], ["abc.xxyz"], [".xyz"], ["xyz"], ["xy"]],
+  legend: [
+    ["outer", "<code>xyzCandidate</code>"],
+    ["inner", "<code>before</code>"],
+    ["match", "a real \"xyz\""],
+    ["bad", "a period in front of \"xyz\""]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let i = null, cand = false, bef = false, hit = null, dot = [], front = false;
+    T.view = () => {
+      const s = T.strip("str", str);
+      dot.forEach(k => s.at(k, "miss").cls(k + 1, k + 4, "soft"));
+      if (front) s.cls(0, 3, "win").top(0, "0 ▼");
+      if (i !== null) {
+        s.top(i, `i=${i} ▼`);
+        if (cand) s.cls(i, i + 3, "win");
+        if (bef) s.at(i - 1, "win2").bot(i - 1, "▲ i-1");
+      }
+      if (hit !== null) s.cls(hit, hit + 3, "hit");
+      return [s];
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>xyzThere(${q(str)})</code>.`);
+    if (n < 3) {
+      T.ret(2, `<code>str.length() &lt; 3</code> → <code>${n} &lt; 3</code> is <b>true</b>. Too short to hold "xyz", so <code>return false</code>.`, false,
+        { chk: [["str.length() &lt; 3", `${n} < 3 → true`, true]] });
+      return;
+    }
+    T.push(2, `<code>${n} &lt; 3</code> is <b>false</b>.`, { chk: [["str.length() &lt; 3", `${n} < 3 → false`, false]] });
+    if (n === 3) {
+      const r = str === "xyz";
+      front = true;
+      if (r) hit = 0;
+      T.ret(3, `<code>str.length() == 3</code> is <b>true</b>, so the answer is just <code>str.equals("xyz")</code> → <b>${r}</b>.`, r,
+        { chk: [["str.length() == 3", "3 == 3 → true", true], ['str.equals("xyz")', String(r), r]] });
+      return;
+    }
+    T.push(3, `<code>${n} == 3</code> is <b>false</b>.`, { chk: [["str.length() == 3", `${n} == 3 → false`, false]] });
+    const f = str.substring(0, 3), fOk = f === "xyz";
+    front = true;
+    const fchk = [["str.substring(0,3)", JSON.stringify(f)], ['.equals("xyz")', String(fOk), fOk]];
+    if (fOk) {
+      hit = 0;
+      T.ret(4, `<code>str.substring(0, 3)</code> is <code>"xyz"</code>. Nothing comes before index 0, so it can't have a period in front — <code>return true</code>.`, true, { chk: fchk });
+      return;
+    }
+    T.push(4, `<code>str.substring(0, 3)</code> is <code>${q(f)}</code>, not "xyz". The front is handled, so the loop can start at <code>i = 1</code> — every candidate from here on has a letter before it.`, { chk: fchk });
+    front = false;
+
+    for (i = 1; ; i++) {
+      T.vars.i = i; cand = bef = false;
+      if (i >= n - 2) {
+        delete T.vars.xyzCandidate; delete T.vars.before;
+        T.push(6, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${n - 2}</code> is <b>false</b> — no room left for three letters.`);
+        break;
+      }
+      T.push(6, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${n - 2}</code> is <b>true</b>.`);
+      const c = str.substring(i, i + 3);
+      cand = true; T.vars.xyzCandidate = c;
+      T.push(7, `<code>xyzCandidate = str.substring(${i}, ${i + 3})</code> → <code>${q(c)}</code>.`);
+      const b = str.substring(i - 1, i);
+      bef = true; T.vars.before = b;
+      T.push(8, `<code>before = str.substring(${i - 1}, ${i})</code> → <code>${q(b)}</code>, the letter just in front of the candidate.`);
+      const isX = c === "xyz", noDot = b !== ".";
+      const chk = [['xyzCandidate.equals("xyz")', String(isX), isX]];
+      if (!isX) {
+        chk.push(['!before.equals(".")', "(skipped)"]);
+        T.push(9, `<code>${q(c)}.equals("xyz")</code> is <b>false</b>, and <code>&amp;&amp;</code> stops right there.`, { chk });
+        continue;
+      }
+      chk.push(['!before.equals(".")', `!${b === "."} → ${noDot}`, noDot]);
+      if (!noDot) {
+        dot.push(i - 1);
+        T.push(9, `The candidate <em>is</em> "xyz"… but <code>before</code> is <code>"."</code>, so <code>!before.equals(".")</code> is <b>false</b>. This one doesn't count — keep looking.`, { chk });
+        continue;
+      }
+      T.push(9, `The candidate is "xyz" and <code>before</code> is <code>${q(b)}</code>, not a period. Both sides of <code>&amp;&amp;</code> are <b>true</b>.`, { chk });
+      hit = i;
+      T.ret(10, `<code>return true</code> — found an "xyz" without a period in front. The loop stops immediately.`, true, { chk });
+      return;
+    }
+    delete T.vars.i;
+    T.ret(13, `<code>return false</code> — every "xyz" (if there were any) had a period in front of it.`, false);
+  }
+});
+</script>
+</body>
+</html>

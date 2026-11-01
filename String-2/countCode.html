@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>countCode Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>countCode: "co_e" with any letter for the d</h1>
+  <p class="sub">Count how many times <code>"code"</code> appears, except any letter is accepted in place of the <code>'d'</code> — so <code>"cope"</code> and <code>"cooe"</code> count too. Step through <code>countCode</code>: it checks index <code>i</code>, <code>i+1</code> and <code>i+3</code>, and never looks at <code>i+2</code>. Watch <code>&amp;&amp;</code> stop at the first test that fails.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "countCode",
+  wide: true,
+  code: [
+    "public int countCode(String str) {",
+    "  int count = 0;",
+    "",
+    "  for (int i = 0; i <= str.length()-4; i++) {",
+    "    if (str.charAt(i)   == 'c' && str.charAt(i+1) == 'o' && str.charAt(i+3) == 'e') {",
+    "      count++;",
+    "    }",
+    "  }",
+    "",
+    "  return count;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "cozexxcope" }],
+  presets: [["aaacodebbb"], ["codexxcode"], ["cozexxcope"], ["cozfxxcope"], ["xxcozeyycop"], ["cod"]],
+  legend: [
+    ["outer", "the four boxes from <code>i</code> to <code>i+3</code>"],
+    ["inner", "a box being tested"],
+    ["match", "counted"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let i = null, found = [], testing = [];
+    T.view = () => {
+      const s = T.strip("str", str);
+      found.forEach(k => s.cls(k, k + 4, "hit"));
+      if (i !== null) {
+        s.top(i, `i=${i} ▼`);
+        if (i <= n - 4) {
+          s.cls(i, i + 4, "win").top(i + 1, "i+1").top(i + 3, "i+3").bot(i + 2, "any", "muted");
+          testing.forEach(k => s.at(k, "inner"));
+        }
+      }
+      return [s];
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>countCode(${q(str)})</code>.`);
+    T.vars.count = 0;
+    T.push(1, `<code>count = 0</code>.`);
+
+    const tests = [[0, "c"], [1, "o"], [3, "e"]];
+    for (i = 0; ; i++) {
+      T.vars.i = i; testing = [];
+      if (i > n - 4) {
+        T.push(3, `Loop: <code>i = ${i}</code>, <code>${i} &lt;= ${n - 4}</code> is <b>false</b>. ${n >= 4 ? "Four boxes starting here would run past the end." : "The string is shorter than 4 letters, so the loop never runs."}`);
+        break;
+      }
+      T.push(3, i === 0
+        ? `Loop starts at <code>i = 0</code>. A match needs 4 boxes, so the last start is <code>str.length()-4 = ${n - 4}</code>. <code>0 &lt;= ${n - 4}</code> is <b>true</b>.`
+        : `Loop: <code>i = ${i}</code>, <code>${i} &lt;= ${n - 4}</code> is <b>true</b>.`);
+      const chk = [];
+      let ok = true;
+      for (const [d, want] of tests) {
+        const at = i + d, got = str[at], pass = got === want;
+        const label = d ? `str.charAt(i+${d}) == '${want}'` : `str.charAt(i) == '${want}'`;
+        if (!ok) { chk.push([label, "(skipped)"]); continue; }
+        chk.push([label, `'${got}' == '${want}' → ${pass}`, pass]);
+        testing = [at];
+        if (!pass) ok = false;
+      }
+      // Narrate the && chain one test at a time.
+      for (let t = 0; t < tests.length; t++) {
+        const [d, want] = tests[t], at = i + d, got = str[at], pass = got === want;
+        testing = [at];
+        const rows = pass ? chk.slice(0, t + 1) : chk;
+        T.push(4, `<code>str.charAt(${at})</code> is <code>'${T.esc(got)}'</code>. <code>'${T.esc(got)}' == '${want}'</code> is <b>${pass}</b>.` +
+          (pass ? (t < tests.length - 1 ? ` Keep checking.` : ` All three tests passed!`)
+                : ` Because of <code>&amp;&amp;</code>, Java stops here — the rest of the condition isn't checked.`), { chk: rows });
+        if (!pass) break;
+      }
+      if (ok) {
+        testing = [];
+        found.push(i); T.vars.count++;
+        T.push(5, `<code>count++</code> → <code>count = ${T.vars.count}</code>. The letter at index ${i + 2} (<code>'${T.esc(str[i + 2])}'</code>) never mattered.`, { chk });
+      }
+    }
+    delete T.vars.i; testing = [];
+    T.ret(9, `<code>return count</code> → <code>${T.vars.count}</code>.`, T.vars.count);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>zipZap Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>zipZap: drop the middle of z?p</h1>
+  <p class="sub">Look for patterns like <code>"zip"</code> and <code>"zap"</code>: a <code>'z'</code>, any letter, then a <code>'p'</code>. Return a string where each such pattern loses its middle letter. Step through <code>zipZap</code>: the <code>while</code> loop moves <code>i</code> forward by 3 after a pattern but by 1 otherwise, then the last couple of letters are tacked on after the loop.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "zipZap",
+  wide: true,
+  code: [
+    "public String zipZap(String str) {",
+    "",
+    "  //edge case: if the string is shorter than 3 chars, it can't contain zap",
+    "  if (str.length() < 3) return str;",
+    "",
+    "  //Now parse through the string. I am using a while loop because I want to have",
+    "  //more control over the iteration step. Also, it is important to make sure",
+    "  //the variable i is available outside the loop for the last step.",
+    "  String ans = \"\";",
+    "  int i = 0;",
+    "  while ( i < str.length()-2) {",
+    "    if (str.charAt(i) == 'z' && str.charAt(i+2) == 'p') {",
+    "      ans += \"zp\";",
+    "      i += 3;",
+    "    } else {",
+    "      ans += str.charAt(i);",
+    "      i++;",
+    "    }",
+    "  }",
+    "",
+    "  //add on the remaining letters, if necessary",
+    "  if (i < str.length()) {",
+    "    return ans + str.substring(i);",
+    "  } else {",
+    "    return ans;",
+    "  }",
+    "",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "zzzopzop" }],
+  presets: [["zipXzap"], ["zopzop"], ["zzzopzop"], ["zibzap"], ["zip"], ["zi"], ["azbcppp"], ["zzp"]],
+  legend: [
+    ["outer", "<code>str.charAt(i)</code>"],
+    ["inner", "<code>str.charAt(i+2)</code>"],
+    ["match", "copied into <code>ans</code>"],
+    ["bad", "dropped (middle of z?p)"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let i = null, ans = null, retStr = null, added = 0, kept = [], dropped = [], look = false, tail = false;
+    T.view = () => {
+      const s = T.strip("str", str);
+      kept.forEach(k => s.at(k, "soft"));
+      dropped.forEach(k => s.at(k, "miss"));
+      if (i !== null) {
+        s.top(i, `i=${i} ▼`);
+        if (i < n && !tail) s.at(i, "outer");
+        if (look) s.bot(i + 2, "▲ i+2").at(i + 2, "inner");
+        if (tail) s.cls(i, n, "win");
+      }
+      const out = [s];
+      if (ans !== null) {
+        const r = T.strip("ans", ans);
+        if (added) r.cls(ans.length - added, ans.length, "new");
+        out.push(r);
+      }
+      if (retStr !== null) out.push(T.strip("", retStr).named(`ans + str.substring(${i}) = ${JSON.stringify(retStr)}`).cls(ans.length, retStr.length, "new"));
+      return out;
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>zipZap(${q(str)})</code>.`);
+    if (n < 3) {
+      T.ret(3, `<code>${n} &lt; 3</code> is <b>true</b> — too short for a z?p pattern, so return the string unchanged.`, str, { chk: [["str.length() &lt; 3", `${n} < 3 → true`, true]] });
+      return;
+    }
+    T.push(3, `<code>${n} &lt; 3</code> is <b>false</b>, so keep going.`, { chk: [["str.length() &lt; 3", `${n} < 3 → false`, false]] });
+    ans = ""; T.vars.ans = "";
+    T.push(8, `<code>ans = ""</code>.`);
+    i = 0; T.vars.i = 0;
+    T.push(9, `<code>i = 0</code>. It's declared <em>outside</em> the loop, so it still exists after the loop ends.`);
+
+    for (;;) {
+      added = 0; look = false;
+      if (i >= n - 2) {
+        T.push(10, `<code>i &lt; str.length()-2</code> → <code>${i} &lt; ${n - 2}</code> is <b>false</b>. There's no room for <code>i+2</code>, so the loop stops.`);
+        break;
+      }
+      T.push(10, `<code>i &lt; str.length()-2</code> → <code>${i} &lt; ${n - 2}</code> is <b>true</b>.`);
+      const a = str[i], c = str[i + 2], aZ = a === "z", cP = c === "p";
+      const chk = [["str.charAt(i) == 'z'", `'${a}' == 'z' → ${aZ}`, aZ]];
+      if (aZ) { look = true; chk.push(["str.charAt(i+2) == 'p'", `'${c}' == 'p' → ${cP}`, cP]); }
+      else chk.push(["str.charAt(i+2) == 'p'", "(skipped)"]);
+      if (aZ && cP) {
+        T.push(11, `<code>str.charAt(${i})</code> is <code>'z'</code> and <code>str.charAt(${i + 2})</code> is <code>'p'</code> — a z?p pattern!`, { chk });
+        ans += "zp"; added = 2; T.vars.ans = ans;
+        kept.push(i, i + 2); dropped.push(i + 1);
+        T.push(12, `<code>ans += "zp"</code> — the middle letter <code>'${T.esc(str[i + 1])}'</code> is left out. <code>ans = ${q(ans)}</code>.`, { chk });
+        added = 0; look = false;
+        i += 3; T.vars.i = i;
+        T.push(13, `<code>i += 3</code> → <code>i = ${i}</code>. Jump past all three letters of the pattern.`);
+      } else {
+        T.push(11, aZ
+          ? `<code>str.charAt(${i})</code> is <code>'z'</code>, but <code>str.charAt(${i + 2})</code> is <code>'${T.esc(c)}'</code>, not <code>'p'</code>. No pattern here, so go to the <code>else</code>.`
+          : `<code>str.charAt(${i})</code> is <code>'${T.esc(a)}'</code>, not <code>'z'</code>. <code>&amp;&amp;</code> stops right away; go to the <code>else</code>.`, { chk });
+        look = false;
+        ans += a; added = 1; T.vars.ans = ans; kept.push(i);
+        T.push(15, `<code>ans += str.charAt(${i})</code> copies <code>'${T.esc(a)}'</code>. <code>ans = ${q(ans)}</code>.`, { chk });
+        added = 0;
+        i++; T.vars.i = i;
+        T.push(16, `<code>i++</code> → <code>i = ${i}</code>.`);
+      }
+    }
+    const more = i < n;
+    const chk = [["i &lt; str.length()", `${i} < ${n} → ${more}`, more]];
+    if (more) {
+      tail = true;
+      T.push(21, `<code>${i} &lt; ${n}</code> is <b>true</b> — the loop stopped early to avoid reading past the end, so ${n - i === 1 ? "1 letter wasn't" : `${n - i} letters weren't`} copied yet.`, { chk });
+      const rest = str.substring(i), r = ans + rest;
+      for (let k = i; k < n; k++) kept.push(k);
+      retStr = r;
+      T.ret(22, `<code>ans + str.substring(${i})</code> is <code>${q(r.slice(0, r.length - rest.length))} + ${q(rest)}</code> → <code>${q(r)}</code>.`, r, { chk });
+    } else {
+      T.ret(24, `<code>${i} &lt; ${n}</code> is <b>false</b> — a pattern used up the last letters, so nothing is left over. <code>return ans</code> → <code>${q(ans)}</code>.`, ans, { chk });
+    }
+  }
+});
+</script>
+</body>
+</html>

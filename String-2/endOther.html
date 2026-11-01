@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>endOther Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>endOther: does one string end the other?</h1>
+  <p class="sub">Return true if either string appears at the very end of the other, ignoring upper/lower case. There's no loop here: <code>endOther</code> works out which string is shorter, lowercases both, then cuts the same number of letters off the end of the longer one and compares.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "endOther",
+  code: [
+    "public boolean endOther(String a, String b) {",
+    "  String shorter = \"\";",
+    "  String longer  = \"\";",
+    "",
+    "  if (a.length() <= b.length()) {",
+    "    shorter = a.toLowerCase();",
+    "    longer  = b.toLowerCase();",
+    "  } else {",
+    "    shorter = b.toLowerCase();",
+    "    longer  = a.toLowerCase();",
+    "  }",
+    "",
+    "  String longerEnd = longer.substring(longer.length() - shorter.length());",
+    "  return longerEnd.equals(shorter);",
+    "}"
+  ],
+  inputs: [{ id: "a", value: "Hiabc" }, { id: "b", value: "abc" }],
+  presets: [["Hiabc", "abc"], ["AbC", "HiaBc"], ["abc", "abXabc"], ["Hiabc", "abcd"], ["abc", "abc"], ["xyz", "12xyz"], ["ab", "ab12"]],
+  stripsTitle: "The strings",
+  stripsLegend: true,
+  wide: true,
+  legend: [
+    ["outer", "the end of <code>longer</code>"],
+    ["match", "letters that match"],
+    ["bad", "letters that don't match"]
+  ],
+  trace([a, b], T) {
+    const q = T.q;
+    let shorter = null, longer = null, start = null, cmp = false;
+    T.view = () => {
+      const out = [T.strip("a", a), T.strip("b", b)];
+      if (longer !== null) {
+        const L = T.strip("longer", longer), S = T.strip("shorter", shorter);
+        if (start !== null) {
+          L.cls(start, longer.length, cmp ? "" : "win").top(start, `${start} ▼`);
+          // line shorter up under the end of longer
+          S.shift(start);
+          if (cmp) for (let k = 0; k < shorter.length; k++) {
+            const m = longer[start + k] === shorter[k] ? "hit" : "miss";
+            L.at(start + k, m); S.at(k, m);
+          }
+        }
+        out.push(L, S);
+      }
+      return out;
+    };
+
+    T.vars.a = a; T.vars.b = b;
+    T.push(0, `Call <code>endOther(${q(a)}, ${q(b)})</code>.`);
+    T.vars.shorter = ""; T.push(1, `<code>shorter = ""</code> for now.`);
+    T.vars.longer = ""; T.push(2, `<code>longer = ""</code> for now.`);
+    const aShort = a.length <= b.length;
+    const chk = [["a.length() &lt;= b.length()", `${a.length} <= ${b.length} → ${aShort}`, aShort]];
+    T.push(4, `<code>a.length() &lt;= b.length()</code> → <code>${a.length} &lt;= ${b.length}</code> is <b>${aShort}</b>. ${aShort ? "So <code>a</code> is the shorter one (or they're the same length)." : "So <code>b</code> is the shorter one."}`, { chk });
+    const sSrc = aShort ? a : b, lSrc = aShort ? b : a, sName = aShort ? "a" : "b", lName = aShort ? "b" : "a";
+    shorter = sSrc.toLowerCase(); longer = "";
+    T.vars.shorter = shorter;
+    T.push(aShort ? 5 : 8, `<code>shorter = ${sName}.toLowerCase()</code> → <code>${q(shorter)}</code>. Lowercasing both strings is what makes the comparison ignore case.`, { chk });
+    longer = lSrc.toLowerCase();
+    T.vars.longer = longer;
+    T.push(aShort ? 6 : 9, `<code>longer = ${lName}.toLowerCase()</code> → <code>${q(longer)}</code>.`, { chk });
+
+    start = longer.length - shorter.length;
+    const end = longer.substring(start);
+    T.vars.longerEnd = end;
+    T.push(12, `<code>longer.length() - shorter.length()</code> is <code>${longer.length} - ${shorter.length} = ${start}</code>. <code>longer.substring(${start})</code> keeps everything from index ${start} to the end: <code>${q(end)}</code> — the same length as <code>shorter</code>.`,
+      { chk: [["longer.length() - shorter.length()", `${longer.length} - ${shorter.length} = ${start}`], [`longer.substring(${start})`, JSON.stringify(end)]] });
+    cmp = true;
+    const r = end === shorter;
+    T.ret(13, `<code>${q(end)}.equals(${q(shorter)})</code> is <b>${r}</b>. ${r ? "The shorter string sits exactly at the end of the longer one." : "At least one letter is different, so the shorter string is not at the end."}`, r,
+      { chk: [["longerEnd.equals(shorter)", `${JSON.stringify(end)} vs ${JSON.stringify(shorter)} → ${r}`, r]] });
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>catDog Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>catDog: as many cats as dogs?</h1>
+  <p class="sub">Return true if <code>"cat"</code> and <code>"dog"</code> appear the same number of times in the string. Step through <code>catDog</code> and watch a three-letter window slide along, keeping two separate counts. The <code>else if</code> only checks for "cat" when the window is <em>not</em> "dog".</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "catDog",
+  code: [
+    "public boolean catDog(String str) {",
+    "",
+    "  int dogCount = 0;",
+    "  int catCount = 0;",
+    "",
+    "  for (int i = 0; i <= str.length()-3; i++) {",
+    "    if (str.substring(i,i+3).equals(\"dog\"))",
+    "      dogCount++;",
+    "    else if (str.substring(i,i+3).equals(\"cat\"))",
+    "      catCount++;",
+    "  }",
+    "",
+    "  return (catCount == dogCount);",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "1cat1cadodog" }],
+  presets: [["catdog"], ["catcat"], ["1cat1cadodog"], ["catxxdogxxxdog"], ["dogdogcat"], ["xx"]],
+  legend: [
+    ["outer", "the window <code>substring(i, i+3)</code>"],
+    ["match", "counted \"cat\""],
+    ["inner", "counted \"dog\""]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let i = null, cats = [], dogs = [], win = false;
+    T.view = () => {
+      const s = T.strip("str", str);
+      if (i !== null && win) s.cls(i, i + 3, "win");
+      dogs.forEach(k => s.cls(k, k + 3, "win2").badge(k, "dog", "mid"));
+      cats.forEach(k => s.cls(k, k + 3, "hit").badge(k, "cat", "ok"));
+      if (i !== null) s.top(i, `i=${i} ▼`);
+      if (win) s.bot(i + 2, "▲ i+2");
+      return [s];
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>catDog(${q(str)})</code>.`);
+    T.vars.dogCount = 0;
+    T.push(2, `<code>dogCount = 0</code>.`);
+    T.vars.catCount = 0;
+    T.push(3, `<code>catCount = 0</code>.`);
+
+    for (i = 0; ; i++) {
+      T.vars.i = i; win = false;
+      if (i > n - 3) {
+        T.push(5, `Loop: <code>i = ${i}</code>, <code>${i} &lt;= ${n - 3}</code> is <b>false</b>. ${n >= 3 ? "There's no room for another three-letter window." : "The string is too short to hold even one window."}`);
+        break;
+      }
+      win = true;
+      T.push(5, i === 0
+        ? `Loop starts at <code>i = 0</code>. The last window starts at <code>str.length()-3 = ${n - 3}</code>, and <code>0 &lt;= ${n - 3}</code> is <b>true</b>.`
+        : `Loop: <code>i = ${i}</code>, <code>${i} &lt;= ${n - 3}</code> is <b>true</b>.`);
+      const w = str.substring(i, i + 3);
+      const isDog = w === "dog", isCat = w === "cat";
+      const chk = [[`str.substring(${i},${i + 3})`, JSON.stringify(w)], [`.equals("dog")`, String(isDog), isDog]];
+      if (isDog) {
+        T.push(6, `<code>str.substring(${i}, ${i + 3})</code> is <code>${q(w)}</code>. <code>.equals("dog")</code> is <b>true</b>.`, { chk });
+        dogs.push(i); T.vars.dogCount++;
+        T.push(7, `<code>dogCount++</code> → <code>dogCount = ${T.vars.dogCount}</code>. Because the first <code>if</code> was true, the <code>else if</code> is skipped.`, { chk });
+      } else {
+        T.push(6, `<code>str.substring(${i}, ${i + 3})</code> is <code>${q(w)}</code>. <code>.equals("dog")</code> is <b>false</b>, so try the <code>else if</code>.`, { chk });
+        chk.push([`.equals("cat")`, String(isCat), isCat]);
+        if (isCat) {
+          T.push(8, `<code>${q(w)}.equals("cat")</code> is <b>true</b>.`, { chk });
+          cats.push(i); T.vars.catCount++;
+          T.push(9, `<code>catCount++</code> → <code>catCount = ${T.vars.catCount}</code>.`, { chk });
+        } else {
+          T.push(8, `<code>${q(w)}.equals("cat")</code> is <b>false</b> too. Neither count changes.`, { chk });
+        }
+      }
+    }
+    delete T.vars.i; win = false;
+    const r = T.vars.catCount === T.vars.dogCount;
+    T.ret(12, `<code>catCount == dogCount</code> → <code>${T.vars.catCount} == ${T.vars.dogCount}</code> is <b>${r}</b>. ${r ? "The counts match." : "The counts are different."}`, r,
+      { chk: [["catCount == dogCount", `${T.vars.catCount} == ${T.vars.dogCount} → ${r}`, r]] });
+  }
+});
+</script>
+</body>
+</html>

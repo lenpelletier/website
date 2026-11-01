@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>getSandwich Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>getSandwich: what's between the bread?</h1>
+  <p class="sub">A sandwich is two pieces of <code>"bread"</code> with something in between. Return whatever is between the first and last <code>"bread"</code>, or <code>""</code> if there aren't two. Step through <code>getSandwich</code> and watch <code>indexOf</code> search from the left and <code>lastIndexOf</code> search from the right.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "getSandwich",
+  code: [
+    "public String getSandwich(String str) {",
+    "  String answer = \"\";",
+    "",
+    "  int b1 = str.indexOf(\"bread\");",
+    "  int b2 = str.lastIndexOf(\"bread\");",
+    "  if (b1 != b2) {",
+    "    answer = str.substring(b1+5, b2);",
+    "  }",
+    "",
+    "  return answer;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "xxbreadjambreadyy" }],
+  presets: [["breadjambread"], ["xxbreadjambreadyy"], ["xxbreadyy"], ["xxbreadbreadjambreadyy"], ["breadbread"], ["breaxbreadybread"], ["jam"]],
+  legend: [
+    ["inner", "searching / the bread"],
+    ["outer", "the filling, <code>substring(b1+5, b2)</code>"],
+    ["match", "the answer"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let scan = null, b1 = null, b2 = null, fill = false, done = false, ans = null;
+    T.view = () => {
+      const s = T.strip("str", str);
+      if (b1 !== null && b1 >= 0) s.cls(b1, b1 + 5, "win2").bot(b1, "▲ b1", "inner");
+      if (b2 !== null && b2 >= 0) s.cls(b2, b2 + 5, "win2").bot(b2, "▲ b2", "inner");
+      if (scan !== null) s.cls(scan, scan + 5, "win").top(scan, `${scan} ▼`);
+      if (fill) { s.cls(b1 + 5, b2, done ? "hit" : "win").top(b1 + 5, "b1+5 ▼"); }
+      const out = [s];
+      if (ans !== null) out.push(T.strip("answer", ans));
+      return out;
+    };
+    function search(line, fromRight) {
+      const name = fromRight ? "lastIndexOf" : "indexOf";
+      T.push(line, fromRight
+        ? `<code>str.lastIndexOf("bread")</code> tries each starting spot from the <b>right</b>, moving left, until five letters spell "bread".`
+        : `<code>str.indexOf("bread")</code> tries each starting spot from the <b>left</b>, moving right, until five letters spell "bread".`);
+      const starts = [];
+      for (let k = 0; k <= n - 5; k++) starts.push(k);
+      if (fromRight) starts.reverse();
+      for (const k of starts) {
+        scan = k;
+        const w = str.substring(k, k + 5);
+        if (w === "bread") {
+          T.push(line, `Index ${k}: <code>${q(w)}</code> — match! <code>${name}</code> returns <code>${k}</code>.`);
+          scan = null;
+          return k;
+        }
+        T.push(line, `Index ${k}: <code>${q(w)}</code> isn't "bread".`);
+      }
+      scan = null;
+      T.push(line, `No "bread" anywhere${n < 5 ? " (the string is shorter than 5 letters)" : ""}, so <code>${name}</code> returns <code>-1</code>.`);
+      return -1;
+    }
+
+    T.vars.str = str;
+    T.push(0, `Call <code>getSandwich(${q(str)})</code>.`);
+    T.vars.answer = ""; ans = "";
+    T.push(1, `<code>answer = ""</code>. If there's no sandwich, this is what gets returned.`);
+    b1 = search(3, false); T.vars.b1 = b1;
+    T.push(3, `<code>b1 = ${b1}</code>${b1 >= 0 ? " — the first bread starts here." : "."}`);
+    b2 = search(4, true); T.vars.b2 = b2;
+    T.push(4, `<code>b2 = ${b2}</code>${b2 >= 0 ? " — the last bread starts here." : "."}`);
+
+    const diff = b1 !== b2;
+    const chk = [["b1 != b2", `${b1} != ${b2} → ${diff}`, diff]];
+    if (!diff) {
+      T.push(5, `<code>${b1} != ${b2}</code> is <b>false</b>. ${b1 < 0 ? "Both are -1: there's no bread at all." : "The first and last bread are the same piece — only one slice, no sandwich."} Skip the <code>if</code>.`, { chk });
+      T.ret(9, `<code>return answer</code> → <code>""</code>.`, "", { chk });
+      return;
+    }
+    T.push(5, `<code>${b1} != ${b2}</code> is <b>true</b> — there are two different slices of bread.`, { chk });
+    fill = true;
+    T.push(6, `The filling starts right after the first bread: <code>b1+5 = ${b1 + 5}</code> ("bread" is 5 letters). It ends just before the last bread, at index <code>b2 = ${b2}</code>, which <code>substring</code> doesn't include.`,
+      { chk: chk.concat([["b1+5", String(b1 + 5)]]) });
+    ans = str.substring(b1 + 5, b2); T.vars.answer = ans; done = true;
+    T.push(6, `<code>answer = str.substring(${b1 + 5}, ${b2})</code> → <code>${q(ans)}</code>.`);
+    T.ret(9, `<code>return answer</code> → <code>${q(ans)}</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

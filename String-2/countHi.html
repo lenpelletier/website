@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>countHi Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>countHi: how many "hi"s?</h1>
+  <p class="sub">Return the number of times <code>"hi"</code> appears anywhere in the string. Step through <code>countHi</code> and watch a two-letter window, <code>substring(i, i+2)</code>, slide along the string one box at a time. The loop stops one box early because the last letter has no partner to its right.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "countHi",
+  code: [
+    "public int countHi(String str) {",
+    "  int count = 0;",
+    "",
+    "  for (int i = 0; i < str.length()-1; i++) {",
+    "    String s = str.substring(i, i+2);",
+    "    if (s.equals(\"hi\")) {",
+    "      count ++;",
+    "    }",
+    "  }",
+    "  return count;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "ABChi hi" }],
+  presets: [["abc hi ho"], ["ABChi hi"], ["hihi"], ["hiHIhi"], ["h"], ["xhixhix"]],
+  legend: [
+    ["outer", "the window <code>substring(i, i+2)</code>"],
+    ["match", "a \"hi\" that was counted"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let i = null, found = [], win = false;
+    T.view = () => {
+      const s = T.strip("str", str);
+      found.forEach(k => s.cls(k, k + 2, "hit"));
+      if (i !== null) {
+        s.top(i, `i=${i} ▼`);
+        if (win) s.cls(i, i + 2, "win").bot(i + 1, "▲ i+1");
+      }
+      return [s];
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>countHi(${q(str)})</code>.`);
+    T.vars.count = 0;
+    T.push(1, `<code>count = 0</code>. No "hi" found yet.`);
+
+    for (i = 0; ; i++) {
+      T.vars.i = i; win = false;
+      if (i >= n - 1) {
+        delete T.vars.s;
+        T.push(3, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${n - 1}</code> is <b>false</b>. ${n > 0 ? `A window starting at index ${i} would need index ${i + 1}, which doesn't exist — so the loop stops here.` : "The string is empty."}`);
+        break;
+      }
+      win = true;
+      T.push(3, i === 0
+        ? `Loop starts at <code>i = 0</code>. The test is <code>i &lt; str.length()-1</code>, which is <code>0 &lt; ${n - 1}</code>: <b>true</b>.`
+        : `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${n - 1}</code> is <b>true</b>.`);
+      const s = str.substring(i, i + 2);
+      T.vars.s = s;
+      T.push(4, `<code>s = str.substring(${i}, ${i + 2})</code> → <code>${q(s)}</code>, the two letters at index ${i} and ${i + 1}.`);
+      const ok = s === "hi";
+      const chk = [[`s.equals("hi")`, String(ok), ok]];
+      if (ok) {
+        T.push(5, `<code>${q(s)}.equals("hi")</code> is <b>true</b> — found one!`, { chk });
+        found.push(i);
+        T.vars.count++;
+        T.push(6, `<code>count++</code> → <code>count = ${T.vars.count}</code>.`, { chk });
+      } else {
+        T.push(5, `<code>${q(s)}.equals("hi")</code> is <b>false</b>${s.toLowerCase() === "hi" ? " — <code>equals</code> is case-sensitive" : ""}. Move on (<code>i++</code>).`, { chk });
+      }
+    }
+    delete T.vars.i;
+    T.ret(9, `<code>return count</code> → <code>${T.vars.count}</code>.`, T.vars.count);
+  }
+});
+</script>
+</body>
+</html>

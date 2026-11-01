@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bobThere Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>bobThere: b, anything, b</h1>
+  <p class="sub">Return true if the string contains a "bob" pattern: a <code>'b'</code>, then any one character, then another <code>'b'</code>. Step through <code>bobThere</code> and watch it compare the letter at <code>i</code> with the letter two boxes later, ignoring the one in between.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "bobThere",
+  code: [
+    "public boolean bobThere(String str) {",
+    "  for (int i = 0; i <= str.length()-3; i++) {",
+    "    if (str.charAt(i) == 'b' && str.charAt(i+2) == 'b') return true;",
+    "  }",
+    "  return false;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "abcbob" }],
+  presets: [["abcbob"], ["b9b"], ["bac"], ["bbb"], ["abcdefb"], ["xxbxb"], ["bb"]],
+  legend: [
+    ["outer", "<code>str.charAt(i)</code>"],
+    ["inner", "<code>str.charAt(i+2)</code>"],
+    ["match", "a b?b pattern"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let i = null, look = [], hit = null;
+    T.view = () => {
+      const s = T.strip("str", str);
+      if (i !== null) {
+        s.top(i, `i=${i} ▼`);
+        if (i <= n - 3) { s.at(i, "outer").bot(i + 2, "▲ i+2").bot(i + 1, "any", "muted"); look.forEach(k => s.at(k, "inner")); }
+      }
+      if (hit !== null) s.cls(hit, hit + 3, "hit");
+      return [s];
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>bobThere(${q(str)})</code>.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; look = [];
+      if (i > n - 3) {
+        T.push(1, `Loop: <code>i = ${i}</code>, <code>${i} &lt;= ${n - 3}</code> is <b>false</b>. ${n >= 3 ? "Index <code>i+2</code> would be past the end." : "The string is too short for the pattern."}`);
+        break;
+      }
+      T.push(1, i === 0
+        ? `Loop starts at <code>i = 0</code>. Because the code reads <code>charAt(i+2)</code>, <code>i</code> can only go up to <code>str.length()-3 = ${n - 3}</code>. <code>0 &lt;= ${n - 3}</code> is <b>true</b>.`
+        : `Loop: <code>i = ${i}</code>, <code>${i} &lt;= ${n - 3}</code> is <b>true</b>.`);
+      const a = str[i], c = str[i + 2], aOk = a === "b", cOk = c === "b";
+      const chk = [[`str.charAt(i) == 'b'`, `'${a}' == 'b' → ${aOk}`, aOk]];
+      if (!aOk) {
+        chk.push([`str.charAt(i+2) == 'b'`, "(skipped)"]);
+        T.push(2, `<code>str.charAt(${i})</code> is <code>'${T.esc(a)}'</code>, not <code>'b'</code>. <code>&amp;&amp;</code> stops right away — no need to look at index ${i + 2}.`, { chk });
+        continue;
+      }
+      look = [i + 2];
+      chk.push([`str.charAt(i+2) == 'b'`, `'${c}' == 'b' → ${cOk}`, cOk]);
+      if (!cOk) {
+        T.push(2, `<code>str.charAt(${i})</code> is <code>'b'</code> ✓, so check two boxes later: <code>str.charAt(${i + 2})</code> is <code>'${T.esc(c)}'</code> ✗. Not a match.`, { chk });
+        continue;
+      }
+      T.push(2, `<code>str.charAt(${i})</code> is <code>'b'</code> ✓ and <code>str.charAt(${i + 2})</code> is <code>'b'</code> ✓. The letter between them (<code>'${T.esc(str[i + 1])}'</code>) can be anything.`, { chk });
+      hit = i;
+      T.ret(2, `<code>return true</code> — found <code>${q(str.substring(i, i + 3))}</code> starting at index ${i}. The loop stops immediately.`, true, { chk });
+      return;
+    }
+    delete T.vars.i;
+    T.ret(4, `<code>return false</code> — no <code>'b'</code> had another <code>'b'</code> two boxes later.`, false);
+  }
+});
+</script>
+</body>
+</html>

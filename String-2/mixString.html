@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mixString Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>mixString: take turns</h1>
+  <p class="sub">Build a new string from the first letter of <code>a</code>, the first of <code>b</code>, the second of <code>a</code>, the second of <code>b</code>, and so on. Any leftover letters of the longer string go on the end. Step through <code>mixString</code>: the loop runs as long as the <em>longer</em> string, and the two <code>if</code>s stop it from reading past the end of the shorter one.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "mixString",
+  code: [
+    "public String mixString(String a, String b) {",
+    "  int maxlen = Math.max(a.length(), b.length());",
+    "  String ans = \"\";",
+    "",
+    "  for (int i = 0; i < maxlen; i++) {",
+    "    String pieceOfA = \"\";",
+    "    String pieceOfB = \"\";",
+    "    if (i < a.length()) pieceOfA = a.substring(i,i+1);",
+    "    if (i < b.length()) pieceOfB = b.substring(i,i+1);",
+    "    ans += pieceOfA + pieceOfB;",
+    "  }",
+    "",
+    "  return ans;",
+    "}"
+  ],
+  inputs: [{ id: "a", value: "Hi" }, { id: "b", value: "There" }],
+  presets: [["abc", "xyz"], ["Hi", "There"], ["xxxx", "There"], ["xxx", "X"], ["2/", "27 around"], ["", "Hello"]],
+  legend: [
+    ["outer", "letter taken from <code>a</code>"],
+    ["inner", "letter taken from <code>b</code>"],
+    ["match", "just added to <code>ans</code>"]
+  ],
+  trace([a, b], T) {
+    const q = T.q;
+    let i = null, ans = "", added = 0, tookA = false, tookB = false;
+    T.view = () => {
+      const A = T.strip("a", a), B = T.strip("b", b);
+      if (i !== null) {
+        A.top(i, `i=${i} ▼`); B.top(i, `i=${i} ▼`);
+        if (tookA) A.at(i, "win outer");
+        if (tookB) B.at(i, "win2 inner");
+      }
+      const R = T.strip("ans", ans);
+      if (added) R.cls(ans.length - added, ans.length, "new");
+      return [A, B, R];
+    };
+
+    T.vars.a = a; T.vars.b = b;
+    T.push(0, `Call <code>mixString(${q(a)}, ${q(b)})</code>.`);
+    const maxlen = Math.max(a.length, b.length);
+    T.vars.maxlen = maxlen;
+    T.push(1, `<code>Math.max(${a.length}, ${b.length})</code> → <code>${maxlen}</code>. The loop must run once for every letter of the longer string.`);
+    T.vars.ans = "";
+    T.push(2, `<code>ans = ""</code>.`);
+
+    for (i = 0; ; i++) {
+      T.vars.i = i; added = 0; tookA = tookB = false;
+      delete T.vars.pieceOfA; delete T.vars.pieceOfB;
+      if (i >= maxlen) {
+        T.push(4, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${maxlen}</code> is <b>false</b> — both strings are used up.`);
+        break;
+      }
+      T.push(4, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${maxlen}</code> is <b>true</b>.`);
+      T.vars.pieceOfA = "";
+      T.push(5, `<code>pieceOfA = ""</code>. It stays empty unless <code>a</code> has a letter at index ${i}.`);
+      T.vars.pieceOfB = "";
+      T.push(6, `<code>pieceOfB = ""</code>.`);
+      const inA = i < a.length, inB = i < b.length;
+      if (inA) {
+        tookA = true; T.vars.pieceOfA = a[i];
+        T.push(7, `<code>${i} &lt; ${a.length}</code> is <b>true</b>, so <code>pieceOfA = a.substring(${i}, ${i + 1})</code> → <code>${q(a[i])}</code>.`, { chk: [["i &lt; a.length()", `${i} < ${a.length} → true`, true]] });
+      } else {
+        T.push(7, `<code>${i} &lt; ${a.length}</code> is <b>false</b> — <code>a</code> has run out. <code>pieceOfA</code> stays <code>""</code> (calling <code>substring</code> here would crash).`, { chk: [["i &lt; a.length()", `${i} < ${a.length} → false`, false]] });
+      }
+      const c1 = ["i &lt; b.length()", `${i} < ${b.length} → ${inB}`, inB];
+      if (inB) {
+        tookB = true; T.vars.pieceOfB = b[i];
+        T.push(8, `<code>${i} &lt; ${b.length}</code> is <b>true</b>, so <code>pieceOfB = b.substring(${i}, ${i + 1})</code> → <code>${q(b[i])}</code>.`, { chk: [c1] });
+      } else {
+        T.push(8, `<code>${i} &lt; ${b.length}</code> is <b>false</b> — <code>b</code> has run out. <code>pieceOfB</code> stays <code>""</code>.`, { chk: [c1] });
+      }
+      const piece = (inA ? a[i] : "") + (inB ? b[i] : "");
+      ans += piece; added = piece.length; T.vars.ans = ans;
+      T.push(9, `<code>pieceOfA + pieceOfB</code> is <code>${q(piece)}</code>. Now <code>ans = ${q(ans)}</code>.`);
+    }
+    delete T.vars.i;
+    T.ret(12, `<code>return ans</code> → <code>${q(ans)}</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

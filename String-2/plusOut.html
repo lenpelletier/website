@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>plusOut Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>plusOut: everything becomes + except the word</h1>
+  <p class="sub">Return a version of <code>str</code> where every character is replaced by <code>'+'</code>, except wherever <code>word</code> appears, which stays unchanged. Step through <code>plusOut</code>: the first <code>while</code> loop compares a <code>word</code>-sized chunk at each spot and jumps past the whole word when it matches. Near the end there's no room for a full chunk, so a second loop turns the leftover letters into pluses.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "plusOut",
+  code: [
+    "public String plusOut(String str, String word) {",
+    "  String newString = \"\";",
+    "  int i = 0;",
+    "  int s = str.length();",
+    "  int w = word.length();",
+    "",
+    "  while (i < s-w+1) {",
+    "    String chunk = str.substring(i, i+w);",
+    "    if (chunk.equals(word)) {",
+    "      newString += word;",
+    "      i += w;",
+    "    }",
+    "    else {",
+    "      newString += \"+\";",
+    "      i++;",
+    "    }",
+    "  }",
+    "",
+    "  while (i < s) {",
+    "    newString += \"+\";",
+    "    i++;",
+    "  }",
+    "",
+    "  return newString;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "12xy34" }, { id: "word", value: "xy", width: 100 }],
+  presets: [["12xy34", "xy"], ["12xy34", "1"], ["12xy34xyabcxy", "xy"], ["abXYabcXYZ", "ab"], ["aaxxxxbb", "xx"], ["xyx", "xyx"]],
+  validate([str, word]) {
+    if (word.length === 0) return "<code>word</code> can't be empty — with <code>w = 0</code>, <code>i += w</code> would never move forward and the loop would run forever.";
+  },
+  legend: [
+    ["outer", "<code>chunk</code> = <code>str.substring(i, i+w)</code>"],
+    ["match", "kept as <code>word</code>"],
+    ["inner", "turned into +"]
+  ],
+  trace([str, word], T) {
+    const q = T.q, s = str.length, w = word.length;
+    let i = null, win = false, keep = [], plus = [], ns = "", added = 0, second = false;
+    T.view = () => {
+      const S = T.strip("str", str);
+      keep.forEach(k => S.at(k, "soft"));
+      plus.forEach(k => S.at(k, "done"));
+      if (i !== null) {
+        S.top(i, `i=${i} ▼`);
+        if (win) S.cls(i, i + w, "win");
+        if (second && i < s) S.at(i, "outer");
+      }
+      if (i !== null && !second && s - w + 1 >= 0) S.bot(s - w + 1, "▲ s-w+1", "muted");
+      const R = T.strip("newString", ns);
+      plus.forEach(k => R.at(k, "win2"));   // newString lines up with str box for box
+      if (added) R.cls(ns.length - added, ns.length, "new");
+      return [S, T.strip("word", word), R];
+    };
+
+    T.vars.str = str; T.vars.word = word;
+    T.push(0, `Call <code>plusOut(${q(str)}, ${q(word)})</code>.`);
+    T.vars.newString = ""; T.push(1, `<code>newString = ""</code>.`);
+    i = 0; T.vars.i = 0; T.push(2, `<code>i = 0</code>.`);
+    T.vars.s = s; T.push(3, `<code>s = ${s}</code>, the length of <code>str</code>.`);
+    T.vars.w = w; T.push(4, `<code>w = ${w}</code>, the length of <code>word</code>.`);
+
+    const limit = s - w + 1;
+    for (;;) {
+      win = false; added = 0;
+      if (i >= limit) {
+        delete T.vars.chunk;
+        T.push(6, `<code>i &lt; s-w+1</code> → <code>${i} &lt; ${limit}</code> is <b>false</b>. ${i < s ? `A chunk of ${w} starting at ${i} would run past the end.` : "Every letter has been handled."}`);
+        break;
+      }
+      T.push(6, `<code>i &lt; s-w+1</code> → <code>${i} &lt; ${limit}</code> is <b>true</b>. ${i === 0 ? `(<code>s-w+1 = ${limit}</code> is one more than the last spot where a full chunk fits.)` : ""}`);
+      win = true;
+      const chunk = str.substring(i, i + w);
+      T.vars.chunk = chunk;
+      T.push(7, `<code>chunk = str.substring(${i}, ${i + w})</code> → <code>${q(chunk)}</code>.`);
+      const ok = chunk === word;
+      const chk = [["chunk.equals(word)", `${JSON.stringify(chunk)} vs ${JSON.stringify(word)} → ${ok}`, ok]];
+      if (ok) {
+        T.push(8, `<code>${q(chunk)}.equals(${q(word)})</code> is <b>true</b> — the word is here.`, { chk });
+        ns += word; added = w; T.vars.newString = ns;
+        for (let k = i; k < i + w; k++) keep.push(k);
+        T.push(9, `<code>newString += word</code> keeps it as is. <code>newString = ${q(ns)}</code>.`, { chk });
+        added = 0; win = false;
+        i += w; T.vars.i = i;
+        T.push(10, `<code>i += w</code> → <code>i = ${i}</code>. Jump over the whole word so none of its letters become pluses.`, { chk });
+      } else {
+        T.push(8, `<code>${q(chunk)}.equals(${q(word)})</code> is <b>false</b>. Go to the <code>else</code>.`, { chk });
+        ns += "+"; added = 1; T.vars.newString = ns; plus.push(i);
+        win = false;
+        T.push(13, `<code>newString += "+"</code> replaces <code>'${T.esc(str[i])}'</code> (index ${i}). <code>newString = ${q(ns)}</code>.`, { chk });
+        added = 0;
+        i++; T.vars.i = i;
+        T.push(14, `<code>i++</code> → <code>i = ${i}</code>. Only move one box — the word might start at the very next letter.`);
+      }
+    }
+
+    second = true;
+    for (;;) {
+      added = 0;
+      if (i >= s) {
+        T.push(18, `Second loop: <code>i &lt; s</code> → <code>${i} &lt; ${s}</code> is <b>false</b>. ${plus.length + keep.length === s ? "Every letter is accounted for." : ""}`, { in: true });
+        break;
+      }
+      T.push(18, `Second loop: <code>i &lt; s</code> → <code>${i} &lt; ${s}</code> is <b>true</b>. Index ${i} wasn't handled by the first loop because there wasn't room for a full chunk.`, { in: true });
+      ns += "+"; added = 1; T.vars.newString = ns; plus.push(i);
+      T.push(19, `<code>newString += "+"</code> → <code>${q(ns)}</code>.`, { in: true });
+      added = 0;
+      i++; T.vars.i = i;
+      T.push(20, `<code>i++</code> → <code>i = ${i}</code>.`, { in: true });
+    }
+    T.ret(23, `<code>return newString</code> → <code>${q(ns)}</code>.`, ns);
+  }
+});
+</script>
+</body>
+</html>

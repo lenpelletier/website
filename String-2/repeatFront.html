@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>repeatFront Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>repeatFront: a shrinking front</h1>
+  <p class="sub">Given a string and an int <code>n</code>, return the first <code>n</code> characters, then the first <code>n-1</code>, and so on down to just the first one. Step through <code>repeatFront</code>: this loop counts <em>down</em>, and <code>i</code> is the end of <code>substring(0, i)</code>, so each piece is one letter shorter. (CodingBat promises <code>n</code> is between 0 and the length of the string.)</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "repeatFront",
+  chk: false,
+  code: [
+    "public String repeatFront(String str, int n) {",
+    "  String ans = \"\";",
+    "",
+    "  for (int i = n; i > 0; i--) {",
+    "    ans += str.substring(0,i);",
+    "  }",
+    "",
+    "  return ans;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "Chocolate" }, { id: "n", kind: "int", value: 4 }],
+  presets: [["Chocolate", 4], ["Chocolate", 3], ["Ice Cream", 2], ["Ice Cream", 1], ["xyz", 3], ["Java", 0]],
+  validate([str, n]) {
+    if (n < 0 || n > str.length) return `<code>n</code> must be between 0 and <code>str.length()</code> (${str.length}). Otherwise <code>substring</code> would throw a <code>StringIndexOutOfBoundsException</code>.`;
+  },
+  legend: [
+    ["outer", "<code>str.substring(0, i)</code>"],
+    ["match", "the piece just added"]
+  ],
+  trace([str, n], T) {
+    const q = T.q;
+    let i = null, ans = "", added = 0, win = false;
+    T.view = () => {
+      const s = T.strip("str", str);
+      if (i !== null) {
+        s.top(i, `i=${i} ▼`);
+        if (win) s.cls(0, i, "win").bot(0, "▲ 0");
+      }
+      const r = T.strip("ans", ans);
+      if (added) r.cls(ans.length - added, ans.length, "new");
+      return [s, r];
+    };
+
+    T.vars.str = str; T.vars.n = n;
+    T.push(0, `Call <code>repeatFront(${q(str)}, ${n})</code>.`);
+    T.vars.ans = "";
+    T.push(1, `<code>ans = ""</code>.`);
+    for (i = n; ; i--) {
+      T.vars.i = i; added = 0; win = false;
+      if (i <= 0) {
+        T.push(3, `Loop: <code>i = ${i}</code>, <code>${i} &gt; 0</code> is <b>false</b>. ${n ? "A piece of length 0 would be empty, so the loop is done." : "With n = 0 the loop never runs."}`);
+        break;
+      }
+      T.push(3, i === n
+        ? `The loop starts <code>i</code> at <code>n = ${n}</code> and counts down (<code>i--</code>). <code>${i} &gt; 0</code> is <b>true</b>.`
+        : `Loop: <code>i = ${i}</code>, <code>${i} &gt; 0</code> is <b>true</b>.`);
+      win = true;
+      const piece = str.substring(0, i);
+      ans += piece; added = i; T.vars.ans = ans;
+      T.push(4, `<code>str.substring(0, ${i})</code> is the first ${i} letter${i === 1 ? "" : "s"}: <code>${q(piece)}</code>. Index ${i} itself is <em>not</em> included. Now <code>ans = ${q(ans)}</code>.`);
+    }
+    delete T.vars.i;
+    T.ret(7, `<code>return ans</code> → <code>${q(ans)}</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

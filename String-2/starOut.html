@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>starOut Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>starOut: remove each * and its neighbours</h1>
+  <p class="sub">Return a version of the string where every <code>'*'</code> is removed, along with the characters just to its left and right. So <code>"ab*cd"</code> becomes <code>"ad"</code>. Step through <code>starOut</code>: it looks at two boxes at a time (<code>a</code> and <code>b</code>). A letter is kept only if neither it nor the box after it is a star. When a star is followed by a letter, <code>i++</code> inside the loop skips that letter too. The last letter has no box after it, so it gets checked separately at the end.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "starOut",
+  wide: true,
+  code: [
+    "public String starOut(String str) {",
+    "",
+    "  String answer = \"\";",
+    "",
+    "  //deal with tiny strings",
+    "  if (str.length() < 3) {",
+    "    if (str.contains(\"*\")) {",
+    "      return \"\";",
+    "    } else {",
+    "      return str;",
+    "    }",
+    "  }",
+    "",
+    "  //process larger strings",
+    "  for (int i = 0; i < str.length()-1; i++) {",
+    "    String sub = str.substring(i,i+2);",
+    "    char a = str.charAt(i);",
+    "    char b = str.charAt(i+1);",
+    "    if (!sub.contains(\"*\")) {",
+    "      answer += a;",
+    "    }",
+    "    else {",
+    "      if (a == '*' & b != '*') {",
+    "        i++; //skip ahead 2",
+    "      } else {",
+    "        //do nothing, will skip ahead 1 because of for loop",
+    "      }",
+    "    }",
+    "  }",
+    "",
+    "  //deal with last character separately to avoid out of bounds",
+    "  String lastTwo = str.substring(str.length()-2);",
+    "  char lastChar = str.charAt(str.length()-1);",
+    "  if (!lastTwo.contains(\"*\")) {",
+    "    answer += lastChar;",
+    "  }",
+    "",
+    "  return answer;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "sm*eilly" }],
+  presets: [["ab*cd"], ["ab**cd"], ["sm*eilly"], ["sm*eil*ly"], ["sm**eil*ly"], ["*abc*"], ["ab"], ["a*"]],
+  legend: [
+    ["outer", "<code>a</code> = <code>str.charAt(i)</code>"],
+    ["inner", "<code>b</code> = <code>str.charAt(i+1)</code>"],
+    ["match", "kept"],
+    ["bad", "removed"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let i = null, win = false, kept = [], gone = [], ans = "", added = 0, last2 = false;
+    T.view = () => {
+      const s = T.strip("str", str);
+      kept.forEach(k => s.at(k, "soft"));
+      gone.forEach(k => s.at(k, "miss"));
+      if (i !== null) {
+        s.top(i, `i=${i} ▼`);
+        if (win) s.cls(i, i + 2, "win").at(i, "outer").at(i + 1, "inner").bot(i + 1, "▲ i+1");
+        else if (i < n - 1) s.at(i, "outer");
+      }
+      if (last2) s.cls(n - 2, n, "win2").bot(n - 1, "▲ last");
+      const r = T.strip("answer", ans);
+      if (added) r.cls(ans.length - added, ans.length, "new");
+      return [s, r];
+    };
+    const has = t => t.includes("*");
+
+    T.vars.str = str;
+    T.push(0, `Call <code>starOut(${q(str)})</code>.`);
+    T.vars.answer = "";
+    T.push(2, `<code>answer = ""</code>.`);
+    if (n < 3) {
+      const st = has(str);
+      const chk = [["str.length() &lt; 3", `${n} < 3 → true`, true], ['str.contains("*")', String(st), st]];
+      T.push(5, `<code>${n} &lt; 3</code> is <b>true</b> — a tiny string gets special treatment.`, { chk: chk.slice(0, 1) });
+      if (st) {
+        for (let k = 0; k < n; k++) gone.push(k);
+        T.ret(7, `It contains a star. With only ${n} box${n === 1 ? "" : "es"}, every box is the star or right next to it, so everything goes. <code>return ""</code>.`, "", { chk });
+      } else {
+        for (let k = 0; k < n; k++) kept.push(k);
+        T.ret(9, `No star, so nothing needs removing. <code>return str</code> → <code>${q(str)}</code>.`, str, { chk });
+      }
+      return;
+    }
+    T.push(5, `<code>${n} &lt; 3</code> is <b>false</b>.`, { chk: [["str.length() &lt; 3", `${n} < 3 → false`, false]] });
+
+    for (i = 0; ; i++) {
+      T.vars.i = i; win = false; added = 0;
+      if (i >= n - 1) {
+        delete T.vars.sub; delete T.vars.a; delete T.vars.b;
+        T.push(14, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${n - 1}</code> is <b>false</b>. ${i === n - 1 ? "Index i+1 would be past the end, so the loop stops." : "The skip carried <code>i</code> past the last box."}`);
+        break;
+      }
+      T.push(14, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${n - 1}</code> is <b>true</b>.`);
+      win = true;
+      const sub = str.substring(i, i + 2), a = str[i], b = str[i + 1];
+      T.vars.sub = sub;
+      T.push(15, `<code>sub = str.substring(${i}, ${i + 2})</code> → <code>${q(sub)}</code>.`);
+      T.vars.a = T.c(a); T.vars.b = T.c(b);
+      T.push(17, `<code>a = '${T.esc(a)}'</code> (index ${i}) and <code>b = '${T.esc(b)}'</code> (index ${i + 1}).`);
+      const noStar = !has(sub);
+      const chk = [['!sub.contains("*")', String(noStar), noStar]];
+      if (noStar) {
+        T.push(18, `<code>${q(sub)}</code> has no star, so <code>a</code> isn't next to a star on its right. (A star on its left would already have skipped it.)`, { chk });
+        ans += a; added = 1; T.vars.answer = ans; kept.push(i);
+        T.push(19, `<code>answer += a</code> keeps <code>'${T.esc(a)}'</code>. <code>answer = ${q(ans)}</code>.`, { chk });
+        continue;
+      }
+      T.push(18, `<code>${q(sub)}</code> contains a star, so <code>a</code> (index ${i}) is not kept. Go to the <code>else</code>.`, { chk });
+      if (!gone.includes(i)) gone.push(i);
+      const skip = a === "*" && b !== "*";
+      chk.push(["a == '*' &amp; b != '*'", `${a === "*"} & ${b !== "*"} → ${skip}`, skip]);
+      if (skip) {
+        T.push(22, `<code>a</code> is the star and <code>b</code> (<code>'${T.esc(b)}'</code>) is a letter right after it, so <code>b</code> must be removed too.`, { chk });
+        gone.push(i + 1);
+        i++; T.vars.i = i;
+        win = false;
+        T.push(23, `<code>i++</code> → <code>i = ${i}</code>. Together with the loop's own <code>i++</code>, this skips over <code>b</code> entirely.`, { chk });
+      } else {
+        T.push(22, a === "*"
+          ? `<code>a</code> is a star, but <code>b</code> is also a star, so don't skip — the next pass will look at that star with whatever follows it.`
+          : `<code>a</code> is a letter with a star right after it. Nothing more to do here; the loop's <code>i++</code> moves on to the star.`, { chk });
+      }
+    }
+    win = false;
+    delete T.vars.i;
+    const lastTwo = str.substring(n - 2), lastChar = str[n - 1];
+    last2 = true; T.vars.lastTwo = lastTwo;
+    T.push(31, `The loop never kept or dropped the last box on its own terms, so check it now. <code>lastTwo = str.substring(${n - 2})</code> → <code>${q(lastTwo)}</code>.`);
+    T.vars.lastChar = T.c(lastChar);
+    T.push(32, `<code>lastChar = str.charAt(${n - 1})</code> → <code>'${T.esc(lastChar)}'</code>.`);
+    const ok = !has(lastTwo);
+    const chk = [['!lastTwo.contains("*")', String(ok), ok]];
+    if (ok) {
+      T.push(33, `<code>${q(lastTwo)}</code> has no star, so the last letter isn't a star and has no star before it.`, { chk });
+      ans += lastChar; added = 1; T.vars.answer = ans;
+      kept.push(n - 1); gone = gone.filter(k => k !== n - 1);
+      T.push(34, `<code>answer += lastChar</code> → <code>${q(ans)}</code>.`, { chk });
+    } else {
+      if (!gone.includes(n - 1)) gone.push(n - 1);
+      T.push(33, `<code>${q(lastTwo)}</code> contains a star, so the last letter is a star or right after one. It is not added.`, { chk });
+    }
+    added = 0; last2 = false;
+    T.ret(37, `<code>return answer</code> → <code>${q(ans)}</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

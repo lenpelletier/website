@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>oneTwo Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>oneTwo: "abc" becomes "bca"</h1>
+  <p class="sub">Split the string into groups of three. In each group, move the first letter to the end, so <code>"abc"</code> becomes <code>"bca"</code>. Leftover letters at the end (fewer than three) are dropped. Step through <code>oneTwo</code>: instead of moving an index forward, this loop chops the first three letters off <code>str</code> each time, until fewer than three are left.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "oneTwo",
+  wide: true,
+  chk: false,
+  code: [
+    "public String oneTwo(String str) {",
+    "  String ans = \"\";",
+    "",
+    "  while (str.length() >= 3) {",
+    "    String a  = str.substring(0,1);",
+    "    String bc = str.substring(1,3);",
+    "    ans += bc + a;",
+    "    str = str.substring(3);  //instead of moving the index forward, I cut away the front of str",
+    "  }",
+    "",
+    "  return ans;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "tcagdo" }],
+  presets: [["abc"], ["tca"], ["tcagdo"], ["tcagd"], ["abcdefghijkl"], ["ab"]],
+  legend: [
+    ["outer", "<code>a</code> = <code>str.substring(0, 1)</code>"],
+    ["inner", "<code>bc</code> = <code>str.substring(1, 3)</code>"],
+    ["match", "just added to <code>ans</code>"]
+  ],
+  trace([orig], T) {
+    const q = T.q;
+    let str = orig, ans = "", added = 0, showA = false, showBC = false;
+    T.view = () => {
+      const cut = orig.length - str.length;
+      const o = T.strip("original", orig).named(`original str = ${JSON.stringify(orig)}`);
+      if (cut) o.cls(0, cut, "done").tag("grey = cut away", "");
+      const s = T.strip("str", str);
+      if (showA) s.at(0, "win outer");
+      if (showBC) s.cls(1, 3, "win2");
+      const r = T.strip("ans", ans);
+      if (added) r.cls(ans.length - added, ans.length, "new");
+      return [o, s, r];
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>oneTwo(${q(orig)})</code>.`);
+    T.vars.ans = "";
+    T.push(1, `<code>ans = ""</code>.`);
+    for (;;) {
+      added = 0; showA = showBC = false;
+      if (str.length < 3) {
+        delete T.vars.a; delete T.vars.bc;
+        T.push(3, `<code>str.length() &gt;= 3</code> → <code>${str.length} &gt;= 3</code> is <b>false</b>. ${str.length ? `The leftover ${q(str)} isn't a full group, so it's ignored.` : "Nothing is left."} The loop ends.`);
+        break;
+      }
+      T.push(3, `<code>str.length() &gt;= 3</code> → <code>${str.length} &gt;= 3</code> is <b>true</b>. There's a full group of three at the front.`);
+      const a = str.substring(0, 1), bc = str.substring(1, 3);
+      showA = true; T.vars.a = a;
+      T.push(4, `<code>a = str.substring(0, 1)</code> → <code>${q(a)}</code>, the first letter.`);
+      showBC = true; T.vars.bc = bc;
+      T.push(5, `<code>bc = str.substring(1, 3)</code> → <code>${q(bc)}</code>, the next two letters.`);
+      ans += bc + a; added = 3; T.vars.ans = ans;
+      T.push(6, `<code>bc + a</code> is <code>${q(bc + a)}</code> — the first letter moved to the back. <code>ans = ${q(ans)}</code>.`);
+      added = 0; showA = showBC = false;
+      const before = str;
+      str = str.substring(3); T.vars.str = str;
+      T.push(7, `<code>str = str.substring(3)</code> chops off the group just used: <code>${q(before)}</code> → <code>${q(str)}</code>. The next group is now at the front, at index 0 again.`);
+    }
+    T.ret(10, `<code>return ans</code> → <code>${q(ans)}</code>.`, ans);
+  }
+});
+</script>
+</body>
+</html>

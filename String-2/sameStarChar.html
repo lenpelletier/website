@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sameStarChar Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>sameStarChar: same letter on both sides of every *</h1>
+  <p class="sub">Return true if, for every <code>'*'</code> in the string, the characters just before and just after it are the same. Step through <code>sameStarChar</code>: the loop skips the first and last boxes (they're missing a neighbour), and only looks at the neighbours when it lands on a star.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "sameStarChar",
+  code: [
+    "public boolean sameStarChar (String str) {",
+    "  if (str.length() < 3) return true;",
+    "",
+    "  for (int i = 1; i < str.length()-1; i++) {",
+    "    if (str.charAt(i) == '*') {",
+    "      char front = str.charAt(i-1);",
+    "      char back  = str.charAt(i+1);",
+    "      if (front != back)",
+    "        return false;",
+    "    }",
+    "  }",
+    "",
+    "  return true;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "*xa*az" }],
+  presets: [["xy*yzz"], ["xy*zzz"], ["*xa*az"], ["*xa*bz"], ["*xa*a*a"], ["**"], ["a**a"]],
+  legend: [
+    ["outer", "<code>str.charAt(i)</code>"],
+    ["inner", "<code>front</code> and <code>back</code>"],
+    ["match", "a star that passed"],
+    ["bad", "a star that failed"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let i = null, nb = [], ok = [], bad = null;
+    T.view = () => {
+      const s = T.strip("str", str);
+      ok.forEach(k => s.cls(k - 1, k + 2, "soft").badge(k, "✓", "ok"));
+      if (bad !== null) s.cls(bad - 1, bad + 2, "miss").badge(bad, "✗", "no");
+      if (i !== null) {
+        s.top(i, `i=${i} ▼`);
+        if (i < n - 1) s.at(i, "outer");
+      }
+      if (nb.includes(i - 1)) s.at(i - 1, "inner").bot(i - 1, "▲ front");
+      if (nb.includes(i + 1)) s.at(i + 1, "inner").bot(i + 1, "▲ back");
+      return [s];
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>sameStarChar(${q(str)})</code>.`);
+    const short = n < 3;
+    if (short) {
+      T.ret(1, `<code>${n} &lt; 3</code> is <b>true</b>. No star can have a letter on <em>both</em> sides, so there's nothing that could fail. <code>return true</code>.`, true, { chk: [["str.length() &lt; 3", `${n} < 3 → true`, true]] });
+      return;
+    }
+    T.push(1, `<code>${n} &lt; 3</code> is <b>false</b>.`, { chk: [["str.length() &lt; 3", `${n} < 3 → false`, false]] });
+
+    for (i = 1; ; i++) {
+      T.vars.i = i; nb = [];
+      delete T.vars.front; delete T.vars.back;
+      if (i >= n - 1) {
+        T.push(3, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${n - 1}</code> is <b>false</b> — the last box has no <code>back</code> neighbour, so it isn't checked.`);
+        break;
+      }
+      T.push(3, i === 1
+        ? `The loop starts at <code>i = 1</code> and stops before the last index, so every <code>i</code> has a box on both sides. <code>1 &lt; ${n - 1}</code> is <b>true</b>.`
+        : `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${n - 1}</code> is <b>true</b>.`);
+      const c = str[i], star = c === "*";
+      const chk = [["str.charAt(i) == '*'", `'${c}' == '*' → ${star}`, star]];
+      if (!star) {
+        T.push(4, `<code>str.charAt(${i})</code> is <code>'${T.esc(c)}'</code>, not a star. Nothing to check.`, { chk });
+        continue;
+      }
+      T.push(4, `<code>str.charAt(${i})</code> is <code>'*'</code> — check its neighbours.`, { chk });
+      const f = str[i - 1], b = str[i + 1];
+      nb = [i - 1]; T.vars.front = T.c(f);
+      T.push(5, `<code>front = str.charAt(${i - 1})</code> → <code>'${T.esc(f)}'</code>.`, { chk });
+      nb = [i - 1, i + 1]; T.vars.back = T.c(b);
+      T.push(6, `<code>back = str.charAt(${i + 1})</code> → <code>'${T.esc(b)}'</code>.`, { chk });
+      const diff = f !== b;
+      chk.push(["front != back", `'${f}' != '${b}' → ${diff}`, !diff]);
+      if (diff) {
+        T.push(7, `<code>'${T.esc(f)}' != '${T.esc(b)}'</code> is <b>true</b> — the two sides don't match.`, { chk });
+        bad = i;
+        T.ret(8, `<code>return false</code>. One bad star is enough; the loop stops immediately.`, false, { chk });
+        return;
+      }
+      ok.push(i);
+      T.push(7, `<code>'${T.esc(f)}' != '${T.esc(b)}'</code> is <b>false</b> — both sides are the same, so this star is fine. Keep going.`, { chk });
+    }
+    delete T.vars.i; nb = [];
+    T.ret(12, `<code>return true</code> — every star had the same character on both sides.`, true);
+  }
+});
+</script>
+</body>
+</html>

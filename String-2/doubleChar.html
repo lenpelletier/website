@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>doubleChar Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>doubleChar: two of every character</h1>
+  <p class="sub">Given a string, return a string where every character of the original appears twice. Step through <code>doubleChar</code> and watch the loop take one letter at a time with <code>substring(i, i+1)</code> and glue two copies onto the end of the answer.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "doubleChar",
+  code: [
+    "public String doubleChar(String str) {",
+    "   String answerString = \"\";",
+    "",
+    "   for (int i = 0; i < str.length(); i++) {",
+    "      String letter = str.substring(i,i+1);",
+    "      answerString += letter + letter;",
+    "   }",
+    "",
+    "   return answerString;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "The" }],
+  chk: false,
+  presets: [["The"], ["AAbb"], ["Hi-There"], ["a"], [""]],
+  legend: [
+    ["outer", "<code>i</code> / <code>str.substring(i, i+1)</code>"],
+    ["match", "just added to <code>answerString</code>"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let i = null, ans = "", added = 0;
+    T.view = () => {
+      const s = T.strip("str", str);
+      if (i !== null) { s.top(i, `i=${i} ▼`); if (i < n) s.at(i, "outer win"); }
+      const a = T.strip("answerString", ans);
+      if (added) a.cls(ans.length - added, ans.length, "new");
+      return [s, a];
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>doubleChar(${q(str)})</code>.`);
+    T.vars.answerString = "";
+    T.push(1, `Start with an empty <code>answerString</code>. Letters get added to its end as the loop runs.`);
+
+    for (i = 0; ; i++) {
+      T.vars.i = i; added = 0;
+      if (i >= n) {
+        delete T.vars.letter;
+        T.push(3, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${n}</code> is <b>false</b> — every letter has been doubled.`);
+        break;
+      }
+      T.push(3, i === 0
+        ? `Loop starts at <code>i = 0</code>. <code>0 &lt; ${n}</code> is <b>true</b>, so enter the loop body.`
+        : `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const letter = str[i];
+      T.vars.letter = letter;
+      T.push(4, `<code>letter = str.substring(${i}, ${i + 1})</code> → <code>${q(letter)}</code>. A substring from <code>i</code> to <code>i+1</code> is exactly one letter long.`);
+      ans += letter + letter; added = 2;
+      T.vars.answerString = ans;
+      T.push(5, `<code>letter + letter</code> is <code>${q(letter + letter)}</code>. Add it to the end: <code>answerString</code> is now <code>${q(ans)}</code>.`);
+    }
+    delete T.vars.i;
+    T.ret(8, n
+      ? `<code>return answerString</code> → <code>${q(ans)}</code>, twice as long as the original.`
+      : `<code>return answerString</code> → <code>""</code>. The loop never ran because the string is empty.`, ans);
+  }
+});
+</script>
+</body>
+</html>

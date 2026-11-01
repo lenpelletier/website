@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>String-2 Loop Tracers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+<style>
+
+  /* Header styled like the code panel */
+  .hero {
+    background: var(--code-bg); color: #f8f8f2; border-radius: 12px;
+    padding: 22px 24px; margin-bottom: 22px; position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 5px;
+    background: linear-gradient(90deg, #f92672, #fd971f, #e6db74, #a6e22e, #66d9ef, #ae81ff);
+  }
+  .hero h1 { font: 600 2rem "Victor Mono", monospace; margin: 0 0 6px; color: #a6e22e; font-variant-ligatures: none; }
+  .hero h1 .k { color: #f92672; font-weight: 400; }
+  .hero .cm { font: italic 0.95rem "Victor Mono", monospace; color: #75715e; margin: 0 0 12px; }
+  .hero p { margin: 0; color: #d6d5cc; max-width: 820px; }
+  .hero a { color: #66d9ef; }
+  .hero .how { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 0.85rem; color: #a09f95; margin-top: 12px; }
+  .hero kbd { font: 600 0.75rem Inter, sans-serif; border: 1px solid #5a5b52; border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; color: #f8f8f2; background: #3a3b34; }
+
+  .probs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 760px) { .probs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 440px) { .probs { grid-template-columns: minmax(0, 1fr); } }
+  .probs a {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 16px 18px; border-radius: 10px; text-decoration: none;
+    font: 600 1.1rem "Victor Mono", monospace; font-variant-ligatures: none;
+    color: var(--text);
+    background: color-mix(in srgb, var(--c) 10%, var(--panel));
+    border: 1px solid color-mix(in srgb, var(--c) 35%, var(--border));
+    border-left: 6px solid var(--c);
+    transition: background .15s, transform .15s, box-shadow .15s;
+  }
+  .probs a::after { content: "▶"; font-size: 0.75rem; color: var(--c); opacity: 0.6; transition: opacity .15s, transform .15s; }
+  .probs a:hover, .probs a:focus-visible {
+    background: color-mix(in srgb, var(--c) 22%, var(--panel));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--c) 25%, transparent);
+  }
+  .probs a:hover::after { opacity: 1; transform: translateX(3px); }
+  /* Colour = what the method returns */
+  .str  { --c: var(--inner); }   /* String  */
+  .bool { --c: var(--bad); }     /* boolean */
+  .int  { --c: var(--match); }   /* int     */
+
+  .legend-key { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 16px; }
+  .legend-key div {
+    display: flex; align-items: baseline; gap: 8px; padding: 8px 14px; border-radius: 999px;
+    background: color-mix(in srgb, var(--c) 12%, var(--panel));
+    border: 1px solid color-mix(in srgb, var(--c) 40%, var(--border));
+  }
+  .legend-key div::before { content: ""; width: 12px; height: 12px; border-radius: 3px; background: var(--c); align-self: center; }
+  .legend-key b { font-weight: 700; }
+  .legend-key span { color: var(--muted); font-size: 0.85rem; }
+  .legend-key code { color: var(--c); font-weight: 600; }
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <h1><span class="k">String</span>-2</h1>
+    <div class="cm">// Medium String problems -- 1 loop</div>
+    <p>Step-by-step animations of the answer key for the <a href="https://codingbat.com/java/String-2" target="_blank" rel="noopener">CodingBat String-2</a> problems, in the same order as CodingBat. Pick a problem to watch the Java code run line by line.</p>
+    <div class="how">
+      <span>Type your own inputs or choose from <b>Examples…</b></span>
+      <span><kbd>Space</kbd> play / pause</span>
+      <span><kbd>←</kbd> <kbd>→</kbd> step back / forward</span>
+    </div>
+  </header>
+
+  <div class="legend-key">
+    <div class="str"><b>String Builders</b> <span>return a <code>String</code></span></div>
+    <div class="bool"><b>String Searchers</b> <span>return a <code>boolean</code></span></div>
+    <div class="int"><b>String Counters</b> <span>return an <code>int</code></span></div>
+  </div>
+
+  <nav class="probs">
+    <a class="str" href="doubleChar.html" title="returns String">doubleChar</a>
+    <a class="int" href="countHi.html" title="returns int">countHi</a>
+    <a class="bool" href="catDog.html" title="returns boolean">catDog</a>
+    <a class="int" href="countCode.html" title="returns int">countCode</a>
+    <a class="bool" href="endOther.html" title="returns boolean">endOther</a>
+    <a class="bool" href="xyzThere.html" title="returns boolean">xyzThere</a>
+    <a class="bool" href="bobThere.html" title="returns boolean">bobThere</a>
+    <a class="bool" href="xyBalance.html" title="returns boolean">xyBalance</a>
+    <a class="str" href="mixString.html" title="returns String">mixString</a>
+    <a class="str" href="repeatEnd.html" title="returns String">repeatEnd</a>
+    <a class="str" href="repeatFront.html" title="returns String">repeatFront</a>
+    <a class="str" href="repeatSeparator.html" title="returns String">repeatSeparator</a>
+    <a class="bool" href="prefixAgain.html" title="returns boolean">prefixAgain</a>
+    <a class="bool" href="xyzMiddle.html" title="returns boolean">xyzMiddle</a>
+    <a class="str" href="getSandwich.html" title="returns String">getSandwich</a>
+    <a class="bool" href="sameStarChar.html" title="returns boolean">sameStarChar</a>
+    <a class="str" href="oneTwo.html" title="returns String">oneTwo</a>
+    <a class="str" href="zipZap.html" title="returns String">zipZap</a>
+    <a class="str" href="starOut.html" title="returns String">starOut</a>
+    <a class="str" href="plusOut.html" title="returns String">plusOut</a>
+    <a class="str" href="wordEnds.html" title="returns String">wordEnds</a>
+  </nav>
+</main>
+</body>
+</html>

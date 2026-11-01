@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xyBalance Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>xyBalance: is every x followed by a y?</h1>
+  <p class="sub">The string is "balanced" if every <code>'x'</code> has a <code>'y'</code> somewhere after it. You only need to check the <em>last</em> x: if some y comes after it, that y also comes after every earlier x. Step through <code>xyBalance</code> and watch <code>lastIndexOf</code> search from the right-hand end of the string.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "xyBalance",
+  code: [
+    "public boolean xyBalance(String str) {",
+    "  int lastX = str.lastIndexOf(\"x\");",
+    "  int lastY = str.lastIndexOf(\"y\");",
+    "",
+    "  return (lastY > lastX || lastY == lastX);",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "aaxbby" }],
+  presets: [["aaxbby"], ["aaxbb"], ["yaaxbby"], ["yaaxbb"], ["xaxxbbyx"], ["bbb"], ["y"], ["x"]],
+  legend: [
+    ["inner", "<code>lastIndexOf</code> searching"],
+    ["outer", "<code>lastX</code>"],
+    ["match", "<code>lastY</code>"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let scan = null, lastX = null, lastY = null;
+    T.view = () => {
+      const s = T.strip("str", str);
+      if (lastX !== null && lastX >= 0) s.at(lastX, "win").top(lastX, "lastX ▼", "outer");
+      if (lastY !== null && lastY >= 0) s.at(lastY, "hit").top(lastY, "lastY ▼", "match");
+      if (scan !== null) s.at(scan, "inner").bot(scan, "▲ search");
+      return [s];
+    };
+    function lastIndexOf(name, letter, line) {
+      T.push(line, `<code>str.lastIndexOf("${letter}")</code> starts at the <b>end</b> of the string and walks left, looking for <code>"${letter}"</code>.`);
+      for (let k = n - 1; k >= 0; k--) {
+        scan = k;
+        if (str[k] === letter) {
+          T.push(line, `Index ${k} is <code>'${letter}'</code> — found it! This is the last <code>"${letter}"</code> because nothing to its right matched.`);
+          scan = null;
+          return k;
+        }
+        T.push(line, `Index ${k} is <code>'${T.esc(str[k])}'</code>, not <code>'${letter}'</code>. Move left.`);
+      }
+      scan = null;
+      T.push(line, `Reached the front without finding <code>"${letter}"</code>. When there's no match, <code>lastIndexOf</code> returns <code>-1</code>.`);
+      return -1;
+    }
+
+    T.vars.str = str;
+    T.push(0, `Call <code>xyBalance(${q(str)})</code>.`);
+    lastX = lastIndexOf("lastX", "x", 1);
+    T.vars.lastX = lastX;
+    T.push(1, `<code>lastX = ${lastX}</code>.${lastX < 0 ? " There's no x at all." : ""}`);
+    lastY = lastIndexOf("lastY", "y", 2);
+    T.vars.lastY = lastY;
+    T.push(2, `<code>lastY = ${lastY}</code>.${lastY < 0 ? " There's no y at all." : ""}`);
+
+    const gt = lastY > lastX, eq = lastY === lastX, r = gt || eq;
+    const chk = [["lastY &gt; lastX", `${lastY} > ${lastX} → ${gt}`, gt]];
+    chk.push(["lastY == lastX", gt ? "(skipped)" : `${lastY} == ${lastX} → ${eq}`, gt ? undefined : eq]);
+    let why;
+    if (gt) why = lastX < 0 ? "There are no x's, and a y is still \"after\" index -1." : `The last y (index ${lastY}) comes after the last x (index ${lastX}), so every x has a y after it. <code>||</code> doesn't need to check the right side.`;
+    else if (eq) why = "The two can only be equal when both are <code>-1</code>: no x's and no y's, which counts as balanced.";
+    else why = lastY < 0 ? "There's an x but no y anywhere." : `The last x (index ${lastX}) comes after the last y (index ${lastY}), so that x has no y after it.`;
+    T.ret(4, `<code>lastY &gt; lastX || lastY == lastX</code> is <b>${r}</b>. ${why}`, r, { chk });
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xyzMiddle Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>xyzMiddle: is "xyz" in the middle?</h1>
+  <p class="sub">Return true if <code>"xyz"</code> appears in the middle of the string: the number of characters to its left and to its right differ by at most one. There's no loop: <code>xyzMiddle</code> finds the midpoint and looks at the three-letter window centred on it. An even-length string has no single middle letter, so it also tries the window one box to the left.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "xyzMiddle",
+  code: [
+    "public boolean xyzMiddle(String str) {",
+    "",
+    "  if (str.length() < 3)  return false;",
+    "  if (str.length() == 3) return \"xyz\".equals(str);",
+    "",
+    "  int midpoint = str.length() / 2;",
+    "  String oddCenter  = str.substring(midpoint-1, midpoint+2);",
+    "  String evenCenter = str.substring(midpoint-2, midpoint+1);",
+    "",
+    "  if (str.length() % 2 == 1)",
+    "    return \"xyz\".equals(oddCenter);",
+    "  else",
+    "    return \"xyz\".equals(evenCenter) || \"xyz\".equals(oddCenter);",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "AxyzBB" }],
+  presets: [["AAxyzBB"], ["AxyzBB"], ["AxyzBBB"], ["AAxyzB"], ["xyzAxyzBBB"], ["xyz"], ["AAAxyzB"]],
+  legend: [
+    ["outer", "<code>oddCenter</code>"],
+    ["inner", "<code>evenCenter</code>"],
+    ["match", "the \"xyz\" that was found"]
+  ],
+  trace([str], T) {
+    const q = T.q, n = str.length;
+    let mid = null, odd = false, even = false, hit = null, which = null;
+    const sides = (a) => `${a} left · ${n - a - 3} right`;
+    T.view = () => {
+      const s = T.strip("str", str);
+      if (mid !== null) s.top(mid, `mid=${mid} ▼`);
+      if (odd && which !== "even") s.cls(mid - 1, mid + 2, "win").tag("oddCenter: " + sides(mid - 1), "outer");
+      if (even && which !== "odd") s.cls(mid - 2, mid + 1, "win2").bot(mid - 2, "▲ even", "inner").tag("evenCenter: " + sides(mid - 2));
+      if (hit !== null) s.cls(hit, hit + 3, "hit");
+      return [s];
+    };
+
+    T.vars.str = str;
+    T.push(0, `Call <code>xyzMiddle(${q(str)})</code>.`);
+    if (n < 3) {
+      T.ret(2, `<code>${n} &lt; 3</code> is <b>true</b> — too short to hold "xyz". <code>return false</code>.`, false, { chk: [["str.length() &lt; 3", `${n} < 3 → true`, true]] });
+      return;
+    }
+    T.push(2, `<code>${n} &lt; 3</code> is <b>false</b>.`, { chk: [["str.length() &lt; 3", `${n} < 3 → false`, false]] });
+    if (n === 3) {
+      const r = str === "xyz"; if (r) hit = 0;
+      T.ret(3, `The string is exactly 3 long, so it's in the middle only if it <em>is</em> "xyz": <code>"xyz".equals(${q(str)})</code> → <b>${r}</b>.`, r,
+        { chk: [["str.length() == 3", "3 == 3 → true", true], ['"xyz".equals(str)', String(r), r]] });
+      return;
+    }
+    T.push(3, `<code>${n} == 3</code> is <b>false</b>.`, { chk: [["str.length() == 3", `${n} == 3 → false`, false]] });
+
+    mid = Math.floor(n / 2); T.vars.midpoint = mid;
+    T.push(5, `<code>midpoint = ${n} / 2</code> → <code>${mid}</code>${n % 2 ? ` (integer division drops the .5)` : ""}.`);
+    const oc = str.substring(mid - 1, mid + 2);
+    odd = true; T.vars.oddCenter = oc;
+    T.push(6, `<code>oddCenter = str.substring(${mid - 1}, ${mid + 2})</code> → <code>${q(oc)}</code>: one letter before the midpoint, the midpoint, and one after.`);
+    const ec = str.substring(mid - 2, mid + 1);
+    even = true; T.vars.evenCenter = ec;
+    T.push(7, `<code>evenCenter = str.substring(${mid - 2}, ${mid + 1})</code> → <code>${q(ec)}</code>: the same window shifted one box left.`);
+
+    const isOdd = n % 2 === 1;
+    const lenChk = ["str.length() % 2 == 1", `${n} % 2 = ${n % 2} → ${isOdd}`, isOdd];
+    if (isOdd) {
+      T.push(9, `<code>${n} % 2</code> is <code>1</code>, so the length is <b>odd</b>. Only <code>oddCenter</code> has the same number of letters on each side.`, { chk: [lenChk] });
+      which = "odd";
+      const r = oc === "xyz"; if (r) hit = mid - 1;
+      T.ret(10, `<code>"xyz".equals(${q(oc)})</code> → <b>${r}</b>.`, r, { chk: [lenChk, ['"xyz".equals(oddCenter)', String(r), r]] });
+      return;
+    }
+    T.push(9, `<code>${n} % 2</code> is <code>0</code>, so the length is <b>even</b> — go to the <code>else</code>. Either window leaves the two sides differing by just one letter, so both are allowed.`, { chk: [lenChk] });
+    const re = ec === "xyz", ro = oc === "xyz", r = re || ro;
+    if (re) { hit = mid - 2; which = "even"; } else if (ro) { hit = mid - 1; which = "odd"; }
+    T.ret(12, re
+      ? `<code>"xyz".equals(${q(ec)})</code> is <b>true</b>, so <code>||</code> doesn't even check <code>oddCenter</code>. <code>return true</code>.`
+      : `<code>"xyz".equals(${q(ec)})</code> is <b>false</b>, so <code>||</code> checks the other side: <code>"xyz".equals(${q(oc)})</code> → <b>${ro}</b>.`, r,
+      { chk: [lenChk, ['"xyz".equals(evenCenter)', String(re), re], ['"xyz".equals(oddCenter)', re ? "(skipped)" : String(ro), re ? undefined : ro]] });
+  }
+});
+</script>
+</body>
+</html>

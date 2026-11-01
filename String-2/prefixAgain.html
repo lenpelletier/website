@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>prefixAgain Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>prefixAgain: does the front show up again?</h1>
+  <p class="sub">Take the first <code>n</code> characters of the string (the prefix). Does that prefix appear again somewhere else in the string? Step through <code>prefixAgain</code> and watch an <code>n</code>-letter window slide along, starting just after the prefix, and get compared with it. (CodingBat promises <code>n</code> is between 1 and the length of the string.)</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "prefixAgain",
+  code: [
+    "public boolean prefixAgain(String str, int n) {",
+    "  int strLen = str.length();",
+    "  String prefix = str.substring(0, n);",
+    "",
+    "  for (int i = n; i <= strLen-n; i++) {",
+    "    String chunk = str.substring(i, i+n);",
+    "    if (chunk.equals(prefix)) return true;",
+    "  }",
+    "",
+    "  return false;",
+    "}"
+  ],
+  inputs: [{ id: "str", value: "abXYabc" }, { id: "n", kind: "int", value: 2 }],
+  presets: [["abXYabc", 1], ["abXYabc", 2], ["abXYabc", 3], ["xyzxyxyxy", 2], ["Hi12345Hi6789Hi10", 3], ["a", 1]],
+  validate([str, n]) {
+    if (n < 1 || n > str.length) return `<code>n</code> must be between 1 and <code>str.length()</code> (${str.length}).`;
+  },
+  legend: [
+    ["inner", "<code>prefix</code>"],
+    ["outer", "<code>chunk</code> = <code>str.substring(i, i+n)</code>"],
+    ["match", "a chunk that equals the prefix"]
+  ],
+  trace([str, n], T) {
+    const q = T.q, L = str.length;
+    let showPre = false, i = null, chunk = false, hit = null;
+    T.view = () => {
+      const s = T.strip("str", str);
+      if (showPre) s.cls(0, n, "win2").bot(0, "▲ prefix");
+      if (i !== null) {
+        s.top(i, `i=${i} ▼`);
+        if (chunk) s.cls(i, i + n, "win");
+      }
+      if (hit !== null) s.cls(hit, hit + n, "hit");
+      return [s];
+    };
+
+    T.vars.str = str; T.vars.n = n;
+    T.push(0, `Call <code>prefixAgain(${q(str)}, ${n})</code>.`);
+    T.vars.strLen = L;
+    T.push(1, `<code>strLen = ${L}</code>.`);
+    const prefix = str.substring(0, n);
+    showPre = true; T.vars.prefix = prefix;
+    T.push(2, `<code>prefix = str.substring(0, ${n})</code> → <code>${q(prefix)}</code>, the first ${n} letter${n === 1 ? "" : "s"}.`);
+
+    for (i = n; ; i++) {
+      T.vars.i = i; chunk = false;
+      if (i > L - n) {
+        delete T.vars.chunk;
+        T.push(4, `Loop: <code>i = ${i}</code>, <code>${i} &lt;= ${L - n}</code> is <b>false</b>. A chunk of ${n} starting at ${i} would run past the end.`);
+        break;
+      }
+      T.push(4, i === n
+        ? `The loop starts at <code>i = n = ${n}</code>, right after the prefix, so the prefix is never compared with itself. The last chunk starts at <code>strLen-n = ${L - n}</code>. <code>${i} &lt;= ${L - n}</code> is <b>true</b>.`
+        : `Loop: <code>i = ${i}</code>, <code>${i} &lt;= ${L - n}</code> is <b>true</b>.`);
+      const c = str.substring(i, i + n);
+      chunk = true; T.vars.chunk = c;
+      T.push(5, `<code>chunk = str.substring(${i}, ${i + n})</code> → <code>${q(c)}</code>.`);
+      const ok = c === prefix;
+      const chk = [["chunk.equals(prefix)", `${JSON.stringify(c)} vs ${JSON.stringify(prefix)} → ${ok}`, ok]];
+      if (ok) {
+        hit = i;
+        T.ret(6, `<code>${q(c)}.equals(${q(prefix)})</code> is <b>true</b> — the prefix appears again at index ${i}. <code>return true</code>.`, true, { chk });
+        return;
+      }
+      T.push(6, `<code>${q(c)}.equals(${q(prefix)})</code> is <b>false</b>. Slide the window one box right.`, { chk });
+    }
+    delete T.vars.i;
+    T.ret(9, `<code>return false</code> — no chunk after the prefix matched it.`, false);
+  }
+});
+</script>
+</body>
+</html>

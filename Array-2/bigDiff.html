@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bigDiff Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>bigDiff: largest minus smallest</h1>
+  <p class="sub">Given an array of length 1 or more, return the difference between the largest and smallest values. Step through <code>bigDiff</code>: <code>min</code> and <code>max</code> both start as the first value, and <code>Math.min</code> / <code>Math.max</code> update them as the loop sees each number.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "bigDiff",
+  code: [
+    "public int bigDiff(int[] nums) {",
+    "  int min = nums[0];",
+    "  int max = nums[0];",
+    "",
+    "  for (int i = 0; i < nums.length; i++) {",
+    "      min = Math.min(nums[i], min);",
+    "      max = Math.max(nums[i], max);",
+    "  }",
+    "",
+    "  return max - min;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [10, 3, 5, 6], width: 240 }],
+  presets: [[[10, 3, 5, 6]], [[7, 2, 10, 9]], [[2, 10, 7, 2]], [[2, 10]], [[10, 2]], [[10, 0]], [[2, 3]], [[2, 2]], [[2]], [[5, 1, 6, 1, 9, 9]], [[-3, 4, 0]]],
+  validate([nums]) {
+    if (!nums.length) return `<code>nums</code> needs at least 1 value — <code>nums[0]</code> doesn't exist in an empty array.`;
+  },
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["inner", "where <code>min</code> came from"],
+    ["match", "where <code>max</code> came from"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, minAt = null, maxAt = null;
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      if (minAt !== null) A.at(minAt, "win2").bot(minAt, "▲ min");
+      if (maxAt !== null) A.at(maxAt, "hit").bot(maxAt, "▲ max", "match");
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>bigDiff(${T.fmt(nums)})</code>.`);
+    let min = nums[0], max = nums[0];
+    minAt = 0; T.vars.min = min;
+    T.push(1, `<code>min = nums[0]</code> → ${min}. Starting with a real value from the array is safer than guessing a starting number.`);
+    maxAt = 0; T.vars.max = max;
+    T.push(2, `<code>max = nums[0]</code> → ${max}.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i;
+      if (i >= n) { T.push(4, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b> — every value has been seen.`); break; }
+      T.push(4, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = nums[i];
+      const nm = Math.min(x, min);
+      T.push(5, x < min ? `<code>Math.min(${x}, ${min})</code> → ${nm}. A new smallest value!` : `<code>Math.min(${x}, ${min})</code> → ${nm}. <code>min</code> stays ${min}.`);
+      if (x < min) { min = x; minAt = i; T.vars.min = min; }
+      const oldMax = max, nx = Math.max(x, max);
+      if (x > max) { max = x; maxAt = i; T.vars.max = max; }
+      T.push(6, x > oldMax ? `<code>Math.max(${x}, ${oldMax})</code> → ${nx}. A new largest value!` : `<code>Math.max(${x}, ${oldMax})</code> → ${nx}. <code>max</code> stays ${oldMax}.`);
+    }
+    delete T.vars.i; i = null;
+    T.ret(9, `<code>max - min</code> is <code>${max} - ${min}</code> → <code>${max - min}</code>.`, max - min);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>isEverywhere Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>isEverywhere: is val in every pair?</h1>
+  <p class="sub">A value is "everywhere" in an array if, for every pair of neighbouring elements, at least one of the pair is that value. Return true if <code>val</code> is everywhere. Step through <code>isEverywhere</code>: it checks each pair <code>nums[i]</code>, <code>nums[i+1]</code>, and fails as soon as it finds a pair with no <code>val</code> in it.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "isEverywhere",
+  code: [
+    "public boolean isEverywhere(int[] nums, int val) {",
+    "",
+    "  for (int i = 0; i < nums.length-1; i++)",
+    "  {",
+    "    if (!(nums[i] == val || nums[i+1] == val))",
+    "      return false;",
+    "  }",
+    "  return true;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 1, 3], width: 240 }, { id: "val", kind: "int", value: 1 }],
+  presets: [[[1, 2, 1, 3], 1], [[1, 2, 1, 3], 2], [[1, 2, 1, 3, 4], 1], [[2, 1, 2, 1], 1], [[2, 1, 2, 1], 2], [[2, 1, 2, 3, 1], 2], [[3, 1], 3], [[3, 1], 2], [[3], 1], [[], 1], [[1, 2, 1, 2, 3, 2, 5], 2], [[2, 4, 2, 4, 2], 2]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["inner", "<code>nums[i+1]</code>"],
+    ["match", "equals <code>val</code>"],
+    ["bad", "a pair with no <code>val</code>"]
+  ],
+  trace([nums, val], T) {
+    const n = nums.length;
+    let i = null, pair = false, fail = false;
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      nums.forEach((x, k) => { if (x === val) A.at(k, "soft"); });
+      if (i !== null) {
+        A.top(i, `i=${i} ▼`);
+        if (pair) { A.at(i, "outer").at(i + 1, "inner").bot(i + 1, "▲ i+1"); if (fail) A.cls(i, i + 2, "miss"); }
+      }
+      return [A];
+    };
+    T.vars.nums = nums; T.vars.val = val;
+    T.push(0, `Call <code>isEverywhere(${T.fmt(nums)}, ${val})</code>. The boxes holding ${val} are shaded.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; pair = false;
+      if (i >= n - 1) { T.push(2, `<code>i = ${i}</code>: <code>${i} &lt; ${n - 1}</code> is <b>false</b>. ${n > 1 ? "Every pair had a " + val + " in it." : "There are no pairs to check."}`); break; }
+      T.push(2, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n - 1}</code> is <b>true</b>.`);
+      pair = true;
+      const a = nums[i], b = nums[i + 1], has = a === val || b === val;
+      const chk = [["nums[i] == val", `${a} == ${val} → ${a === val}`, a === val], ["nums[i+1] == val", a === val ? "(skipped)" : `${b} == ${val} → ${b === val}`, a === val ? undefined : b === val], ["!( … || … )", String(!has), !has]];
+      if (!has) fail = true;
+      T.push(4, has ? `The pair ${a}, ${b} contains ${val}, so <code>!( … )</code> is false. This pair is fine.` : `Neither ${a} nor ${b} is ${val}. <code>!( … )</code> is <b>true</b>.`, { chk });
+      if (!has) { T.ret(5, `This pair has no ${val}, so ${val} isn't everywhere. <code>return false</code>.`, false, { chk }); return; }
+    }
+    delete T.vars.i; i = null;
+    T.ret(7, `<code>return true</code>.`, true);
+  }
+});
+</script>
+</body>
+</html>

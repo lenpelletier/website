@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>no14 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>no14: no 1s, or no 4s?</h1>
+  <p class="sub">Given an array of ints, return true if it contains no 1's or it contains no 4's. Step through <code>no14</code>: two flags record whether a 1 and a 4 have been seen. The only way to fail is to have seen <em>both</em>.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "no14",
+  code: [
+    "public boolean no14(int[] nums) {",
+    "  boolean hasOnes = false, hasFours = false;",
+    "  for (int i = 0; i < nums.length; i++)",
+    "  {",
+    "    if (nums[i] == 1)",
+    "      hasOnes = true;",
+    "    if (nums[i] == 4)",
+    "      hasFours = true;",
+    "  }",
+    "  return !(hasOnes && hasFours);",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 3, 4], width: 240 }],
+  presets: [[[1, 2, 3]], [[1, 2, 3, 4]], [[2, 3, 4]], [[1, 1, 4, 4]], [[2, 2, 4, 4]], [[2, 3, 4, 1]], [[2, 1, 1]], [[1, 4]], [[2]], [[2, 1]], [[1]], [[4]], [[]], [[1, 1, 1, 1]], [[9, 4, 4, 1]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["match", "a 1"],
+    ["inner", "a 4"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, ones = [], fours = [];
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      ones.forEach(k => A.at(k, "hit")); fours.forEach(k => A.at(k, "win2"));
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>no14(${T.fmt(nums)})</code>.`);
+    let h1 = false, h4 = false;
+    T.vars.hasOnes = false; T.vars.hasFours = false;
+    T.push(1, `Both flags start <code>false</code>: no 1s or 4s seen yet.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i;
+      if (i >= n) { T.push(2, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(2, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = nums[i], c1 = ["nums[i] == 1", `${x} == 1 → ${x === 1}`, x === 1];
+      T.push(4, x === 1 ? `<code>nums[${i}]</code> is a 1.` : `<code>nums[${i}]</code> is ${x}, not 1.`, { chk: [c1] });
+      if (x === 1) { h1 = true; T.vars.hasOnes = true; ones.push(i); T.push(5, `<code>hasOnes = true</code>.`, { chk: [c1] }); }
+      const c2 = ["nums[i] == 4", `${x} == 4 → ${x === 4}`, x === 4];
+      T.push(6, x === 4 ? `It's a 4.` : `It isn't a 4.`, { chk: [c1, c2] });
+      if (x === 4) { h4 = true; T.vars.hasFours = true; fours.push(i); T.push(7, `<code>hasFours = true</code>.`, { chk: [c1, c2] }); }
+    }
+    delete T.vars.i; i = null;
+    const both = h1 && h4, r = !both;
+    T.ret(9, `<code>hasOnes &amp;&amp; hasFours</code> is <code>${h1} &amp;&amp; ${h4}</code> → ${both}. The <code>!</code> flips it → <b>${r}</b>.${both ? " The array has both a 1 and a 4." : ""}`, r,
+      { chk: [["hasOnes &amp;&amp; hasFours", `${h1} && ${h4} → ${both}`, both], ["!( … )", String(r), r]] });
+  }
+});
+</script>
+</body>
+</html>

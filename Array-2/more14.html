@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>more14 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>more14: more 1s than 4s?</h1>
+  <p class="sub">Given an array of ints, return true if the number of 1's is greater than the number of 4's. Step through <code>more14</code>: two separate counters, and two separate <code>if</code>s — every number gets checked against both.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "more14",
+  code: [
+    "public boolean more14(int[] nums) {",
+    "  int oneCount = 0;",
+    "  int fourCount = 0;",
+    "",
+    "  for (int i = 0; i < nums.length; i++)",
+    "  {",
+    "    if (nums[i] == 1)",
+    "      oneCount++;",
+    "    if (nums[i] == 4)",
+    "      fourCount++;",
+    "  }",
+    "",
+    "  return oneCount > fourCount;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 4, 1], width: 240 }],
+  presets: [[[1, 4, 1]], [[1, 4, 1, 4]], [[1, 1]], [[1, 6, 6]], [[1]], [[1, 4]], [[6, 1, 1]], [[1, 6, 4]], [[1, 1, 4, 4, 1]], [[1, 1, 6, 4, 4, 1]], [[]], [[4, 1, 4, 6]], [[4, 1, 4, 6, 1]], [[1, 4, 1, 4, 1, 6]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["match", "a 1"],
+    ["inner", "a 4"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, ones = [], fours = [];
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      ones.forEach(k => A.at(k, "hit")); fours.forEach(k => A.at(k, "win2"));
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>more14(${T.fmt(nums)})</code>.`);
+    let one = 0, four = 0;
+    T.vars.oneCount = 0; T.push(1, `<code>oneCount = 0</code>.`);
+    T.vars.fourCount = 0; T.push(2, `<code>fourCount = 0</code>.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i;
+      if (i >= n) { T.push(4, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(4, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = nums[i], c1 = ["nums[i] == 1", `${x} == 1 → ${x === 1}`, x === 1];
+      T.push(6, x === 1 ? `<code>nums[${i}]</code> is a 1.` : `<code>nums[${i}]</code> is ${x}, not 1.`, { chk: [c1] });
+      if (x === 1) { one++; T.vars.oneCount = one; ones.push(i); T.push(7, `<code>oneCount++</code> → ${one}.`, { chk: [c1] }); }
+      const c2 = ["nums[i] == 4", `${x} == 4 → ${x === 4}`, x === 4];
+      T.push(8, x === 4 ? `It's a 4.` : `It isn't a 4 either.`.replace(" either", x === 1 ? "" : " either"), { chk: [c1, c2] });
+      if (x === 4) { four++; T.vars.fourCount = four; fours.push(i); T.push(9, `<code>fourCount++</code> → ${four}.`, { chk: [c1, c2] }); }
+    }
+    delete T.vars.i; i = null;
+    const r = one > four;
+    T.ret(12, `<code>oneCount &gt; fourCount</code> → <code>${one} &gt; ${four}</code> → <b>${r}</b>.`, r, { chk: [["oneCount &gt; fourCount", `${one} > ${four} → ${r}`, r]] });
+  }
+});
+</script>
+</body>
+</html>

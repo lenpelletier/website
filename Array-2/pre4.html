@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pre4 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>pre4: everything before the first 4</h1>
+  <p class="sub">Given a non-empty array of ints, return a new array containing the elements that come before the first 4. The array will contain at least one 4. Step through <code>pre4</code>: a <code>while</code> loop walks forward until it finds a 4 — and since <code>first4</code> starts at 0, where it stops is also how many numbers come before it.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "pre4",
+  code: [
+    "public int[] pre4(int[] nums) {",
+    "",
+    "  int first4 = 0;",
+    "  while (nums[first4] != 4) first4++;",
+    "",
+    "  int[] newArray = new int[first4];",
+    "  for (int i = 0; i < newArray.length; i++){",
+    "    newArray[i] = nums[i];",
+    "  }",
+    "",
+    "  return newArray;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 4, 1], width: 240 }],
+  presets: [[[1, 2, 4, 1]], [[3, 1, 4]], [[1, 4, 4]], [[1, 4, 4, 2]], [[1, 3, 4, 2, 4]], [[4, 4]], [[3, 3, 4]], [[1, 2, 1, 4]], [[2, 1, 4, 2]], [[2, 1, 2, 1, 4, 2]]],
+  validate([nums]) {
+    if (!nums.includes(4)) return `<code>nums</code> must contain a 4 — otherwise the <code>while</code> loop would run past the end of the array and throw an exception.`;
+  },
+  legend: [
+    ["outer", "<code>nums[first4]</code> / <code>nums[i]</code>"],
+    ["inner", "the first 4"],
+    ["match", "just copied"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let f = null, found = false, b = null, i = null, fresh = -1;
+    const w = Math.max(42, ...nums.map(x => String(x).length * 12 + 26));
+    T.view = () => {
+      const A = T.arr("nums", nums, w), list = [A];
+      if (f !== null) { if (found) A.at(f, "win2").bot(f, "▲ first4"); else A.at(f, "outer").top(f, `first4=${f} ▼`); }
+      if (b) {
+        const B = T.arr("newArray", b, w);
+        if (i !== null) { B.top(i, `i=${i} ▼`); if (i < b.length) { B.at(i, "outer"); A.at(i, "outer"); } }
+        if (fresh >= 0) B.at(fresh, "new");
+        list.push(B);
+      }
+      return list;
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>pre4(${T.fmt(nums)})</code>.`);
+    f = 0; T.vars.first4 = 0;
+    T.push(2, `<code>first4 = 0</code>. Start looking at the first box.`);
+    for (;;) {
+      const not4 = nums[f] !== 4, chk = [["nums[first4] != 4", `${nums[f]} != 4 → ${not4}`, not4]];
+      if (!not4) { found = true; T.push(3, `<code>nums[${f}]</code> is 4, so the <code>while</code> loop stops. There ${f === 1 ? "is 1 number" : `are ${f} numbers`} before it.`, { chk }); break; }
+      T.push(3, `<code>nums[${f}]</code> is ${nums[f]}, not 4, so <code>first4++</code> → ${f + 1}.`, { chk });
+      f++; T.vars.first4 = f;
+    }
+    b = new Array(f).fill(0); T.vars.newArray = b;
+    T.push(5, `<code>new int[${f}]</code> makes one box for each number before the 4.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; fresh = -1;
+      if (i >= f) { T.push(6, `<code>i = ${i}</code>: <code>${i} &lt; ${f}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(6, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${f}</code> is <b>true</b>.`);
+      b[i] = nums[i]; fresh = i; T.vars.newArray = b;
+      T.push(7, `<code>newArray[${i}] = nums[${i}]</code> → ${nums[i]}.`);
+    }
+    delete T.vars.i; i = null; fresh = -1;
+    T.ret(10, `<code>return newArray</code> → <code>${T.fmt(b)}</code>.`, b.slice());
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fizzArray3 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>fizzArray3: start up to end</h1>
+  <p class="sub">Given <code>start</code> and <code>end</code> numbers, return a new array containing the integers from <code>start</code> up to but not including <code>end</code>, so start = 5 and end = 10 gives <code>{5, 6, 7, 8, 9}</code>. <code>end</code> will be greater than or equal to <code>start</code>. Step through <code>fizzArray3</code>: <code>end-start</code> is exactly how many numbers there are, and <code>start++</code> hands out one number per box.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "fizzArray3",
+  code: [
+    "public int[] fizzArray3(int start, int end) {",
+    "  int[] newArray = new int[end-start];",
+    "",
+    "  for (int i = 0; i < newArray.length; i++) {",
+    "    newArray[i] = start++;",
+    "  }",
+    "  return newArray;",
+    "}"
+  ],
+  inputs: [{ id: "start", kind: "int", value: 5 }, { id: "end", kind: "int", value: 10 }],
+  presets: [[5, 10], [11, 18], [1, 3], [1, 2], [1, 1], [1000, 1005], [-2, 3]],
+  validate([s, e]) {
+    if (e < s) return `<code>end</code> must be at least <code>start</code> — <code>new int[end-start]</code> can't have a negative size.`;
+    if (e - s > 30) return `Please keep <code>end - start</code> at 30 or less, so the array fits on screen.`;
+  },
+  legend: [
+    ["outer", "<code>newArray[i]</code>"],
+    ["match", "just filled in"]
+  ],
+  trace([s0, e], T) {
+    const len = e - s0;
+    let a = null, i = null, fresh = -1, start = s0;
+    T.view = () => {
+      if (!a) return [];
+      const A = T.arr("newArray", a, Math.max(42, Math.max(String(s0).length, String(e).length) * 12 + 26));
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < len) A.at(i, "outer"); }
+      if (fresh >= 0) A.at(fresh, "new");
+      return [A];
+    };
+    T.vars.start = start; T.vars.end = e;
+    T.push(0, `Call <code>fizzArray3(${s0}, ${e})</code>.`);
+    a = new Array(len).fill(0); T.vars.newArray = a;
+    T.push(1, `<code>end-start</code> is <code>${e}-${s0}</code> → ${len}: the count of numbers from ${s0} up to (not including) ${e}. <code>new int[${len}]</code> makes that many boxes, all 0.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; fresh = -1;
+      if (i >= len) { T.push(3, `<code>i = ${i}</code>: <code>${i} &lt; ${len}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(3, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${len}</code> is <b>true</b>.`);
+      a[i] = start; fresh = i; start++; T.vars.start = start; T.vars.newArray = a;
+      T.push(4, `<code>start++</code> gives its current value, ${start - 1}, to <code>newArray[${i}]</code>, and <em>then</em> adds 1 → <code>start = ${start}</code>.`);
+    }
+    delete T.vars.i; i = null; fresh = -1;
+    T.ret(6, `<code>return newArray</code> → <code>${T.fmt(a)}</code>.`, a.slice());
+  }
+});
+</script>
+</body>
+</html>

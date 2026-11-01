@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fizzArray Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>fizzArray: 0, 1, 2, … n-1</h1>
+  <p class="sub">Given a number <code>n</code>, create and return a new int array of length <code>n</code> containing the numbers 0, 1, 2, … n-1. <code>n</code> may be 0, in which case return a length 0 array. Step through <code>fizzArray</code>: <code>new int[n]</code> makes <code>n</code> boxes that all start as 0, and the loop fills box <code>i</code> with the number <code>i</code>.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "fizzArray",
+  code: [
+    "public int[] fizzArray(int n) {",
+    "  int[] a = new int[n];",
+    "  for (int i = 0; i < n; i++)",
+    "    a[i] = i;",
+    "  return a;",
+    "}"
+  ],
+  inputs: [{ id: "n", kind: "int", value: 4 }],
+  presets: [[4], [1], [10], [0], [2], [7]],
+  validate([n]) {
+    if (n < 0) return `<code>n</code> can't be negative — <code>new int[${n}]</code> would throw an exception.`;
+    if (n > 30) return `Please use an <code>n</code> of 30 or less, so the array fits on screen.`;
+  },
+  legend: [
+    ["outer", "<code>a[i]</code>"],
+    ["match", "just filled in"]
+  ],
+  trace([n], T) {
+    let a = null, i = null, fresh = -1;
+    T.view = () => {
+      if (!a) return [];
+      const A = T.arr("a", a);
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      if (fresh >= 0) A.at(fresh, "new");
+      return [A];
+    };
+    T.vars.n = n;
+    T.push(0, `Call <code>fizzArray(${n})</code>.`);
+    a = new Array(n).fill(0); T.vars.a = a;
+    T.push(1, n ? `<code>new int[${n}]</code> makes an array of ${n} box${n === 1 ? "" : "es"}. Java fills every new int box with 0.` : `<code>new int[0]</code> makes an array with no boxes at all — that's allowed.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; fresh = -1;
+      if (i >= n) { T.push(2, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>. ${n ? "Every box is filled." : "The loop runs 0 times, so no special case is needed."}`); break; }
+      T.push(2, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      a[i] = i; fresh = i; T.vars.a = a;
+      T.push(3, `<code>a[${i}] = ${i}</code>. Each box holds its own index.`);
+    }
+    delete T.vars.i; i = null; fresh = -1;
+    T.ret(4, `<code>return a</code> → <code>${T.fmt(a)}</code>.`, a.slice());
+  }
+});
+</script>
+</body>
+</html>

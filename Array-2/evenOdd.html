@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>evenOdd Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>evenOdd: evens first, then odds</h1>
+  <p class="sub">Return an array with exactly the same numbers as the given array, rearranged so that all the even numbers come before all the odd numbers. Other than that, the numbers can be in any order. Step through <code>evenOdd</code>: like zeroFront, the new array is filled from both ends — evens at <code>idx</code> on the left, odds at <code>rdx</code> on the right — using the helper method <code>isEven</code>.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "evenOdd",
+  code: [
+    "public int[] evenOdd(int[] a) {",
+    "  int[] b = new int[a.length];",
+    "  int rdx = a.length-1; // counts index from the end of array",
+    "  int idx = 0;          // counts index from beginning of array",
+    "",
+    "  for (int i = 0; i < a.length; i++) {",
+    "    if (isEven(a[i]))",
+    "      b[idx++] = a[i];",
+    "    else",
+    "      b[rdx--] = a[i];",
+    "  }",
+    "  return b;",
+    "}",
+    "public boolean isEven(int x){",
+    "  return x % 2 == 0;",
+    "}"
+  ],
+  inputs: [{ id: "a", kind: "array", value: [1, 0, 1, 0, 0, 1, 1], width: 240 }],
+  presets: [[[1, 0, 1, 0, 0, 1, 1]], [[3, 3, 2]], [[2, 2, 2]], [[3, 2, 2]], [[1, 1, 0, 1, 0]], [[1]], [[1, 2]], [[2, 1]], [[]]],
+  legend: [
+    ["outer", "<code>a[i]</code>"],
+    ["inner", "evens placed at <code>idx</code>"],
+    ["match", "odds placed at <code>rdx</code>"]
+  ],
+  trace([a], T) {
+    const n = a.length;
+    let b = null, i = null, idx = null, rdx = null, fresh = -1, es = [], os = [], helper = false;
+    const w = Math.max(42, ...a.map(x => String(x).length * 12 + 26));
+    T.view = () => {
+      const A = T.arr("a", a, w), list = [A];
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      if (b) {
+        const B = T.arr("b", b, w);
+        es.forEach(k => B.at(k, "win2")); os.forEach(k => B.at(k, "soft"));
+        if (idx !== null && idx < n) B.top(idx, "idx ▼", "inner");
+        if (rdx !== null && rdx >= 0) B.bot(rdx, "▲ rdx", "match");
+        if (fresh >= 0) B.at(fresh, "new");
+        list.push(B);
+      }
+      return list;
+    };
+    T.vars.a = a;
+    T.push(0, `Call <code>evenOdd(${T.fmt(a)})</code>.`);
+    b = new Array(n).fill(0); T.vars.b = b;
+    T.push(1, `<code>b = new int[${n}]</code>, a new array the same length.`);
+    rdx = n - 1; T.vars.rdx = rdx; T.push(2, `<code>rdx = ${rdx}</code>: the next free box from the right, for odds.`);
+    idx = 0; T.vars.idx = 0; T.push(3, `<code>idx = 0</code>: the next free box from the left, for evens.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; fresh = -1;
+      if (i >= n) { T.push(5, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(5, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = a[i], ev = x % 2 === 0, chk = [["isEven(a[i])", `${x} % 2 == 0 → ${ev}`, ev]];
+      if (!helper) { helper = true; T.push(14, `<code>isEven(${x})</code> runs the helper method: <code>${x} % 2 == 0</code> → <b>${ev}</b>.`); }
+      T.push(6, ev ? `${x} is even.` : `${x} is odd. Go to the <code>else</code>.`, { chk });
+      if (ev) {
+        b[idx] = x; fresh = idx; es.push(idx); idx++; T.vars.b = b; T.vars.idx = idx;
+        T.push(7, `<code>b[idx++] = ${x}</code>: put it in <code>b[${idx - 1}]</code>, then <code>idx</code> moves right to ${idx}.`, { chk });
+      } else {
+        b[rdx] = x; fresh = rdx; os.push(rdx); rdx--; T.vars.b = b; T.vars.rdx = rdx;
+        T.push(9, `<code>b[rdx--] = ${x}</code>: put it in <code>b[${rdx + 1}]</code>, then <code>rdx</code> moves left to ${rdx}.`, { chk });
+      }
+    }
+    delete T.vars.i; i = null; fresh = -1;
+    T.ret(11, `<code>return b</code> → <code>${T.fmt(b)}</code>.`, b.slice());
+  }
+});
+</script>
+</body>
+</html>

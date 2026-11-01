@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fizzBuzz Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>fizzBuzz: Fizz, Buzz, FizzBuzz</h1>
+  <p class="sub">Consider the numbers from <code>start</code> up to but not including <code>end</code>. Return a new String array with the string form of each number, except use <code>"Fizz"</code> for multiples of 3, <code>"Buzz"</code> for multiples of 5, and <code>"FizzBuzz"</code> for multiples of both. Step through <code>fizzBuzz</code>: here <code>i</code> runs through the actual numbers, so <code>i-start</code> converts each number into its box index. The "both" test has to come first.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "fizzBuzz",
+  code: [
+    "public String[] fizzBuzz(int start, int end) {",
+    "  String[] str = new String[end-start];",
+    "  for (int i = start; i < end; i++) {",
+    "    if ((i % 3 == 0) && (i % 5 == 0)) {",
+    "      str[i-start] = \"FizzBuzz\";",
+    "    }",
+    "    else if (i % 3 == 0) {",
+    "      str[i-start] = \"Fizz\";",
+    "    }",
+    "    else if (i % 5 == 0) {",
+    "      str[i-start] = \"Buzz\";",
+    "    }",
+    "    else {",
+    "      str[i-start] = String.valueOf(i);",
+    "    }",
+    "  }",
+    "  return str;",
+    "}"
+  ],
+  inputs: [{ id: "start", kind: "int", value: 1 }, { id: "end", kind: "int", value: 6 }],
+  presets: [[1, 6], [1, 8], [1, 11], [1, 16], [1, 4], [1, 2], [1, 1], [50, 56], [15, 17], [30, 36], [1000, 1006], [99, 102], [14, 20]],
+  validate([s, e]) {
+    if (e < s) return `<code>end</code> must be at least <code>start</code> — <code>new String[end-start]</code> can't have a negative size.`;
+    if (e - s > 20) return `Please keep <code>end - start</code> at 20 or less, so the array fits on screen.`;
+  },
+  legend: [
+    ["outer", "<code>str[i-start]</code>"],
+    ["match", "just filled in"]
+  ],
+  trace([start, end], T) {
+    const len = end - start;
+    const fb = i => i % 3 === 0 && i % 5 === 0 ? "FizzBuzz" : i % 3 === 0 ? "Fizz" : i % 5 === 0 ? "Buzz" : String(i);
+    let w = 42;
+    for (let k = start; k < end; k++) w = Math.max(w, (fb(k).length + 2) * 12 + 34);
+    let a = null, i = null, fresh = -1;
+    T.view = () => {
+      if (!a) return [];
+      const A = T.arr("str", a, w);
+      if (i !== null) { A.top(i - start, `i-start=${i - start} ▼`); if (i < end) A.at(i - start, "outer"); }
+      if (fresh >= 0) A.at(fresh, "new");
+      return [A];
+    };
+    T.vars.start = start; T.vars.end = end;
+    T.push(0, `Call <code>fizzBuzz(${start}, ${end})</code>.`);
+    a = new Array(len).fill(null); T.vars.str = a;
+    T.push(1, `<code>end-start</code> is ${len}, so <code>new String[${len}]</code> makes ${len} boxes, all <code>null</code> for now.`);
+    for (i = start; ; i++) {
+      T.vars.i = i; fresh = -1;
+      if (i >= end) { T.push(2, `<code>i = ${i}</code>: <code>${i} &lt; ${end}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(2, `${i === start ? `Loop starts at <code>i = start</code> = ${start}.` : `Loop: <code>i = ${i}</code>.`} <code>${i} &lt; ${end}</code> is <b>true</b>. This number goes in box <code>i-start</code> = ${i - start}.`);
+      const m3 = i % 3 === 0, m5 = i % 5 === 0;
+      const c1 = ["(i % 3 == 0) &amp;&amp; (i % 5 == 0)", m3 ? `${i}%3=0, ${i}%5=${i % 5} → ${m3 && m5}` : `${i}%3=${i % 3} → false`, m3 && m5];
+      const put = (line, s, msg, chk) => { a[i - start] = s; fresh = i - start; T.vars.str = a; T.push(line, msg, { chk }); };
+      if (m3 && m5) {
+        T.push(3, `${i} is a multiple of both 3 and 5.`, { chk: [c1] });
+        put(4, "FizzBuzz", `<code>str[${i - start}] = "FizzBuzz"</code>.`, [c1]);
+        continue;
+      }
+      T.push(3, `${i} isn't a multiple of both.`, { chk: [c1] });
+      const c2 = ["i % 3 == 0", `${i} % 3 = ${i % 3} → ${m3}`, m3];
+      if (m3) { T.push(6, `${i} is a multiple of 3.`, { chk: [c1, c2] }); put(7, "Fizz", `<code>str[${i - start}] = "Fizz"</code>.`, [c1, c2]); continue; }
+      T.push(6, `Not a multiple of 3.`, { chk: [c1, c2] });
+      const c3 = ["i % 5 == 0", `${i} % 5 = ${i % 5} → ${m5}`, m5];
+      if (m5) { T.push(9, `${i} is a multiple of 5.`, { chk: [c1, c2, c3] }); put(10, "Buzz", `<code>str[${i - start}] = "Buzz"</code>.`, [c1, c2, c3]); continue; }
+      T.push(9, `Not a multiple of 5 either. Go to the <code>else</code>.`, { chk: [c1, c2, c3] });
+      put(13, String(i), `<code>String.valueOf(${i})</code> turns the number into the String <code>"${i}"</code>.`, [c1, c2, c3]);
+    }
+    delete T.vars.i; i = null; fresh = -1;
+    T.ret(16, `<code>return str</code> → <code>${T.fmt(a)}</code>.`, a.slice());
+  }
+});
+</script>
+</body>
+</html>

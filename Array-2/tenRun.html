@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tenRun Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>tenRun: spread each multiple of 10</h1>
+  <p class="sub">For each multiple of 10 in the given array, change all the values after it to that multiple of 10, until you reach another multiple of 10. So <code>{2, 10, 3, 4, 20, 5}</code> gives <code>{2, 10, 10, 10, 20, 20}</code>. Step through <code>tenRun</code>: <code>max</code> remembers the most recent multiple of 10, and -1 means "haven't seen one yet". This code changes the array it was given and returns it.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "tenRun",
+  code: [
+    "public int[] tenRun(int[] nums) {",
+    "  int max = -1;",
+    "  for (int i = 0; i < nums.length; i++)",
+    "  {",
+    "    if (nums[i]%10==0)",
+    "      max = nums[i];",
+    "    else if (max != -1)",
+    "      nums[i] = max;",
+    "  }",
+    "  return nums;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [2, 10, 3, 4, 20, 5], width: 240 }],
+  presets: [[[2, 10, 3, 4, 20, 5]], [[10, 1, 20, 2]], [[10, 1, 9, 20]], [[1, 2, 50, 1]], [[1, 20, 50, 1]], [[10, 10]], [[10, 2]], [[0, 2]], [[1, 2]], [[1]], [[]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["inner", "a multiple of 10"],
+    ["match", "just changed"]
+  ],
+  trace([nums], T) {
+    const n = nums.length, orig = nums.slice();
+    let i = null, tens = [], fresh = -1;
+    const w = Math.max(42, ...nums.map(x => String(x).length * 12 + 26));
+    T.view = () => {
+      const A = T.arr("nums", nums, w);
+      tens.forEach(k => A.at(k, "win2"));
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      if (fresh >= 0) A.at(fresh, "new");
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>tenRun(${T.fmt(orig)})</code>.`);
+    let max = -1; T.vars.max = -1;
+    T.push(1, `<code>max = -1</code>. No multiple of 10 seen yet.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; fresh = -1;
+      if (i >= n) { T.push(2, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(2, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = nums[i], ten = x % 10 === 0;
+      const c1 = ["nums[i]%10==0", `${x} % 10 = ${x % 10} → ${ten}`, ten];
+      if (ten) {
+        tens.push(i);
+        T.push(4, `${x} is a multiple of 10.`, { chk: [c1] });
+        max = x; T.vars.max = max;
+        T.push(5, `<code>max = ${x}</code>. The next values will become ${x}.`, { chk: [c1] });
+      } else {
+        T.push(4, `${x} isn't a multiple of 10. Check the <code>else if</code>.`, { chk: [c1] });
+        const seen = max !== -1, c2 = ["max != -1", `${max} != -1 → ${seen}`, seen];
+        T.push(6, seen ? `A multiple of 10 (${max}) came earlier.` : `No multiple of 10 yet, so leave ${x} alone.`, { chk: [c1, c2] });
+        if (seen) { nums[i] = max; fresh = i; T.vars.nums = nums; T.push(7, `<code>nums[${i}] = ${max}</code>. The ${x} is replaced.`, { chk: [c1, c2] }); }
+      }
+    }
+    delete T.vars.i; i = null; fresh = -1;
+    T.ret(9, `<code>return nums</code> → <code>${T.fmt(nums)}</code>.`, nums.slice());
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>centeredAverage Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>centeredAverage: average without the extremes</h1>
+  <p class="sub">Return the "centered" average of an array of ints: the mean of the values, ignoring the largest and smallest. If there are several copies of the smallest (or largest) value, ignore just one copy. Use int division. The array has length 3 or more. Step through <code>centeredAverage</code>: one loop finds <code>min</code>, <code>max</code> and the total <code>sum</code> at the same time; then those two are taken back out.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "centeredAverage",
+  code: [
+    "public int centeredAverage(int[] nums) {",
+    "",
+    "  int sum = 0;",
+    "  int min = nums[0];",
+    "  int max = nums[0];",
+    "",
+    "  for (int i = 0; i <= nums.length - 1; i++) {",
+    "    min = Math.min(min, nums[i]);",
+    "    max = Math.max(max, nums[i]);",
+    "    sum += nums[i];",
+    "  }",
+    "",
+    "  sum = sum - min - max;",
+    "  return sum / (nums.length-2);",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 3, 4, 100], width: 240 }],
+  presets: [[[1, 2, 3, 4, 100]], [[1, 1, 5, 5, 10, 8, 7]], [[-10, -4, -2, -4, -2, 0]], [[5, 3, 4, 6, 2]], [[5, 3, 4, 0, 100]], [[100, 0, 5, 3, 4]], [[4, 0, 100]], [[0, 2, 3, 4, 100]], [[1, 1, 100]], [[7, 7, 7]], [[1, 7, 8]]],
+  validate([nums]) {
+    if (nums.length < 3) return `<code>nums</code> needs at least 3 values — with fewer, <code>nums.length-2</code> would be 0 or less once the largest and smallest are removed.`;
+  },
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["inner", "where <code>min</code> came from"],
+    ["match", "where <code>max</code> came from"],
+    ["bad", "left out of the average"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, minAt = null, maxAt = null, added = [], cut = false;
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      added.forEach(k => A.at(k, "soft"));
+      if (minAt !== null) A.at(minAt, cut ? "miss" : "win2").bot(minAt, "▲ min");
+      if (maxAt !== null) A.at(maxAt, cut ? "miss" : "hit").bot(maxAt, "▲ max", "match");
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>centeredAverage(${T.fmt(nums)})</code>.`);
+    let sum = 0, min = nums[0], max = nums[0];
+    T.vars.sum = 0; T.push(2, `<code>sum = 0</code>.`);
+    minAt = 0; T.vars.min = min; T.push(3, `<code>min = nums[0]</code> → ${min}.`);
+    maxAt = 0; T.vars.max = max; T.push(4, `<code>max = nums[0]</code> → ${max}.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i;
+      if (i > n - 1) { T.push(6, `<code>i = ${i}</code>: <code>${i} &lt;= ${n - 1}</code> is <b>false</b>. (<code>i &lt;= nums.length - 1</code> means the same as <code>i &lt; nums.length</code>.)`); break; }
+      T.push(6, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt;= ${n - 1}</code> is <b>true</b>.`);
+      const x = nums[i], om = min, oM = max;
+      if (x < min) { min = x; minAt = i; T.vars.min = min; }
+      T.push(7, `<code>Math.min(${om}, ${x})</code> → ${min}.${x < om ? " A new smallest value." : ""}`);
+      if (x > max) { max = x; maxAt = i; T.vars.max = max; }
+      T.push(8, `<code>Math.max(${oM}, ${x})</code> → ${max}.${x > oM ? " A new largest value." : ""}`);
+      sum += x; T.vars.sum = sum; added.push(i);
+      T.push(9, `<code>sum += ${x}</code> → <code>sum = ${sum}</code>.`);
+    }
+    delete T.vars.i; i = null;
+    if (minAt === maxAt) maxAt = minAt === 0 ? 1 : 0;   // all values equal: show two different copies being removed
+    cut = true;
+    const old = sum; sum = sum - min - max; T.vars.sum = sum;
+    T.push(12, `Take out one copy of the smallest and one of the largest: <code>${old} - ${min} - ${max}</code> → <code>sum = ${sum}</code>.`);
+    const avg = Math.trunc(sum / (n - 2));
+    T.ret(13, `${n - 2} values are left, so divide by <code>nums.length-2</code> = ${n - 2}. <code>${sum} / ${n - 2}</code> → <code>${avg}</code>${sum % (n - 2) ? ` (int division drops the remainder${sum < 0 ? ", rounding toward 0" : ""})` : ""}.`, avg);
+  }
+});
+</script>
+</body>
+</html>

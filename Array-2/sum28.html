@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sum28 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>sum28: do the 2s add up to 8?</h1>
+  <p class="sub">Given an array of ints, return true if the sum of all the 2's in the array is exactly 8. Step through <code>sum28</code>: the 2s add up to 8 exactly when there are four of them, so it just counts the 2s and checks for 4.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "sum28",
+  code: [
+    "public boolean sum28(int[] nums) {",
+    "  int twoCount = 0;",
+    "  for (int i = 0; i < nums.length; i++) {",
+    "    if (nums[i] == 2)",
+    "      twoCount++;",
+    "  }",
+    "  return twoCount == 4;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [2, 3, 2, 2, 4, 2], width: 240 }],
+  presets: [[[2, 3, 2, 2, 4, 2]], [[2, 3, 2, 2, 4, 2, 2]], [[1, 2, 3, 4]], [[2, 2, 2, 2]], [[1, 2, 2, 2, 2, 4]], [[]], [[2]], [[8]], [[2, 2, 2]], [[2, 2, 2, 2, 2]], [[1, 2, 2, 1, 2, 2]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["match", "a 2, counted"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, hits = [];
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      hits.forEach(k => A.at(k, "hit"));
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>sum28(${T.fmt(nums)})</code>.`);
+    let c = 0; T.vars.twoCount = 0;
+    T.push(1, `<code>twoCount = 0</code>.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i;
+      if (i >= n) { T.push(2, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(2, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = nums[i], is2 = x === 2, chk = [["nums[i] == 2", `${x} == 2 → ${is2}`, is2]];
+      T.push(3, is2 ? `<code>nums[${i}]</code> is a 2.` : `<code>nums[${i}]</code> is ${x}, not 2.`, { chk });
+      if (is2) { c++; T.vars.twoCount = c; hits.push(i); T.push(4, `<code>twoCount++</code> → ${c}. The 2s so far add up to ${2 * c}.`, { chk }); }
+    }
+    delete T.vars.i; i = null;
+    const r = c === 4;
+    T.ret(6, `<code>twoCount == 4</code> → <code>${c} == 4</code> → <b>${r}</b>. (${c} two${c === 1 ? "" : "s"} add up to ${2 * c}.)`, r, { chk: [["twoCount == 4", `${c} == 4 → ${r}`, r]] });
+  }
+});
+</script>
+</body>
+</html>

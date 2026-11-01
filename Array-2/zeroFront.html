@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>zeroFront Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>zeroFront: zeros to the front</h1>
+  <p class="sub">Return an array with exactly the same numbers as the given array, rearranged so all the zeros are grouped at the start. The order of the other numbers doesn't matter. Step through <code>zeroFront</code>: the new array is filled from both ends at once — zeros go in at <code>idx</code> on the left, everything else at <code>rdx</code> on the right.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "zeroFront",
+  code: [
+    "public int[] zeroFront(int[] nums) {",
+    "  int[] b = new int[nums.length];",
+    "  int idx = 0;",
+    "  int rdx = nums.length-1;",
+    "",
+    "  for (int i = 0; i < nums.length; i++) {",
+    "    if (nums[i] == 0)",
+    "      b[idx++] = nums[i];",
+    "    else",
+    "      b[rdx--] = nums[i];",
+    "  }",
+    "",
+    "  return b;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 0, 0, 1], width: 240 }],
+  presets: [[[1, 0, 0, 1]], [[0, 1, 1, 0, 1]], [[1, 0]], [[0, 1]], [[1, 1, 1, 0]], [[2, 2, 2, 2]], [[0, 0, 1, 0]], [[-1, 0, 0, -1, 0]], [[0, -3, 0, -3]], [[]], [[9, 9, 0, 9, 0, 9]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["inner", "zeros placed at <code>idx</code>"],
+    ["match", "others placed at <code>rdx</code>"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let b = null, i = null, idx = null, rdx = null, fresh = -1, zs = [], os = [];
+    const w = Math.max(42, ...nums.map(x => String(x).length * 12 + 26));
+    T.view = () => {
+      const A = T.arr("nums", nums, w), list = [A];
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      if (b) {
+        const B = T.arr("b", b, w);
+        zs.forEach(k => B.at(k, "win2")); os.forEach(k => B.at(k, "soft"));
+        if (idx !== null && idx < n) B.top(idx, "idx ▼", "inner");
+        if (rdx !== null && rdx >= 0) B.bot(rdx, "▲ rdx", "match");
+        if (fresh >= 0) B.at(fresh, "new");
+        list.push(B);
+      }
+      return list;
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>zeroFront(${T.fmt(nums)})</code>.`);
+    b = new Array(n).fill(0); T.vars.b = b;
+    T.push(1, `<code>b = new int[${n}]</code>, a new array the same length.`);
+    idx = 0; T.vars.idx = 0; T.push(2, `<code>idx = 0</code>: the next free box on the left, for zeros.`);
+    rdx = n - 1; T.vars.rdx = rdx; T.push(3, `<code>rdx = ${rdx}</code>: the next free box on the right, for everything else.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; fresh = -1;
+      if (i >= n) { T.push(5, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>. <code>idx</code> and <code>rdx</code> have met in the middle, and every box of <code>b</code> is filled.`); break; }
+      T.push(5, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = nums[i], z = x === 0, chk = [["nums[i] == 0", `${x} == 0 → ${z}`, z]];
+      T.push(6, z ? `<code>nums[${i}]</code> is a zero.` : `<code>nums[${i}]</code> is ${x}, not zero. Go to the <code>else</code>.`, { chk });
+      if (z) {
+        b[idx] = x; fresh = idx; zs.push(idx); idx++; T.vars.b = b; T.vars.idx = idx;
+        T.push(7, `<code>b[idx++] = 0</code>: put it in <code>b[${idx - 1}]</code>, then <code>idx</code> moves right to ${idx}.`, { chk });
+      } else {
+        b[rdx] = x; fresh = rdx; os.push(rdx); rdx--; T.vars.b = b; T.vars.rdx = rdx;
+        T.push(9, `<code>b[rdx--] = ${x}</code>: put it in <code>b[${rdx + 1}]</code>, then <code>rdx</code> moves left to ${rdx}.`, { chk });
+      }
+    }
+    delete T.vars.i; i = null; fresh = -1;
+    T.ret(12, `<code>return b</code> → <code>${T.fmt(b)}</code>.`, b.slice());
+  }
+});
+</script>
+</body>
+</html>

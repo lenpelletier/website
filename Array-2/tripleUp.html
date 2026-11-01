@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tripleUp Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>tripleUp: three counting up in a row?</h1>
+  <p class="sub">Return true if the array contains, somewhere, three increasing adjacent numbers like 4, 5, 6 or 23, 24, 25. Step through <code>tripleUp</code>: each pass looks at three neighbours and checks that each one is exactly 1 more than the one before.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "tripleUp",
+  code: [
+    "public boolean tripleUp(int[] nums) {",
+    "  for (int i = 0; i <= nums.length-3; i++) {",
+    "    if (nums[i]+1 == nums[i+1] && nums[i+1]+1 == nums[i+2]) {",
+    "      return true;",
+    "    }",
+    "  }",
+    "  return false;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 4, 5, 6, 2], width: 240 }],
+  presets: [[[1, 4, 5, 6, 2]], [[1, 2, 3]], [[1, 2, 4]], [[1, 2, 4, 5, 7, 6, 5, 6, 7, 6]], [[1, 2, 4, 5, 7, 6, 5, 7, 7, 6]], [[1, 2]], [[1]], [[]], [[10, 9, 8, -100, -99, -98, 100]], [[10, 9, 8, -100, -99, 99, 100]], [[-100, 1, 2, 3]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["inner", "<code>nums[i+1]</code> and <code>nums[i+2]</code>"],
+    ["match", "three in a row"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, win = false, found = false;
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      if (i !== null) {
+        A.top(i, `i=${i} ▼`);
+        if (win) { A.at(i, "outer").at(i + 1, "win2").at(i + 2, "win2"); if (found) A.cls(i, i + 3, "hit"); }
+      }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>tripleUp(${T.fmt(nums)})</code>.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; win = false;
+      if (i > n - 3) { T.push(1, `<code>i = ${i}</code>: <code>${i} &lt;= ${n - 3}</code> is <b>false</b>. ${n >= 3 ? "There's no room for three more boxes." : "The array is too short for three boxes."}`); break; }
+      T.push(1, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt;= ${n - 3}</code> is <b>true</b>.`);
+      win = true;
+      const a = nums[i], b = nums[i + 1], c = nums[i + 2], s1 = a + 1 === b, s2 = b + 1 === c;
+      const chk = [["nums[i]+1 == nums[i+1]", `${a}+1 == ${b} → ${s1}`, s1], ["nums[i+1]+1 == nums[i+2]", s1 ? `${b}+1 == ${c} → ${s2}` : "(skipped)", s1 ? s2 : undefined]];
+      if (s1 && s2) found = true;
+      T.push(2, s1 && s2 ? `${a}, ${b}, ${c} count up by 1!` : s1 ? `${a} → ${b} goes up by 1, but ${b} → ${c} doesn't.` : `${a} → ${b} doesn't go up by exactly 1, so <code>&amp;&amp;</code> stops.`, { chk });
+      if (s1 && s2) { T.ret(3, `<code>return true</code>.`, true, { chk }); return; }
+    }
+    delete T.vars.i; i = null;
+    T.ret(6, `<code>return false</code>.`, false);
+  }
+});
+</script>
+</body>
+</html>

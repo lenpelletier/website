@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>has12 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>has12: a 1 with a 2 somewhere later?</h1>
+  <p class="sub">Given an array of ints, return true if there is a 1 in the array with a 2 somewhere later in the array. Step through <code>has12</code>: the flag <code>has1</code> remembers whether a 1 has shown up yet, so a 2 only counts if it comes after one.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "has12",
+  code: [
+    "public boolean has12(int[] nums) {",
+    "  boolean has1 = false;",
+    "  for(int i = 0; i < nums.length; i++) {",
+    "    if (nums[i] == 1)",
+    "      has1 = true;",
+    "    if (has1 && nums[i] == 2)",
+    "      return true;",
+    "  }",
+    "  return false;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [3, 1, 4, 5, 2], width: 240 }],
+  presets: [[[1, 3, 2]], [[3, 1, 2]], [[3, 1, 4, 5, 2]], [[3, 1, 4, 5, 6]], [[3, 1, 4, 1, 6, 2]], [[2, 1, 4, 1, 6, 2]], [[2, 1, 4, 1, 6]], [[1]], [[2, 1, 3]], [[2, 1, 3, 2]], [[2]], [[3, 2]], [[3, 1, 3, 2]], [[3, 5, 9]], [[3, 5, 1]], [[3, 2, 1]], [[1, 2]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["match", "the first 1"],
+    ["inner", "a 2 after it"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, one = null, two = null;
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      if (one !== null) A.at(one, "hit");
+      if (two !== null) A.at(two, "win2");
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>has12(${T.fmt(nums)})</code>.`);
+    let has1 = false; T.vars.has1 = false;
+    T.push(1, `<code>has1 = false</code>. No 1 seen yet.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i;
+      if (i >= n) { T.push(2, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(2, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = nums[i], c1 = ["nums[i] == 1", `${x} == 1 → ${x === 1}`, x === 1];
+      T.push(3, x === 1 ? `<code>nums[${i}]</code> is a 1.` : `<code>nums[${i}]</code> is ${x}, not 1.`, { chk: [c1] });
+      if (x === 1) { if (!has1) one = i; has1 = true; T.vars.has1 = true; T.push(4, `<code>has1 = true</code>. From now on, any 2 counts.`, { chk: [c1] }); }
+      const hit = has1 && x === 2;
+      const c2 = ["has1 &amp;&amp; nums[i] == 2", has1 ? `true && ${x === 2} → ${hit}` : "false && … → false", hit];
+      T.push(5, !has1 ? `<code>has1</code> is false, so <code>&amp;&amp;</code> stops — ${x === 2 ? "this 2 comes before any 1, so it doesn't count." : "no 1 yet."}` : hit ? `There was a 1 earlier, and this is a 2!` : `There was a 1, but this isn't a 2.`, { chk: [c1, c2] });
+      if (hit) { two = i; T.ret(6, `<code>return true</code>.`, true, { chk: [c1, c2] }); return; }
+    }
+    delete T.vars.i; i = null;
+    T.ret(8, `<code>return false</code>.`, false);
+  }
+});
+</script>
+</body>
+</html>

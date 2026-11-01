@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>matchUp Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>matchUp: close but not equal</h1>
+  <p class="sub">Given arrays <code>nums1</code> and <code>nums2</code> of the same length, compare the elements at each index. Return the number of times the two elements differ by 2 or less but are not equal. Step through <code>matchUp</code>: one index <code>i</code> walks down both arrays together, and <code>Math.abs</code> gives the distance between the two numbers whichever is bigger.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "matchUp",
+  wide: true,
+  code: [
+    "public int matchUp(int[] n1, int[] n2) {",
+    "  int diffCount = 0;",
+    "  for (int i = 0; i < n1.length; i++) {",
+    "     if (Math.abs(n1[i] - n2[i]) <= 2 && n1[i] != n2[i])",
+    "       diffCount++;",
+    "  }",
+    "  return diffCount;",
+    "}"
+  ],
+  inputs: [{ id: "n1", kind: "array", value: [1, 2, 3], width: 160 }, { id: "n2", kind: "array", value: [2, 3, 10], width: 160 }],
+  presets: [[[1, 2, 3], [2, 3, 10]], [[1, 2, 3], [2, 3, 5]], [[1, 2, 3], [2, 3, 3]], [[5, 3], [5, 5]], [[5, 3], [4, 4]], [[5, 3], [3, 3]], [[5, 3], [2, 2]], [[5, 3], [1, 1]], [[5, 3], [0, 0]], [[4], [4]], [[4], [5]], [[], []]],
+  validate([a, b]) {
+    if (b.length < a.length) return `<code>n2</code> must be at least as long as <code>n1</code> — otherwise <code>n2[i]</code> would run past its end and throw an exception.`;
+  },
+  legend: [
+    ["outer", "<code>n1[i]</code> and <code>n2[i]</code>"],
+    ["match", "close but not equal — counted"]
+  ],
+  trace([a, b], T) {
+    const n = a.length;
+    let i = null, hits = [];
+    const w = Math.max(42, ...[...a, ...b].map(x => String(x).length * 12 + 26));
+    T.view = () => {
+      const A = T.arr("n1", a, w), B = T.arr("n2", b, w);
+      hits.forEach(k => { A.at(k, "hit"); B.at(k, "hit"); });
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) { A.at(i, "outer"); B.at(i, "outer"); } }
+      return [A, B];
+    };
+    T.vars.n1 = a; T.vars.n2 = b;
+    T.push(0, `Call <code>matchUp(${T.fmt(a)}, ${T.fmt(b)})</code>.`);
+    let c = 0; T.vars.diffCount = 0;
+    T.push(1, `<code>diffCount = 0</code>.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i;
+      if (i >= n) { T.push(2, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(2, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = a[i], y = b[i], d = Math.abs(x - y), close = d <= 2, ne = x !== y, ok = close && ne;
+      const chk = [["Math.abs(n1[i] - n2[i]) &lt;= 2", `|${x} - ${y}| = ${d} → ${close}`, close], ["n1[i] != n2[i]", close ? `${x} != ${y} → ${ne}` : "(skipped)", close ? ne : undefined]];
+      T.push(3, !close ? `${x} and ${y} are ${d} apart — too far.` : ne ? `${x} and ${y} are ${d} apart: close, and not equal.` : `${x} and ${y} are equal, so they don't count.`, { chk });
+      if (ok) { c++; T.vars.diffCount = c; hits.push(i); T.push(4, `<code>diffCount++</code> → ${c}.`, { chk }); }
+    }
+    delete T.vars.i; i = null;
+    T.ret(6, `<code>return diffCount</code> → <code>${c}</code>.`, c);
+  }
+});
+</script>
+</body>
+</html>

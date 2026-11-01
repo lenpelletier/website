@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lucky13 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>lucky13: no 1s and no 3s?</h1>
+  <p class="sub">Given an array of ints, return true if the array contains no 1's and no 3's. Step through <code>lucky13</code>: as soon as it sees a 1 or a 3 it can answer false right away. Only after checking every box can it say true.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "lucky13",
+  code: [
+    "public boolean lucky13(int[] nums) {",
+    "  for (int i = 0; i < nums.length; i++) {",
+    "    if (nums[i] == 1 || nums[i] == 3)",
+    "      return false;",
+    "  }",
+    "  return true;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [0, 2, 4], width: 240 }],
+  presets: [[[0, 2, 4]], [[1, 2, 3]], [[1, 2, 4]], [[2, 7, 2, 8]], [[2, 7, 1, 8]], [[3, 7, 2, 8]], [[2, 7, 2, 1]], [[1, 2]], [[2, 2]], [[2]], [[3]], [[]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["match", "checked, not a 1 or 3"],
+    ["bad", "a 1 or a 3"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, ok = [], bad = null;
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      ok.forEach(k => A.at(k, "soft"));
+      if (bad !== null) A.at(bad, "miss");
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>lucky13(${T.fmt(nums)})</code>.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i;
+      if (i >= n) { T.push(1, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>. ${n ? "Every box checked, and none was a 1 or a 3." : "The array is empty."}`); break; }
+      T.push(1, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = nums[i], is1 = x === 1, is3 = x === 3;
+      const chk = [["nums[i] == 1", `${x} == 1 → ${is1}`, is1], ["nums[i] == 3", is1 ? "(skipped)" : `${x} == 3 → ${is3}`, is1 ? undefined : is3]];
+      T.push(2, is1 ? `<code>nums[${i}]</code> is 1. <code>||</code> only needs one true side, so it stops there.` : is3 ? `<code>nums[${i}]</code> is 3.` : `<code>nums[${i}]</code> is ${x} — neither 1 nor 3.`, { chk });
+      if (is1 || is3) { bad = i; T.ret(3, `Found a ${x}. <code>return false</code> — no need to look any further.`, false, { chk }); return; }
+      ok.push(i);
+    }
+    delete T.vars.i; i = null;
+    T.ret(5, `<code>return true</code>.`, true);
+  }
+});
+</script>
+</body>
+</html>

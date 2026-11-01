@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sum67 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>sum67: add up, skipping 6 … 7</h1>
+  <p class="sub">Return the sum of the numbers in the array, except ignore sections that start with a 6 and run to the next 7 (every 6 will be followed by at least one 7). Return 0 for no numbers. Step through <code>sum67</code>: the boolean <code>counting</code> is like a switch — a 6 turns it off, and the next 7 turns it back on.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "sum67",
+  code: [
+    "public int sum67(int[] nums) {",
+    "",
+    "  boolean counting = true;",
+    "  int total = 0;",
+    "",
+    "  for (int i = 0; i < nums.length; i++) {",
+    "    if (nums[i] == 6)",
+    "      counting = false;",
+    "    if (counting)",
+    "      total += nums[i];",
+    "    else if (nums[i] == 7)",
+    "      counting = true;",
+    "  }",
+    "",
+    "  return total;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 2, 6, 99, 99, 7], width: 240 }],
+  presets: [[[1, 2, 2]], [[1, 2, 2, 6, 99, 99, 7]], [[1, 1, 6, 7, 2]], [[1, 6, 2, 2, 7, 1, 6, 99, 99, 7]], [[1, 6, 2, 6, 2, 7, 1, 6, 99, 99, 7]], [[2, 7, 6, 2, 6, 7, 2, 7]], [[2, 7, 6, 2, 6, 2, 7]], [[1, 6, 7, 7]], [[6, 7, 1, 6, 7, 7]], [[6, 8, 1, 6, 7]], [[]], [[6, 7, 11]], [[11, 6, 7, 11]], [[2, 2, 6, 7, 7]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["match", "added to <code>total</code>"],
+    ["bad", "ignored (between a 6 and a 7)"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, hits = [], gone = [];
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      hits.forEach(k => A.at(k, "hit")); gone.forEach(k => A.at(k, "miss"));
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      return [A.tag(T.vars.counting ? "counting" : "not counting", T.vars.counting ? "match" : "")];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>sum67(${T.fmt(nums)})</code>.`);
+    let counting = true, total = 0;
+    T.vars.counting = true; T.push(2, `<code>counting = true</code>. We start by counting.`);
+    T.vars.total = 0; T.push(3, `<code>total = 0</code>.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i;
+      if (i >= n) { T.push(5, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(5, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = nums[i], is6 = x === 6;
+      const c1 = ["nums[i] == 6", `${x} == 6 → ${is6}`, is6];
+      T.push(6, is6 ? `<code>nums[${i}]</code> is 6 — the start of a section to ignore.` : `<code>nums[${i}]</code> is ${x}, not 6.`, { chk: [c1] });
+      if (is6) { counting = false; T.vars.counting = false; T.push(7, `<code>counting = false</code>. The switch is off.`, { chk: [c1] }); }
+      const c2 = ["counting", String(counting), counting];
+      if (counting) {
+        T.push(8, `<code>counting</code> is <b>true</b>, so this number counts.`, { chk: [c1, c2] });
+        total += x; T.vars.total = total; hits.push(i);
+        T.push(9, `<code>total += ${x}</code> → <code>total = ${total}</code>.`, { chk: [c1, c2] });
+      } else {
+        gone.push(i);
+        T.push(8, `<code>counting</code> is <b>false</b>, so ${x} is ignored. Check the <code>else if</code>.`, { chk: [c1, c2] });
+        const is7 = x === 7, c3 = ["nums[i] == 7", `${x} == 7 → ${is7}`, is7];
+        T.push(10, is7 ? `<code>nums[${i}]</code> is 7 — the end of the ignored section.` : `Not a 7, so keep ignoring.`, { chk: [c1, c2, c3] });
+        if (is7) { counting = true; T.vars.counting = true; T.push(11, `<code>counting = true</code>. The switch is back on for the next number. (This 7 itself was not added.)`, { chk: [c1, c2, c3] }); }
+      }
+    }
+    delete T.vars.i; i = null;
+    T.ret(14, `<code>return total</code> → <code>${total}</code>.`, total);
+  }
+});
+</script>
+</body>
+</html>

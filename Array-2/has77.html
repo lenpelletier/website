@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>has77 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>has77: two 7s close together?</h1>
+  <p class="sub">Given an array of ints, return true if it contains two 7's next to each other, or two 7's with one element between them, such as <code>{7, 1, 7}</code>. Step through <code>has77</code>: the loop looks three boxes at a time from each 7. It stops early so <code>i+2</code> stays inside the array, so the last pair is checked separately after the loop. <code>i</code> is declared before the loop so it can still be used afterwards.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "has77",
+  wide: true,
+  code: [
+    "public boolean has77(int[] nums) {",
+    "  int i;",
+    "  for (i = 0; i < nums.length-2; i++)",
+    "  {",
+    "    if (nums[i] == 7 && (nums[i+1] == 7 || nums[i+2] == 7))",
+    "      return true;",
+    "  }",
+    "  if (nums.length >= 2 && nums[i]==7 && nums[i+1] == 7)",
+    "    return true;",
+    "  return false;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 7, 1, 7], width: 240 }],
+  presets: [[[1, 7, 7]], [[1, 7, 1, 7]], [[1, 7, 1, 1, 7]], [[7, 7, 1, 1, 7]], [[2, 7, 2, 2, 7, 2]], [[2, 7, 2, 2, 7, 7]], [[7, 2, 7, 2, 2, 7]], [[7, 2, 6, 2, 2, 7]], [[7, 7, 7]], [[7, 1, 7]], [[7, 1, 1]], [[1, 2]], [[1, 7]], [[7]], [[7, 7]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["inner", "<code>nums[i+1]</code> and <code>nums[i+2]</code>"],
+    ["match", "two 7s found"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, look = 0, found = null;
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      if (i !== null) {
+        A.top(i, `i=${i} ▼`);
+        if (look) { A.at(i, "outer"); for (let k = 1; k <= look; k++) A.at(i + k, "win2").bot(i + k, `▲ i+${k}`); }
+        else if (i < n) A.at(i, "outer");
+      }
+      if (found) found.forEach(k => A.at(k, "hit"));
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>has77(${T.fmt(nums)})</code>.`);
+    T.push(1, `<code>int i;</code> declares <code>i</code> outside the loop, so it will still exist after the loop ends.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; look = 0;
+      if (i >= n - 2) { T.push(2, `<code>i = ${i}</code>: <code>${i} &lt; ${n - 2}</code> is <b>false</b>. ${n > 2 ? `Starting at ${i}, <code>i+2</code> would be past the end.` : "The array is too short for three boxes, so the loop never runs."}`); break; }
+      T.push(2, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n - 2}</code> is <b>true</b>.`);
+      const a = nums[i], b = nums[i + 1], c = nums[i + 2], a7 = a === 7;
+      if (a7) look = 2;
+      const chk = [["nums[i] == 7", `${a} == 7 → ${a7}`, a7]];
+      if (a7) chk.push(["nums[i+1] == 7 || nums[i+2] == 7", `${b === 7 ? "true" : `false || ${c === 7}`} → ${b === 7 || c === 7}`, b === 7 || c === 7]);
+      else chk.push(["( … || … )", "(skipped)"]);
+      const hit = a7 && (b === 7 || c === 7);
+      if (hit) found = [i, b === 7 ? i + 1 : i + 2];
+      T.push(4, !a7 ? `<code>nums[${i}]</code> is ${a}, not 7, so <code>&amp;&amp;</code> stops there.` : hit ? `<code>nums[${i}]</code> is 7, and ${b === 7 ? `so is <code>nums[${i + 1}]</code> right next to it` : `so is <code>nums[${i + 2}]</code>, one box over`}!` : `<code>nums[${i}]</code> is 7, but neither of the next two boxes is.`, { chk });
+      if (hit) { T.ret(5, `<code>return true</code>.`, true, { chk }); return; }
+    }
+    look = 0;
+    const long = n >= 2;
+    const c1 = ["nums.length &gt;= 2", `${n} >= 2 → ${long}`, long];
+    if (!long) {
+      T.push(7, `<code>${n} &gt;= 2</code> is <b>false</b> — there's no pair at all, so <code>&amp;&amp;</code> stops before <code>nums[i+1]</code> can go past the end.`, { chk: [c1] });
+    } else {
+      const a = nums[i], b = nums[i + 1], both = a === 7 && b === 7;
+      look = 1;
+      const chk = [c1, ["nums[i]==7 &amp;&amp; nums[i+1] == 7", `${a}, ${b} → ${both}`, both]];
+      if (both) found = [i, i + 1];
+      T.push(7, `After the loop, <code>i</code> is ${i}, so <code>nums[i]</code> and <code>nums[i+1]</code> are the last two boxes. ${n === 2 ? "With only 2 boxes the loop never ran, so this is the only check." : "The loop only looked at this pair from a 7 before it, so it gets its own check."} ${both ? "Both are 7!" : "They aren't both 7."}`, { chk });
+      if (both) { T.ret(8, `<code>return true</code>.`, true, { chk }); return; }
+    }
+    look = 0;
+    T.ret(9, `<code>return false</code>.`, false);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>haveThree Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>haveThree: exactly three 3s, none touching</h1>
+  <p class="sub">Given an array of ints, return true if the value 3 appears exactly 3 times and no 3's are next to each other. Step through <code>haveThree</code>: two 3s side by side mean the answer is false right away; otherwise each 3 gets counted. The loop stops one box early (so <code>i+1</code> stays in the array), and the last box is checked on its own afterwards.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "haveThree",
+  wide: true,
+  code: [
+    "public boolean haveThree(int[] nums) {",
+    "  int count3 = 0;",
+    "",
+    "  if (nums.length < 5)",
+    "    return false;",
+    "",
+    "  for (int i = 0; i < nums.length-1; i++)",
+    "  {",
+    "    if (nums[i] == 3 && nums[i+1] == 3)",
+    "      return false;   //two 3s are next to each other",
+    "    if (nums[i] == 3 && nums[i+1] != 3)",
+    "      count3++;",
+    "  }",
+    "  if (nums[nums.length-1] == 3 && nums[nums.length-2] != 3)",
+    "    count3++;",
+    "",
+    "  return count3 == 3;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [3, 1, 3, 1, 3], width: 240 }],
+  presets: [[[3, 1, 3, 1, 3]], [[3, 1, 3, 3]], [[3, 4, 3, 3, 4]], [[1, 3, 1, 3, 1, 2]], [[1, 3, 1, 3, 1, 3]], [[1, 3, 3, 1, 3]], [[1, 3, 1, 3, 1, 3, 4, 3]], [[3, 4, 3, 4, 3, 4, 4]], [[3, 3, 3]], [[1, 3]], [[3]], [[1]], [[3, 1, 3, 1, 3, 3]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["inner", "<code>nums[i+1]</code>"],
+    ["match", "a 3 that was counted"],
+    ["bad", "two 3s touching"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, pair = false, hits = [], last = false, touching = [];
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      hits.forEach(k => A.at(k, "hit"));
+      touching.forEach(k => A.at(k, "miss"));
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (pair) A.at(i, "outer").at(i + 1, "inner").bot(i + 1, "▲ i+1"); }
+      if (last) A.at(n - 1, "outer").top(n - 1, "last ▼").at(n - 2, "inner");
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>haveThree(${T.fmt(nums)})</code>.`);
+    let c = 0; T.vars.count3 = 0;
+    T.push(1, `<code>count3 = 0</code>.`);
+    const short = n < 5, c0 = ["nums.length &lt; 5", `${n} < 5 → ${short}`, short];
+    if (short) {
+      T.push(3, `<code>${n} &lt; 5</code> is <b>true</b>. Three 3s with something between each pair need at least 5 boxes (3 ? 3 ? 3).`, { chk: [c0] });
+      T.ret(4, `<code>return false</code>.`, false, { chk: [c0] });
+      return;
+    }
+    T.push(3, `<code>${n} &lt; 5</code> is <b>false</b>, so there's enough room.`, { chk: [c0] });
+    for (i = 0; ; i++) {
+      T.vars.i = i; pair = false;
+      if (i >= n - 1) { T.push(6, `<code>i = ${i}</code>: <code>${i} &lt; ${n - 1}</code> is <b>false</b>. The last box has no box after it, so it's handled next.`); break; }
+      T.push(6, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n - 1}</code> is <b>true</b>.`);
+      pair = true;
+      const a = nums[i], b = nums[i + 1], touch = a === 3 && b === 3, ok = a === 3 && b !== 3;
+      const c1 = ["nums[i] == 3 &amp;&amp; nums[i+1] == 3", `${a}, ${b} → ${touch}`, touch];
+      if (touch) {
+        touching = [i, i + 1];
+        T.push(8, `<code>nums[${i}]</code> and <code>nums[${i + 1}]</code> are both 3 — two 3s next to each other.`, { chk: [c1] });
+        T.ret(9, `<code>return false</code>. No need to keep counting.`, false, { chk: [c1] });
+        return;
+      }
+      T.push(8, a === 3 ? `<code>nums[${i}]</code> is a 3, but the next box isn't, so they don't touch.` : `<code>nums[${i}]</code> is ${a}, not 3.`, { chk: [c1] });
+      const c2 = ["nums[i] == 3 &amp;&amp; nums[i+1] != 3", `${a}, ${b} → ${ok}`, ok];
+      T.push(10, ok ? `So count this 3.` : `Not a 3, so there's nothing to count.`, { chk: [c1, c2] });
+      if (ok) { c++; T.vars.count3 = c; hits.push(i); T.push(11, `<code>count3++</code> → ${c}.`, { chk: [c1, c2] }); }
+    }
+    pair = false; delete T.vars.i; i = null; last = true;
+    const a = nums[n - 1], b = nums[n - 2], ok = a === 3 && b !== 3;
+    const chk = [["nums[nums.length-1] == 3", `${a} == 3 → ${a === 3}`, a === 3], ["nums[nums.length-2] != 3", a === 3 ? `${b} != 3 → ${b !== 3}` : "(skipped)", a === 3 ? b !== 3 : undefined]];
+    T.push(13, a !== 3 ? `The last box is ${a}, not 3.` : `The last box is a 3, and the box before it isn't. (If it were, the loop would already have returned false.)`, { chk });
+    if (ok) { c++; T.vars.count3 = c; hits.push(n - 1); T.push(14, `<code>count3++</code> → ${c}.`, { chk }); }
+    last = false;
+    const r = c === 3;
+    T.ret(16, `<code>count3 == 3</code> → <code>${c} == 3</code> → <b>${r}</b>.`, r, { chk: [["count3 == 3", `${c} == 3 → ${r}`, r]] });
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>notAlone Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>notAlone: replace each lonely val</h1>
+  <p class="sub">An element is "alone" if there are values before and after it, and those values are different from it. Return a version of the array where every instance of <code>val</code> that is alone is replaced by whichever of its two neighbours is larger. Step through <code>notAlone</code>: the loop skips the first and last boxes, since they don't have a neighbour on both sides. This code changes the array it was given and returns it.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "notAlone",
+  wide: true,
+  code: [
+    "public int[] notAlone(int[] nums, int val) {",
+    "  for (int i = 1; i < nums.length-1; i++) {",
+    "    if (nums[i] == val && (nums[i-1] != val && nums[i+1] != val)) {",
+    "      nums[i] = Math.max(nums[i-1], nums[i+1]);",
+    "    }",
+    "  }",
+    "  return nums;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 3, 2, 5, 2], width: 240 }, { id: "val", kind: "int", value: 2 }],
+  presets: [[[1, 2, 3], 2], [[1, 2, 3, 2, 5, 2], 2], [[3, 4], 3], [[3, 3], 3], [[1, 3, 1, 2], 1], [[3], 3], [[], 3], [[7, 1, 6], 1], [[1, 1, 1], 1], [[1, 1, 1, 2], 1], [[4, 2, 2, 4], 2]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["inner", "its neighbours <code>nums[i-1]</code>, <code>nums[i+1]</code>"],
+    ["match", "just replaced"]
+  ],
+  trace([nums, val], T) {
+    const n = nums.length, orig = nums.slice();
+    let i = null, nb = false, fresh = -1;
+    const w = Math.max(42, ...nums.map(x => String(x).length * 12 + 26));
+    T.view = () => {
+      const A = T.arr("nums", nums, w);
+      if (i !== null) {
+        A.top(i, `i=${i} ▼`);
+        if (i < n - 1) A.at(i, "outer");
+        if (nb) A.at(i - 1, "win2").at(i + 1, "win2").bot(i - 1, "▲ i-1").bot(i + 1, "▲ i+1");
+      }
+      if (fresh >= 0) A.at(fresh, "new");
+      return [A];
+    };
+    T.vars.nums = nums; T.vars.val = val;
+    T.push(0, `Call <code>notAlone(${T.fmt(orig)}, ${val})</code>.`);
+    for (i = 1; ; i++) {
+      T.vars.i = i; nb = false; fresh = -1;
+      if (i >= n - 1) { T.push(1, `<code>i = ${i}</code>: <code>${i} &lt; ${n - 1}</code> is <b>false</b>. ${n > 2 ? "The last box has no right-hand neighbour, so it's never changed." : "There's no box with a neighbour on both sides."}`); break; }
+      T.push(1, `${i === 1 ? "Loop starts at <code>i = 1</code> (box 0 has no left neighbour)." : `Loop: <code>i = ${i}</code>.`} <code>${i} &lt; ${n - 1}</code> is <b>true</b>.`);
+      nb = true;
+      const x = nums[i], L = nums[i - 1], R = nums[i + 1], isV = x === val, lNe = L !== val, rNe = R !== val, go = isV && lNe && rNe;
+      const chk = [["nums[i] == val", `${x} == ${val} → ${isV}`, isV],
+        ["nums[i-1] != val", isV ? `${L} != ${val} → ${lNe}` : "(skipped)", isV ? lNe : undefined],
+        ["nums[i+1] != val", isV && lNe ? `${R} != ${val} → ${rNe}` : "(skipped)", isV && lNe ? rNe : undefined]];
+      T.push(2, !isV ? `<code>nums[${i}]</code> is ${x}, not ${val}, so <code>&amp;&amp;</code> stops.`
+        : !lNe ? `<code>nums[${i}]</code> is ${val}, but its left neighbour is ${val} too — it isn't alone.`
+        : !rNe ? `<code>nums[${i}]</code> is ${val}, but its right neighbour is ${val} too — it isn't alone.`
+        : `<code>nums[${i}]</code> is ${val}, and neither neighbour (${L} and ${R}) is ${val}. It's alone!`, { chk });
+      if (go) {
+        const m = Math.max(L, R);
+        nums[i] = m; fresh = i; T.vars.nums = nums;
+        T.push(3, `<code>Math.max(${L}, ${R})</code> → ${m}, so <code>nums[${i}] = ${m}</code>.`, { chk });
+      }
+    }
+    delete T.vars.i; i = null; nb = false; fresh = -1;
+    T.ret(6, `<code>return nums</code> → <code>${T.fmt(nums)}</code>.`, nums.slice());
+  }
+});
+</script>
+</body>
+</html>

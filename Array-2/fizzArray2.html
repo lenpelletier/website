@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fizzArray2 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>fizzArray2: "0", "1", … as Strings</h1>
+  <p class="sub">Given a number <code>n</code>, create and return a new String array of length <code>n</code> containing the strings <code>"0"</code>, <code>"1"</code>, <code>"2"</code> … through n-1. <code>n</code> may be 0. Step through <code>fizzArray2</code>: a new String array starts out full of <code>null</code>, and <code>""+i</code> turns the number <code>i</code> into a String.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "fizzArray2",
+  code: [
+    "public String[] fizzArray2(int n) {",
+    "  String[] newArray = new String[n];",
+    "",
+    "  for (int i = 0; i < n; i++) {",
+    "    newArray[i] = \"\"+i;",
+    "  }",
+    "",
+    "  return newArray;",
+    "}"
+  ],
+  inputs: [{ id: "n", kind: "int", value: 4 }],
+  presets: [[4], [10], [2], [0], [1], [7]],
+  validate([n]) {
+    if (n < 0) return `<code>n</code> can't be negative — <code>new String[${n}]</code> would throw an exception.`;
+    if (n > 30) return `Please use an <code>n</code> of 30 or less, so the array fits on screen.`;
+  },
+  legend: [
+    ["outer", "<code>newArray[i]</code>"],
+    ["match", "just filled in"]
+  ],
+  trace([n], T) {
+    let a = null, i = null, fresh = -1;
+    T.view = () => {
+      if (!a) return [];
+      const A = T.arr("newArray", a, Math.max(42, (String(Math.max(n - 1, 0)).length + 2) * 12 + 34));
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      if (fresh >= 0) A.at(fresh, "new");
+      return [A];
+    };
+    T.vars.n = n;
+    T.push(0, `Call <code>fizzArray2(${n})</code>.`);
+    a = new Array(n).fill(null); T.vars.newArray = a;
+    T.push(1, n ? `<code>new String[${n}]</code> makes ${n} box${n === 1 ? "" : "es"}. Until something is stored in them, each String box holds <code>null</code> — "no String yet".` : `<code>new String[0]</code> makes an empty array.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; fresh = -1;
+      if (i >= n) { T.push(3, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(3, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      a[i] = String(i); fresh = i; T.vars.newArray = a;
+      T.push(4, `<code>""+${i}</code>: adding a number to a String makes a String, so this is <code>"${i}"</code> (with quotes), not the number ${i}. Store it in <code>newArray[${i}]</code>.`);
+    }
+    delete T.vars.i; i = null; fresh = -1;
+    T.ret(7, `<code>return newArray</code> → <code>${T.fmt(a)}</code>.`, a.slice());
+  }
+});
+</script>
+</body>
+</html>

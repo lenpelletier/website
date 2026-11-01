@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>modThree Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>modThree: three evens or three odds in a row?</h1>
+  <p class="sub">Given an array of ints, return true if it contains either 3 even or 3 odd values all next to each other. Step through <code>modThree</code>: a small helper method, <code>isEven</code>, keeps the long condition readable. Each pass looks at a window of three neighbours.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "modThree",
+  wide: true,
+  code: [
+    "public boolean modThree(int[] nums) {",
+    "  for (int i = 0; i < nums.length-2; i++)",
+    "  {",
+    "    if ( (isEven(nums[i]) && isEven(nums[i+1]) && isEven(nums[i+2])) ||",
+    "         (!isEven(nums[i]) && !isEven(nums[i+1]) && !isEven(nums[i+2])) )",
+    "      return true;",
+    "  }",
+    "  return false;",
+    "}",
+    "public boolean isEven(int x) {",
+    "  return x % 2 == 0;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [2, 1, 3, 5], width: 240 }],
+  presets: [[[2, 1, 3, 5]], [[2, 1, 2, 5]], [[2, 4, 2, 5]], [[1, 2, 1, 2, 1]], [[9, 9, 9]], [[1, 2, 1]], [[1, 2]], [[1]], [[]], [[9, 7, 2, 9]], [[9, 7, 2, 9, 2, 2]], [[9, 7, 2, 9, 2, 2, 6]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["inner", "<code>nums[i+1]</code> and <code>nums[i+2]</code>"],
+    ["match", "three of a kind in a row"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, win = false, found = false, helper = false;
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      if (i !== null) {
+        A.top(i, `i=${i} ▼`);
+        if (win) {
+          A.at(i, "outer").at(i + 1, "win2").at(i + 2, "win2");
+          for (let k = i; k < i + 3; k++) A.badge(k, nums[k] % 2 === 0 ? "even" : "odd", found ? "ok" : "mid");
+          if (found) A.cls(i, i + 3, "hit");
+        }
+      }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>modThree(${T.fmt(nums)})</code>.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; win = false;
+      if (i >= n - 2) { T.push(1, `<code>i = ${i}</code>: <code>${i} &lt; ${n - 2}</code> is <b>false</b>. ${n >= 3 ? "Every window of three has been checked." : "There aren't three boxes to check."}`); break; }
+      T.push(1, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n - 2}</code> is <b>true</b>.`);
+      win = true;
+      const ev = [0, 1, 2].map(k => nums[i + k] % 2 === 0);
+      if (!helper) {
+        helper = true;
+        T.push(10, `The condition calls the helper <code>isEven</code>. For example, <code>isEven(${nums[i]})</code> runs this line: <code>${nums[i]} % 2 == 0</code> → <b>${ev[0]}</b>. It gets called once for each box in the window.`);
+      }
+      const allE = ev.every(Boolean), allO = ev.every(e => !e);
+      const c1 = ["all three isEven", `${ev.join(", ")} → ${allE}`, allE];
+      T.push(3, allE ? `${nums[i]}, ${nums[i + 1]}, ${nums[i + 2]} are all even!` : `${nums[i]}, ${nums[i + 1]}, ${nums[i + 2]} are not all even, so try the second half of the <code>||</code>.`, { chk: [c1] });
+      if (allE) { found = true; T.ret(5, `<code>return true</code>.`, true, { chk: [c1] }); return; }
+      const c2 = ["all three !isEven", `${ev.map(e => !e).join(", ")} → ${allO}`, allO];
+      if (allO) found = true;
+      T.push(4, allO ? `They're all odd!` : `They aren't all odd either.`, { chk: [c1, c2] });
+      if (allO) { T.ret(5, `<code>return true</code>.`, true, { chk: [c1, c2] }); return; }
+    }
+    delete T.vars.i; i = null;
+    T.ret(7, `<code>return false</code>.`, false);
+  }
+});
+</script>
+</body>
+</html>

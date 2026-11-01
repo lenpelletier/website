@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>only14 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>only14: nothing but 1s and 4s?</h1>
+  <p class="sub">Given an array of ints, return true if every element is a 1 or a 4. Step through <code>only14</code>: <code>!( … || … )</code> is true when a number is <em>neither</em> 1 nor 4 — finding even one of those is enough to answer false.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "only14",
+  code: [
+    "public boolean only14(int[] nums) {",
+    "  for (int i = 0; i < nums.length; i++) {",
+    "    if (!(nums[i] == 1 || nums[i] == 4))",
+    "      return false;",
+    "  }",
+    "  return true;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 4, 1, 4], width: 240 }],
+  presets: [[[1, 4, 1, 4]], [[1, 4, 2, 4]], [[1, 1]], [[4, 1]], [[2]], [[]], [[1, 4, 1, 3]], [[3, 1, 3]], [[1]], [[4]], [[3, 4]], [[1, 3, 4]], [[1, 1, 1]], [[1, 1, 1, 5]], [[4, 1, 4, 1]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["match", "a 1 or a 4"],
+    ["bad", "something else"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, ok = [], bad = null;
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      ok.forEach(k => A.at(k, "soft"));
+      if (bad !== null) A.at(bad, "miss");
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>only14(${T.fmt(nums)})</code>.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i;
+      if (i >= n) { T.push(1, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>. ${n ? "Every box was a 1 or a 4." : "The array is empty, so there's nothing that isn't a 1 or 4."}`); break; }
+      T.push(1, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = nums[i], inner = x === 1 || x === 4;
+      const chk = [["nums[i] == 1 || nums[i] == 4", `${x === 1 ? "true" : `false || ${x === 4}`} → ${inner}`, inner], ["!( … )", String(!inner), !inner]];
+      T.push(2, inner ? `<code>nums[${i}]</code> is ${x}, so the inside is true and the <code>!</code> flips it to false. Keep going.` : `<code>nums[${i}]</code> is ${x} — neither 1 nor 4. The inside is false, so <code>!( … )</code> is <b>true</b>.`, { chk });
+      if (!inner) { bad = i; T.ret(3, `<code>return false</code>.`, false, { chk }); return; }
+      ok.push(i);
+    }
+    delete T.vars.i; i = null;
+    T.ret(5, `<code>return true</code>.`, true);
+  }
+});
+</script>
+</body>
+</html>

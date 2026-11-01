@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>withoutTen Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>withoutTen: remove the 10s</h1>
+  <p class="sub">Return a version of the array with all the 10's removed. The remaining elements shift left toward the start, and the empty spaces at the end become 0. So <code>{1, 10, 10, 2}</code> gives <code>{1, 2, 0, 0}</code>. Step through <code>withoutTen</code>: <code>i</code> reads every box of <code>nums</code>, but <code>j</code> only moves when something is actually copied, so the kept values pack together on the left.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "withoutTen",
+  code: [
+    "public int[] withoutTen(int[] nums) {",
+    "  int[] newArray = new int[nums.length];",
+    "  int j = 0;",
+    "",
+    "  for (int i = 0; i < nums.length; i++) {",
+    "    if (nums[i] != 10) {",
+    "      newArray[j] = nums[i];",
+    "      j++;",
+    "    }",
+    "  }",
+    "",
+    "  return newArray;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 10, 10, 2], width: 240 }],
+  presets: [[[1, 10, 10, 2]], [[10, 2, 10]], [[1, 99, 10]], [[10, 13, 10, 14]], [[10, 13, 10, 14, 10]], [[10, 10, 3]], [[1]], [[13, 1]], [[10]], [[]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["bad", "a 10, skipped"],
+    ["match", "just copied to <code>newArray[j]</code>"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let b = null, i = null, j = null, fresh = -1, tens = [];
+    const w = Math.max(42, ...nums.map(x => String(x).length * 12 + 26));
+    T.view = () => {
+      const A = T.arr("nums", nums, w), list = [A];
+      tens.forEach(k => A.at(k, "miss"));
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      if (b) {
+        const B = T.arr("newArray", b, w);
+        if (j !== null && j < n) B.top(j, `j=${j} ▼`, "match");
+        if (fresh >= 0) B.at(fresh, "new");
+        list.push(B);
+      }
+      return list;
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>withoutTen(${T.fmt(nums)})</code>.`);
+    b = new Array(n).fill(0); T.vars.newArray = b;
+    T.push(1, `<code>new int[${n}]</code> starts as all 0s — so any boxes left over at the end will already be 0.`);
+    j = 0; T.vars.j = 0;
+    T.push(2, `<code>j = 0</code>: where the next kept value goes.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; fresh = -1;
+      if (i >= n) { T.push(4, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(4, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = nums[i], keep = x !== 10, chk = [["nums[i] != 10", `${x} != 10 → ${keep}`, keep]];
+      if (!keep) tens.push(i);
+      T.push(5, keep ? `<code>nums[${i}]</code> is ${x}, so keep it.` : `<code>nums[${i}]</code> is 10 — skip it. <code>j</code> stays at ${j}.`, { chk });
+      if (keep) {
+        b[j] = x; fresh = j; T.vars.newArray = b;
+        T.push(6, `<code>newArray[${j}] = ${x}</code>.`, { chk });
+        j++; T.vars.j = j;
+        T.push(7, `<code>j++</code> → ${j}.`, { chk });
+      }
+    }
+    delete T.vars.i; i = null; fresh = -1;
+    T.ret(11, `<code>return newArray</code> → <code>${T.fmt(b)}</code>.`, b.slice());
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>post4 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>post4: everything after the last 4</h1>
+  <p class="sub">Given a non-empty array of ints, return a new array containing the elements that come after the last 4. The array will contain at least one 4. Step through <code>post4</code>: this time the <code>while</code> loop starts at the <em>end</em> and walks backwards, so the first 4 it meets is the last 4 in the array.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "post4",
+  code: [
+    "public int[] post4(int[] nums) {",
+    "",
+    "  int a = nums.length-1;",
+    "  while (nums[a] != 4) a--;",
+    "",
+    "  int start = a+1;",
+    "  int[] newArray = new int[nums.length - start];",
+    "  for (int i = 0; i < newArray.length; i++)",
+    "    newArray[i] = nums[i+start];",
+    "",
+    "  return newArray;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [2, 4, 1, 2], width: 240 }],
+  presets: [[[2, 4, 1, 2]], [[4, 1, 4, 2]], [[4, 4, 1, 2, 3]], [[4, 2]], [[4, 4, 1, 2, 3]], [[4, 4]], [[4]], [[2, 4, 1, 4, 3, 2]], [[4, 1, 4, 2, 2, 2]], [[3, 4, 3, 2]], [[7, 4, 4]]],
+  validate([nums]) {
+    if (!nums.includes(4)) return `<code>nums</code> must contain a 4 — otherwise the <code>while</code> loop would run past the start of the array and throw an exception.`;
+  },
+  legend: [
+    ["outer", "<code>nums[a]</code> / <code>nums[i+start]</code>"],
+    ["inner", "the last 4"],
+    ["match", "just copied"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let a = null, found = false, start = null, b = null, i = null, fresh = -1;
+    const w = Math.max(42, ...nums.map(x => String(x).length * 12 + 26));
+    T.view = () => {
+      const A = T.arr("nums", nums, w), list = [A];
+      if (a !== null) { if (found) A.at(a, "win2").bot(a, "▲ a"); else A.at(a, "outer").top(a, `a=${a} ▼`); }
+      if (start !== null && start < n && i === null && !b) A.bot(start, "▲ start", "match");
+      if (b) {
+        const B = T.arr("newArray", b, w);
+        if (i !== null) { B.top(i, `i=${i} ▼`); if (i < b.length) { B.at(i, "outer"); A.at(i + start, "outer").top(i + start, "i+start ▼"); } }
+        if (fresh >= 0) B.at(fresh, "new");
+        list.push(B);
+      }
+      return list;
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>post4(${T.fmt(nums)})</code>.`);
+    a = n - 1; T.vars.a = a;
+    T.push(2, `<code>a = nums.length-1</code> → ${a}, the last box.`);
+    for (;;) {
+      const not4 = nums[a] !== 4, chk = [["nums[a] != 4", `${nums[a]} != 4 → ${not4}`, not4]];
+      if (!not4) { found = true; T.push(3, `<code>nums[${a}]</code> is 4 — the last 4 in the array. The <code>while</code> loop stops.`, { chk }); break; }
+      T.push(3, `<code>nums[${a}]</code> is ${nums[a]}, not 4, so <code>a--</code> → ${a - 1}.`, { chk });
+      a--; T.vars.a = a;
+    }
+    start = a + 1; T.vars.start = start;
+    T.push(5, `<code>start = a+1</code> → ${start}, the first box after the 4.${start === n ? " That's past the end — nothing comes after this 4." : ""}`);
+    b = new Array(n - start).fill(0); T.vars.newArray = b;
+    T.push(6, `<code>nums.length - start</code> is <code>${n} - ${start}</code> → ${n - start}. <code>new int[${n - start}]</code> has room for everything after the 4.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; fresh = -1;
+      if (i >= b.length) { T.push(7, `<code>i = ${i}</code>: <code>${i} &lt; ${b.length}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(7, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${b.length}</code> is <b>true</b>.`);
+      b[i] = nums[i + start]; fresh = i; T.vars.newArray = b;
+      T.push(8, `<code>newArray[${i}] = nums[${i}+${start}]</code> → ${nums[i + start]}. Adding <code>start</code> shifts the index past the 4.`);
+    }
+    delete T.vars.i; i = null; fresh = -1;
+    T.ret(10, `<code>return newArray</code> → <code>${T.fmt(b)}</code>.`, b.slice());
+  }
+});
+</script>
+</body>
+</html>

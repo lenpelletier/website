@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>either24 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>either24: 2-2 or 4-4, but not both</h1>
+  <p class="sub">Given an array of ints, return true if it contains a 2 next to a 2 or a 4 next to a 4, but not both. Step through <code>either24</code>: the loop just records whether each kind of pair exists, and the final <code>return</code> does the "one but not both" logic.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "either24",
+  code: [
+    "public boolean either24(int[] nums) {",
+    "  boolean pair2 = false;",
+    "  boolean pair4 = false;",
+    "  for (int i = 0; i < nums.length - 1; i++)",
+    "  {",
+    "    if (nums[i] == 2 && nums[i+1] == 2)",
+    "      pair2 = true;",
+    "    if (nums[i] == 4 && nums[i+1] == 4)",
+    "      pair4 = true;",
+    "  }",
+    "",
+    "  return (pair2 || pair4) && !(pair2 && pair4);",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [4, 4, 1, 2, 2], width: 240 }],
+  presets: [[[1, 2, 2]], [[4, 4, 1]], [[4, 4, 1, 2, 2]], [[1, 2, 3, 4]], [[3, 5, 9]], [[1, 2, 3, 4, 4]], [[2, 2, 3, 4]], [[1, 2, 3, 2, 2, 4]], [[1, 2, 3, 2, 2, 4, 4]], [[1, 2]], [[2, 2]], [[4, 4]], [[2]], [[]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["inner", "<code>nums[i+1]</code>"],
+    ["match", "a 2-2 pair"],
+    ["bad", "a 4-4 pair"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, pair = false, p2s = [], p4s = [];
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      p2s.forEach(k => A.cls(k, k + 2, "hit")); p4s.forEach(k => A.cls(k, k + 2, "miss"));
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (pair) A.at(i, "outer").at(i + 1, "inner").bot(i + 1, "▲ i+1"); }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>either24(${T.fmt(nums)})</code>.`);
+    let p2 = false, p4 = false;
+    T.vars.pair2 = false; T.push(1, `<code>pair2 = false</code>.`);
+    T.vars.pair4 = false; T.push(2, `<code>pair4 = false</code>.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; pair = false;
+      if (i >= n - 1) { T.push(3, `<code>i = ${i}</code>: <code>${i} &lt; ${n - 1}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(3, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n - 1}</code> is <b>true</b>.`);
+      pair = true;
+      const a = nums[i], b = nums[i + 1], is2 = a === 2 && b === 2, is4 = a === 4 && b === 4;
+      const c1 = ["nums[i] == 2 &amp;&amp; nums[i+1] == 2", `${a}, ${b} → ${is2}`, is2];
+      T.push(5, is2 ? `${a}, ${b} is a pair of 2s.` : `${a}, ${b} isn't a pair of 2s.`, { chk: [c1] });
+      if (is2) { p2 = true; T.vars.pair2 = true; p2s.push(i); T.push(6, `<code>pair2 = true</code>.`, { chk: [c1] }); }
+      const c2 = ["nums[i] == 4 &amp;&amp; nums[i+1] == 4", `${a}, ${b} → ${is4}`, is4];
+      T.push(7, is4 ? `${a}, ${b} is a pair of 4s.` : `It isn't a pair of 4s either.`, { chk: [c1, c2] });
+      if (is4) { p4 = true; T.vars.pair4 = true; p4s.push(i); T.push(8, `<code>pair4 = true</code>.`, { chk: [c1, c2] }); }
+    }
+    delete T.vars.i; i = null;
+    const any = p2 || p4, both = p2 && p4, r = any && !both;
+    T.ret(11, `<code>pair2 || pair4</code> is ${any} (at least one kind of pair), and <code>!(pair2 &amp;&amp; pair4)</code> is ${!both} (${both ? "but there are both kinds" : "not both kinds"}). So the answer is <b>${r}</b>.`, r,
+      { chk: [["pair2 || pair4", `${p2} || ${p4} → ${any}`, any], ["!(pair2 &amp;&amp; pair4)", String(!both), !both]] });
+  }
+});
+</script>
+</body>
+</html>

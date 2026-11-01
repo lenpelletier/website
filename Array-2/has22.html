@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>has22 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>has22: a 2 next to a 2?</h1>
+  <p class="sub">Given an array of ints, return true if the array contains a 2 next to a 2 somewhere. Step through <code>has22</code>: each pass looks at a pair of neighbours, <code>nums[i]</code> and <code>nums[i+1]</code>. The loop stops one box early so that <code>i+1</code> is never past the end.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "has22",
+  code: [
+    "public boolean has22(int[] nums) {",
+    "",
+    "   for (int i = 0; i < nums.length-1; i++) {",
+    "      if (nums[i] == 2 && nums[i+1] == 2) {",
+    "          return true;",
+    "      }",
+    "   }",
+    "   return false;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 1, 2, 2], width: 240 }],
+  presets: [[[1, 2, 2]], [[1, 2, 1, 2]], [[2, 1, 2]], [[2, 2, 1, 2]], [[1, 3, 2]], [[1, 3, 2, 2]], [[2, 3, 2, 2]], [[4, 2, 4, 2, 2, 5]], [[1, 2]], [[2, 2]], [[2]], [[]], [[3, 3, 2, 2]], [[5, 2, 5, 2]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["inner", "<code>nums[i+1]</code>"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, pair = false, found = false;
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      if (i !== null) {
+        A.top(i, `i=${i} ▼`);
+        if (pair) A.cls(i, i + 2, found ? "hit" : "win").at(i, "outer").at(i + 1, "inner").bot(i + 1, "▲ i+1");
+      }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>has22(${T.fmt(nums)})</code>.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i; pair = false;
+      if (i >= n - 1) { T.push(2, `<code>i = ${i}</code>: <code>${i} &lt; ${n - 1}</code> is <b>false</b>. ${n > 1 ? "Every pair of neighbours has been checked." : "There aren't two boxes to make a pair."}`); break; }
+      T.push(2, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n - 1}</code> is <b>true</b>.`);
+      pair = true;
+      const a = nums[i], b = nums[i + 1], a2 = a === 2, both = a2 && b === 2;
+      const chk = [["nums[i] == 2", `${a} == 2 → ${a2}`, a2], ["nums[i+1] == 2", a2 ? `${b} == 2 → ${b === 2}` : "(skipped)", a2 ? b === 2 : undefined]];
+      T.push(3, both ? `<code>nums[${i}]</code> and <code>nums[${i + 1}]</code> are both 2!` : a2 ? `<code>nums[${i}]</code> is 2, but <code>nums[${i + 1}]</code> is ${b}.` : `<code>nums[${i}]</code> is ${a}, not 2. <code>&amp;&amp;</code> doesn't need to look at <code>nums[${i + 1}]</code>.`, { chk });
+      if (both) { found = true; T.ret(4, `Found a 2 next to a 2. <code>return true</code> — the method stops right here.`, true, { chk }); return; }
+    }
+    delete T.vars.i; i = null;
+    T.ret(7, `No pair of 2s anywhere. <code>return false</code>.`, false);
+  }
+});
+</script>
+</body>
+</html>

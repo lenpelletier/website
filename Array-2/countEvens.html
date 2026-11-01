@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>countEvens Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>countEvens: how many even numbers?</h1>
+  <p class="sub">Return the number of even ints in the given array. Step through <code>countEvens</code>: the loop visits every box, and <code>nums[i] % 2</code> is the remainder after dividing by 2 — it's 0 exactly when the number is even.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "countEvens",
+  code: [
+    "public int countEvens(int[] nums) {",
+    "  int even = 0;",
+    "  for (int i = 0; i < nums.length; i++){",
+    "    if (nums[i] % 2 == 0) {",
+    "       even++;",
+    "    }",
+    "  }",
+    "  return even;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [2, 1, 2, 3, 4], width: 240 }],
+  presets: [[[2, 1, 2, 3, 4]], [[2, 2, 0]], [[1, 3, 5]], [[]], [[11, 9, 0, 1]], [[2, 11, 9, 0]], [[2]], [[2, 5, 12]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["match", "even, counted"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, hits = [];
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      hits.forEach(k => A.at(k, "hit"));
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>countEvens(${T.fmt(nums)})</code>.`);
+    let even = 0; T.vars.even = 0;
+    T.push(1, `<code>even = 0</code>. It will count the even numbers.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i;
+      if (i >= n) { T.push(2, `<code>i = ${i}</code>: <code>${i} &lt; ${n}</code> is <b>false</b> — ${n ? "every box has been checked" : "the array is empty, so the loop never runs"}.`); break; }
+      T.push(2, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt; ${n}</code> is <b>true</b>.`);
+      const x = nums[i], ev = x % 2 === 0, chk = [["nums[i] % 2 == 0", `${x} % 2 = ${x % 2} → ${ev}`, ev]];
+      T.push(3, `<code>nums[${i}]</code> is ${x}. <code>${x} % 2</code> is ${x % 2}, so it's ${ev ? "<b>even</b>" : "odd"}.`, { chk });
+      if (ev) { even++; T.vars.even = even; hits.push(i); T.push(4, `<code>even++</code> → <code>even = ${even}</code>.`, { chk }); }
+    }
+    delete T.vars.i; i = null;
+    T.ret(7, `<code>return even</code> → <code>${even}</code>.`, even);
+  }
+});
+</script>
+</body>
+</html>

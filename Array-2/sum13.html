@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sum13 Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>sum13: add up, but 13 is unlucky</h1>
+  <p class="sub">Return the sum of the numbers in the array, returning 0 for an empty array. Except the number 13 is very unlucky, so it doesn't count, and the number right after a 13 doesn't count either. Step through <code>sum13</code>: a number is added only if it isn't 13 <em>and</em> the number before it isn't 13. Checking <code>i == 0</code> first keeps <code>nums[i-1]</code> from looking before the start of the array.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "sum13",
+  code: [
+    "public int sum13(int[] nums) {",
+    "  int sum = 0;",
+    "  for (int i = 0; i <= nums.length-1; i++) {",
+    "    //a 13 doesn't count, and neither does the number right after a 13",
+    "    if (nums[i] != 13 && (i == 0 || nums[i-1] != 13))",
+    "      sum += nums[i];",
+    "  }",
+    "",
+    "  return sum;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [1, 2, 13, 2, 1, 13], width: 240 }],
+  presets: [[[1, 2, 2, 1]], [[1, 1]], [[1, 2, 2, 1, 13]], [[1, 2, 13, 2, 1, 13]], [[13, 1, 2, 13, 2, 1, 13]], [[]], [[13]], [[13, 13]], [[13, 0, 13]], [[13, 1, 13]], [[5, 7, 2]], [[5, 13, 2]], [[0]], [[13, 0]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["match", "added to <code>sum</code>"],
+    ["bad", "not counted"]
+  ],
+  trace([nums], T) {
+    const n = nums.length;
+    let i = null, hits = [], gone = [];
+    T.view = () => {
+      const A = T.arr("nums", nums);
+      hits.forEach(k => A.at(k, "hit")); gone.forEach(k => A.at(k, "miss"));
+      if (i !== null) { A.top(i, `i=${i} ▼`); if (i < n) A.at(i, "outer"); }
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>sum13(${T.fmt(nums)})</code>.`);
+    let sum = 0; T.vars.sum = 0;
+    T.push(1, `<code>sum = 0</code>.`);
+    for (i = 0; ; i++) {
+      T.vars.i = i;
+      if (i > n - 1) { T.push(2, `<code>i = ${i}</code>: <code>${i} &lt;= ${n - 1}</code> is <b>false</b>, so the loop ends.`); break; }
+      T.push(2, `${i === 0 ? "Loop starts at" : "Loop:"} <code>i = ${i}</code>. <code>${i} &lt;= ${n - 1}</code> is <b>true</b>.`);
+      const x = nums[i], not13 = x !== 13, first = i === 0, prevOk = first || nums[i - 1] !== 13, ok = not13 && prevOk;
+      const chk = [["nums[i] != 13", `${x} != 13 → ${not13}`, not13]];
+      if (!not13) chk.push(["i == 0 || nums[i-1] != 13", "(skipped)"]);
+      else chk.push(["i == 0 || nums[i-1] != 13", first ? "0 == 0 → true" : `${i} == 0 → false, ${nums[i - 1]} != 13 → ${prevOk}`, prevOk]);
+      if (!ok) gone.push(i);
+      T.push(4, !not13 ? `<code>nums[${i}]</code> is 13 — unlucky! <code>&amp;&amp;</code> stops right away, and it isn't added.`
+        : !prevOk ? `<code>nums[${i}]</code> is ${x}, but the number before it, <code>nums[${i - 1}]</code>, is 13 — so this one doesn't count either.`
+        : first ? `<code>nums[0]</code> is ${x}, not 13. It's the first box, so there's no number before it to check (<code>i == 0</code> is true, and <code>||</code> stops there).`
+        : `<code>nums[${i}]</code> is ${x}, not 13, and the number before it (${nums[i - 1]}) isn't 13 either.`, { chk });
+      if (ok) {
+        sum += x; T.vars.sum = sum; hits.push(i);
+        T.push(5, `<code>sum += ${x}</code> → <code>sum = ${sum}</code>.`, { chk });
+      }
+    }
+    delete T.vars.i; i = null;
+    T.ret(8, `<code>return sum</code> → <code>${sum}</code>.`, sum);
+  }
+});
+</script>
+</body>
+</html>

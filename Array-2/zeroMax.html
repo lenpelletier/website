@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>zeroMax Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracer.css">
+</head>
+<body>
+<main>
+  <h1>zeroMax: replace zeros with the largest odd to the right</h1>
+  <p class="sub">Return a version of the array where each zero is replaced by the largest odd value to its right. If there is no odd value to the right of a zero, leave it as zero. Step through <code>zeroMax</code>: the loop runs <em>backwards</em>, from right to left, so <code>biggest</code> always holds the largest odd value seen so far to the right. This code changes the array it was given and returns it.</p>
+  <div id="app"></div>
+</main>
+<script src="tracer.js"></script>
+<script>
+Tracer({
+  name: "zeroMax",
+  wide: true,
+  code: [
+    "public int[] zeroMax(int[] nums) {",
+    "  int len = nums.length;",
+    "  if (len <= 0) return nums;",
+    "",
+    "  int biggest = nums[len-1];",
+    "",
+    "  if (biggest % 2 == 0) {",
+    "    biggest = 0;",
+    "  }",
+    "  for (int i = len - 2; i >= 0; i--) {",
+    "    if (nums[i] == 0) {",
+    "      nums[i] = biggest;",
+    "    } else {",
+    "      int testbiggest = Math.max(biggest, nums[i]);",
+    "      if (testbiggest % 2 == 1) {",
+    "        biggest = testbiggest;",
+    "      }",
+    "    }",
+    "  }",
+    "  return nums;",
+    "}"
+  ],
+  inputs: [{ id: "nums", kind: "array", value: [0, 5, 0, 3], width: 240 }],
+  presets: [[[0, 5, 0, 3]], [[0, 4, 0, 3]], [[0, 1, 0]], [[0, 1, 5]], [[0, 2, 0]], [[1]], [[0]], [[]], [[7, 0, 4, 3, 0, 2]], [[7, 0, 4, 3, 0, 1]], [[7, 0, 4, 3, 0, 0]], [[7, 0, 1, 0, 0, 7]]],
+  legend: [
+    ["outer", "<code>nums[i]</code>"],
+    ["inner", "where <code>biggest</code> came from"],
+    ["match", "a zero just replaced"]
+  ],
+  trace([nums], T) {
+    const len = nums.length, orig = nums.slice();
+    let i = null, bAt = null, fresh = -1;
+    const w = Math.max(42, ...nums.map(x => String(x).length * 12 + 26));
+    T.view = () => {
+      const A = T.arr("nums", nums, w);
+      if (bAt !== null) A.at(bAt, "win2").bot(bAt, "▲ biggest");
+      if (i !== null && i >= 0) A.top(i, `i=${i} ▼`).at(i, "outer");   // i ends at -1, just off the front
+      if (fresh >= 0) A.at(fresh, "new");
+      return [A];
+    };
+    T.vars.nums = nums;
+    T.push(0, `Call <code>zeroMax(${T.fmt(orig)})</code>.`);
+    T.vars.len = len; T.push(1, `<code>len = ${len}</code>.`);
+    const e = len <= 0, c0 = ["len &lt;= 0", `${len} <= 0 → ${e}`, e];
+    if (e) { T.ret(2, `The array is empty — nothing to do. <code>return nums</code>.`, [], { chk: [c0] }); return; }
+    T.push(2, `<code>${len} &lt;= 0</code> is <b>false</b>.`, { chk: [c0] });
+    let big = nums[len - 1]; bAt = len - 1; T.vars.biggest = big;
+    T.push(4, `<code>biggest = nums[${len - 1}]</code> → ${big}. Start with the last box.`);
+    const ev = big % 2 === 0, c1 = ["biggest % 2 == 0", `${big} % 2 = ${big % 2} → ${ev}`, ev];
+    T.push(6, ev ? `${big} is even, so it can't be the answer for any zero.` : `${big} is odd, so it's a candidate.`, { chk: [c1] });
+    if (ev) { big = 0; bAt = null; T.vars.biggest = 0; T.push(7, `<code>biggest = 0</code>. 0 means "no odd value found yet" — a zero replaced by 0 stays 0.`, { chk: [c1] }); }
+    for (i = len - 2; ; i--) {
+      T.vars.i = i; fresh = -1;
+      if (i < 0) { T.push(9, `<code>i = ${i}</code>: <code>${i} &gt;= 0</code> is <b>false</b> — the loop has reached the front.`); break; }
+      T.push(9, `${i === len - 2 ? `Loop starts at <code>i = len - 2</code> = ${i} (the last box was handled above) and counts down.` : `Loop: <code>i--</code> → <code>i = ${i}</code>.`} <code>${i} &gt;= 0</code> is <b>true</b>.`);
+      const x = nums[i], z = x === 0, c2 = ["nums[i] == 0", `${x} == 0 → ${z}`, z];
+      if (z) {
+        T.push(10, `<code>nums[${i}]</code> is a zero.`, { chk: [c2] });
+        nums[i] = big; fresh = i; T.vars.nums = nums;
+        T.push(11, `<code>nums[${i}] = biggest</code> → ${big}.${big === 0 ? " No odd value to its right, so it stays 0." : ""}`, { chk: [c2] });
+      } else {
+        T.push(10, `<code>nums[${i}]</code> is ${x}, not zero. Go to the <code>else</code>.`, { chk: [c2] });
+        const t = Math.max(big, x); T.vars.testbiggest = t;
+        T.push(13, `<code>Math.max(${big}, ${x})</code> → <code>testbiggest = ${t}</code>.`, { chk: [c2] });
+        const odd = t % 2 === 1, c3 = ["testbiggest % 2 == 1", `${t} % 2 = ${t % 2} → ${odd}`, odd];
+        T.push(14, odd ? (t !== big ? `${t} is odd and bigger than before.` : `${t} is odd (it's still the same biggest).`) : `${t} is even, so it can't replace <code>biggest</code>.`, { chk: [c2, c3] });
+        if (odd) { if (t !== big) bAt = i; big = t; T.vars.biggest = big; T.push(15, `<code>biggest = ${big}</code>.`, { chk: [c2, c3] }); }
+        delete T.vars.testbiggest;
+      }
+    }
+    delete T.vars.i; i = null; fresh = -1;
+    T.ret(19, `<code>return nums</code> → <code>${T.fmt(nums)}</code>.`, nums.slice());
+  }
+});
+</script>
+</body>
+</html>

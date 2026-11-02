@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PPAP Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Shared styles for the String-2 loop tracers.
+   Same palette and layout as AbecedarianAnimation.html / ScrabbleAnimation.html. */
+:root {
+  --bg: #f6f5f0;
+  --panel: #ffffff;
+  --border: #dcd9cf;
+  --text: #23241f;
+  --muted: #6b6a62;
+  --outer: #e07b00;     /* the main loop index */
+  --inner: #0a8fb0;     /* a second index / helper position */
+  --match: #4f9a12;
+  --bad: #d0284f;
+  --cell: #fbfaf6;
+  --code-bg: #272822;
+  --code-hl: #49483e;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1c18;
+    --panel: #23241f;
+    --border: #3a3b34;
+    --text: #f0efe8;
+    --muted: #a09f95;
+    --outer: #fd971f;
+    --inner: #66d9ef;
+    --match: #a6e22e;
+    --bad: #f92672;
+    --cell: #2c2d27;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1b1c18;
+  --panel: #23241f;
+  --border: #3a3b34;
+  --text: #f0efe8;
+  --muted: #a09f95;
+  --outer: #fd971f;
+  --inner: #66d9ef;
+  --match: #a6e22e;
+  --bad: #f92672;
+  --cell: #2c2d27;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, sans-serif;
+  line-height: 1.45;
+}
+main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+main.wide { max-width: 1400px; }   /* pages whose code has long lines */
+h1 { font-size: 1.5rem; margin: 0 0 4px; }
+.sub { color: var(--muted); margin: 0 0 20px; max-width: 900px; }
+code, .mono { font-family: "Victor Mono", ui-monospace, monospace; font-variant-ligatures: none; }
+a { color: var(--inner); }
+
+/* Navigation between problems */
+.nav { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; font-size: 0.85rem; margin-bottom: 14px; }
+.nav a { color: var(--muted); text-decoration: none; }
+.nav a:hover { color: var(--text); text-decoration: underline; }
+.nav .home { font-weight: 600; }
+.nav .pn { display: flex; gap: 14px; }
+.nav .spacer { flex: 1; }
+
+/* Controls */
+.controls {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px; margin-bottom: 16px;
+}
+.controls input[type=text], .controls input[type=number] {
+  font: 600 1rem "Victor Mono", monospace; font-variant-ligatures: none;
+  padding: 7px 10px; border-radius: 6px; width: 170px; max-width: 100%;
+  border: 1px solid var(--border); background: var(--cell); color: var(--text);
+}
+.controls input[type=number] { width: 70px; }
+.controls select, .controls button {
+  font: 600 0.9rem Inter, sans-serif;
+  padding: 7px 12px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--cell); color: var(--text);
+}
+.controls button.primary { background: var(--outer); border-color: var(--outer); color: #1b1c18; }
+.controls button:disabled { opacity: 0.4; cursor: default; }
+.controls label { font-size: 0.85rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.controls .spacer { flex: 1; }
+
+/* Layout */
+.grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; }
+.grid.wide { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+@media (max-width: 860px) { .grid, .grid.wide { grid-template-columns: minmax(0, 1fr); } }
+.card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; min-width: 0;
+}
+.card h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 12px; }
+
+/* Code panel (always Monokai, to match the answer-key screenshots) */
+pre.code {
+  margin: 0; background: var(--code-bg); color: #f8f8f2;
+  border-radius: 8px; padding: 12px 0; overflow-x: auto;
+  font: 13px/1.6 "Victor Mono", monospace;
+}
+/* No ligatures: students should see <=, != and ==, not a fused glyph. */
+pre.code, .narr code, .frame table, .cell, .strip-label, .result, .controls input { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+pre.code .ln { display: block; padding: 0 14px; white-space: pre; border-left: 4px solid transparent; transition: background .15s; }
+pre.code .ln.active { background: var(--code-hl); border-left-color: var(--outer); }
+pre.code .ln.active.in { border-left-color: var(--inner); }
+.k { color: #f92672; } .t { color: #66d9ef; font-style: italic; }
+.f { color: #a6e22e; } .n { color: #ae81ff; } .s { color: #e6db74; }
+.cm { color: #75715e; font-style: italic; }
+
+/* String strips */
+.strip-label { font: 600 0.9rem "Victor Mono", monospace; margin: 4px 0 2px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.strip-label .tag { font: 600 0.7rem Inter, sans-serif; text-transform: uppercase; letter-spacing: 0.06em; padding: 1px 7px; border-radius: 999px; background: color-mix(in srgb, var(--inner) 20%, transparent); color: var(--inner); }
+.strip-label .tag.outer { background: color-mix(in srgb, var(--outer) 20%, transparent); color: var(--outer); }
+.strip-label .tag.match { background: color-mix(in srgb, var(--match) 22%, transparent); color: var(--match); }
+.strip-wrap { overflow-x: auto; padding-bottom: 4px; margin-bottom: 8px; position: relative; scroll-behavior: smooth; }
+.strip { display: grid; grid-auto-flow: column; grid-auto-columns: var(--cw, 42px); gap: 5px; width: max-content; }
+.col { display: grid; grid-template-rows: 20px 42px 20px; gap: 3px; justify-items: center; align-items: center; min-width: 0; grid-template-columns: minmax(0, 1fr); }   /* long pointer labels overflow instead of pushing the box sideways */
+.strip.none, .strip.none .col { grid-auto-columns: auto; grid-template-columns: auto; }   /* the "empty" placeholder sizes to its text */
+.strip.badges .col { grid-template-rows: 20px 42px 20px 24px; }
+.ptr { font: 600 12px "Victor Mono", monospace; white-space: nowrap; font-variant-ligatures: none; }
+.ptr.outer { color: var(--outer); }
+.ptr.inner { color: var(--inner); }
+.ptr.match { color: var(--match); }
+.ptr.bad { color: var(--bad); }
+.ptr.muted { color: var(--muted); }
+.ptr.l { justify-self: start; margin-left: 17px; }   /* "▲ label": arrow under the middle of the box */
+.ptr.r { justify-self: end; margin-right: 17px; }    /* "label ▼": arrow over the middle of the box */
+.cell {
+  width: var(--cw, 42px); height: 42px; border-radius: 8px;
+  display: grid; place-items: center; position: relative;
+  font: 600 20px "Victor Mono", monospace;
+  background: var(--cell); border: 2px solid var(--border);
+  transition: border-color .15s, background .15s, transform .15s, opacity .15s;
+}
+.cell .idx { position: absolute; top: 1px; left: 4px; font-size: 10px; color: var(--muted); font-weight: 400; }
+.cell.space { color: var(--muted); }
+.cell.ghost { border-style: dashed; background: transparent; color: var(--muted); }
+.cell.empty { width: auto; padding: 0 12px; border-style: dashed; background: transparent; color: var(--muted); font: 400 13px Inter, sans-serif; white-space: nowrap; }
+.cell.win { background: color-mix(in srgb, var(--outer) 16%, var(--cell)); border-color: color-mix(in srgb, var(--outer) 55%, var(--border)); }
+.cell.win2 { background: color-mix(in srgb, var(--inner) 16%, var(--cell)); border-color: color-mix(in srgb, var(--inner) 55%, var(--border)); }
+.cell.outer { border-color: var(--outer); transform: translateY(-3px); }
+.cell.inner { transform: translateY(-3px); box-shadow: 0 0 0 3px color-mix(in srgb, var(--inner) 45%, transparent); }
+.cell.hit { background: color-mix(in srgb, var(--match) 35%, var(--cell)); border-color: var(--match); }
+.cell.soft { background: color-mix(in srgb, var(--match) 14%, var(--cell)); }
+.cell.miss { background: color-mix(in srgb, var(--bad) 22%, var(--cell)); border-color: var(--bad); }
+.cell.new { background: color-mix(in srgb, var(--match) 35%, var(--cell)); border-color: var(--match); transform: translateY(-3px); }
+.cell.done { opacity: 0.35; }
+.cell.nul { color: var(--muted); font: italic 400 13px "Victor Mono", monospace; }   /* an empty slot in a new String[] */
+.badge {
+  font: 600 11px "Victor Mono", monospace; padding: 2px 6px; border-radius: 999px;
+  white-space: nowrap; font-variant-ligatures: none;
+}
+.badge.ok { background: color-mix(in srgb, var(--match) 25%, transparent); color: var(--match); }
+.badge.no { background: color-mix(in srgb, var(--bad) 22%, transparent); color: var(--bad); }
+.badge.mid { background: color-mix(in srgb, var(--outer) 22%, transparent); color: var(--outer); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--c); }
+
+/* Narration + variables */
+.narr {
+  font-size: 1.02rem; min-height: 3.2em; margin: 16px 0 0;
+  padding: 12px 14px; border-radius: 8px; background: var(--cell); border-left: 4px solid var(--outer);
+}
+.narr.in { border-left-color: var(--inner); }
+.narr.err { border-left-color: var(--bad); }
+.narr code { font-size: 0.95em; }
+.vars { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.vars.one { grid-template-columns: 1fr; }
+@media (max-width: 520px) { .vars { grid-template-columns: 1fr; } }
+.frame { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; transition: opacity .2s; min-width: 0; }
+.frame.idle { opacity: 0.45; }
+.frame h3 { margin: 0 0 6px; font: 600 0.85rem "Victor Mono", monospace; color: var(--outer); }
+.frame.chk h3 { color: var(--inner); }
+.frame table { border-collapse: collapse; width: 100%; font: 14px "Victor Mono", monospace; table-layout: fixed; }
+.frame td { padding: 2px 0; overflow-wrap: anywhere; vertical-align: top; }
+.frame td:first-child { color: var(--muted); width: 45%; padding-right: 8px; }
+.frame td.changed { color: var(--outer); font-weight: 600; }
+.frame.inner h3 { color: var(--inner); }
+.frame.inner td.changed { color: var(--inner); }
+.vars.helper .frame.chk { grid-column: 1 / -1; }   /* with a helper frame, the test spans the full width */
+.ck { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 10px; padding: 3px 0; font: 14px "Victor Mono", monospace; font-variant-ligatures: none; border-bottom: 1px dashed var(--border); }
+.ck:last-child { border-bottom: 0; }
+.ck .e { overflow-wrap: anywhere; }
+.ck .v { margin-left: auto; color: var(--muted); overflow-wrap: anywhere; text-align: right; }
+.ck .v.ok { color: var(--match); font-weight: 600; }
+.ck .v.no { color: var(--bad); font-weight: 600; }
+
+.result { white-space: pre-line;
+  margin-top: 16px; padding: 12px 14px; border-radius: 8px; font-weight: 700; text-align: center;
+  display: none; font-family: "Victor Mono", monospace; overflow-wrap: anywhere;
+}
+.result.on { display: block; }
+.result.true { background: color-mix(in srgb, var(--match) 22%, transparent); color: var(--match); }
+.result.false { background: color-mix(in srgb, var(--bad) 20%, transparent); color: var(--bad); }
+.result.val { background: color-mix(in srgb, var(--outer) 18%, transparent); color: var(--outer); }
+.progress { height: 4px; background: var(--border); border-radius: 2px; margin-top: 14px; overflow: hidden; }
+.progress div { height: 100%; width: 0; background: var(--outer); transition: width .15s; }
+.stepcount { font-size: 0.8rem; color: var(--muted); margin-top: 6px; text-align: right; }
+
+</style>
+</head>
+<body>
+<main>
+  <h1>PPAP: rearrange the lyric</h1>
+  <p class="sub"><code>ppap</code> takes a lyric like <code>"I have a man, I have a dog"</code> and turns it into <code>"Uh! dog man."</code>. Step through it: <code>indexOf</code> finds the comma, <code>substring(9, …)</code> grabs the first thing (index 9 is right after <code>"I have a "</code>), and <code>lastIndexOf(" ")</code> finds the space before the last word.</p>
+  <div id="app"></div>
+</main>
+<script>
+/* -------------------------------------------------------------
+   Program tracer engine (single-page animations)
+   Each problem page calls Tracer({...}) with its Java code, its
+   inputs and a trace(values, T) function that records the steps.
+   The engine builds the controls, the code panel, the string
+   strips, the variable table and the playback.
+   ------------------------------------------------------------- */
+(function () {
+  "use strict";
+
+
+  // ---------- Syntax highlighting (Monokai) ----------
+  const KW = /^(public|static|final|for|while|if|else|return|new)$/;
+  const TY = /^(int|char|boolean|String|void)$/;
+  const LIT = /^(true|false|null)$/;
+  function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function highlightCode(line) {
+    return line.replace(/[A-Za-z_]\w*|\d+|"[^"]*"|'[^']*'|[^\w"']+/g, (tok, off, str) => {
+      const e = esc(tok);
+      if (KW.test(tok)) return `<span class="k">${e}</span>`;
+      if (TY.test(tok)) return `<span class="t">${e}</span>`;
+      if (LIT.test(tok) || /^\d+$/.test(tok)) return `<span class="n">${e}</span>`;
+      if (/^["']/.test(tok)) return `<span class="s">${e}</span>`;
+      if (/^[A-Za-z_]/.test(tok) && /^\s*\(/.test(str.slice(off + tok.length))) return `<span class="f">${e}</span>`;
+      return e;
+    });
+  }
+  function highlight(line) {
+    // Split off a // comment that is not inside a string literal.
+    let inStr = null;
+    for (let k = 0; k < line.length - 1; k++) {
+      const ch = line[k];
+      if (inStr) { if (ch === inStr) inStr = null; }
+      else if (ch === '"' || ch === "'") inStr = ch;
+      else if (ch === "/" && line[k + 1] === "/")
+        return highlightCode(line.slice(0, k)) + `<span class="cm">${esc(line.slice(k))}</span>`;
+    }
+    return highlightCode(line);
+  }
+
+  // ---------- Values ----------
+  function Ch(c) { this.c = c; }
+  function fmt(v) {
+    if (v instanceof Ch) return `'${v.c}'`;
+    if (Array.isArray(v)) return "[" + v.map(x => x === null ? "null" : fmt(x)).join(", ") + "]";
+    if (typeof v === "string") return JSON.stringify(v);
+    return String(v);
+  }
+
+  // A string drawn as a row of boxes, plus the marks for one step.
+  function Strip(name, text) {
+    this.label = `${name} = ${JSON.stringify(text)}`;
+    this.text = text; this.cw = 0; this.c = {}; this.t = {}; this.b = {}; this.g = {}; this.tags = []; this.off = 0;
+  }
+  Strip.prototype = {
+    // add a CSS class to boxes a..b-1 (win, win2, outer, inner, hit, soft, miss, new, done)
+    cls(a, b, name) { for (let k = a; k < b; k++) this.c[k] = (this.c[k] ? this.c[k] + " " : "") + name; return this; },
+    at(i, name) { return this.cls(i, i + 1, name); },
+    top(i, text, color) { return this._ptr(this.t, i, text, color || "outer"); },
+    bot(i, text, color) { return this._ptr(this.b, i, text, color || "inner"); },
+    _ptr(map, i, text, color) { map[i] = map[i] ? { text: map[i].text + " " + text, color: map[i].color } : { text, color }; return this; },
+    badge(i, text, kind) { this.g[i] = { text, kind: kind || "ok" }; return this; },
+    tag(text, color) { this.tags.push({ text, color: color || "" }); return this; },
+    named(label) { this.label = label; return this; },
+    width(px) { this.cw = px; return this; },   // box width, for arrays whose values are wide
+    // mark the boxes str.substring(a, b) takes, with "▲ a" under the start and "▲ b stop" under the end
+    cut(a, b, name) { return this.cls(a, b, name).bot(a, `▲ ${a}`).bot(b, `▲ ${b} stop`, "muted"); },
+    shift(n) { this.off = n; return this; }   // indent the row by n blank boxes (to line strings up)
+  };
+
+  // ---------- Page ----------
+  window.Tracer = function (cfg) {
+    const $ = id => document.getElementById(id);
+    const main = document.querySelector("main");
+    if (cfg.wide) main.classList.add("wide");
+
+    // Controls + panels
+    const inputs = cfg.inputs.map(inp => inp.kind === "bool"
+      ? `<label>${esc(inp.label || inp.id)} <select id="in_${inp.id}">` +
+        ["true", "false"].map(v => `<option${String(inp.value) === v ? " selected" : ""}>${v}</option>`).join("") + `</select></label>`
+      : `<label>${esc(inp.label || inp.id)} <input id="in_${inp.id}" type="${inp.kind === "int" ? "number" : "text"}" ` +
+      `value="${esc(inp.kind === "array" ? inp.value.join(", ") : inp.value)}" spellcheck="false" autocomplete="off"${inp.width ? ` style="width:${inp.width}px"` : ""}></label>`).join("");
+    const presets = cfg.presets.map((p, k) => `<option value="${k}">${esc(argList(p))}</option>`).join("");
+    const legend = (cfg.legend || []).map(([c, h]) => `<span style="--c: var(--${c})">${h}</span>`).join("");
+    $("app").innerHTML = `
+  <div class="controls">
+    ${inputs}
+    ${cfg.presets.length ? `<select id="preset" aria-label="Examples"><option value="">Examples…</option>${presets}</select>` : ""}
+    <button id="reset">${cfg.inputs.length ? "Load" : "Restart"}</button>
+    <span class="spacer"></span>
+    <button id="back" title="Step back (←)">◀ Back</button>
+    <button id="play" class="primary" title="Play / pause (space)">▶ Play</button>
+    <button id="step" title="Step forward (→)">Step ▶</button>
+    <label>Speed <input id="speed" type="range" min="1" max="10" value="5"></label>
+    ${cfg.detail ? `<label><input id="detail" type="checkbox" checked> ${cfg.detail}</label>` : ""}
+  </div>
+  <div class="grid${cfg.wide ? " wide" : ""}">
+    <section class="card">
+      <h2>Code</h2>
+      <pre class="code" id="code"></pre>
+    </section>
+    <section class="card">
+      <h2>${cfg.stripsTitle || "The arrays"}</h2>
+      <div id="strips"></div>
+      <div class="legend">${legend}</div>
+      <div class="narr" id="narr"></div>
+      <div class="vars${cfg.chk === false && !cfg.helper ? " one" : ""}${cfg.helper ? " helper" : ""}">
+        <div class="frame" id="fMain"><h3>${esc(cfg.name)}</h3><table id="vars"></table></div>
+        ${cfg.helper ? `<div class="frame inner idle" id="fHelp"><h3>${esc(cfg.helper)}</h3><table id="hvars"></table></div>` : ""}
+        ${cfg.chk === false ? "" : `<div class="frame chk idle" id="fChk"><h3>${cfg.chkTitle || "the test"}</h3><div id="chk"></div></div>`}
+      </div>
+      <div class="result" id="result"></div>
+      <div class="progress"><div id="bar"></div></div>
+      <div class="stepcount" id="stepcount"></div>
+    </section>
+  </div>`;
+
+    const codeEl = $("code");
+    codeEl.innerHTML = cfg.code.map(l => `<span class="ln">${highlight(l) || " "}</span>`).join("");
+    const lineEls = [...codeEl.querySelectorAll(".ln")];
+
+    function argList(vals) {
+      return vals.map((v, k) => cfg.inputs[k].kind === "array" ? fmt(v) : cfg.inputs[k].kind ? String(v) : JSON.stringify(v)).join(", ");
+    }
+    function readInputs() {
+      return cfg.inputs.map(inp => {
+        const raw = $("in_" + inp.id).value;
+        if (inp.kind === "bool") return raw === "true";
+        if (inp.kind === "array") return raw.replace(/[\[\]{}]/g, " ").split(/[\s,]+/).filter(t => t !== "").map(Number);
+        return inp.kind === "int" ? (raw.trim() === "" ? NaN : Number(raw)) : raw;
+      });
+    }
+
+    // ---------- Trace recording ----------
+    function record(vals) {
+      const steps = [];
+      const T = {
+        vars: {}, view: null,
+        help: null,                       // the helper method's variables while it is running, else null
+        detail: !$("detail") || $("detail").checked,
+        c: ch => new Ch(ch),
+        strip: (name, text) => new Strip(name, text),
+        // an array drawn as boxes; String values keep their quotes, null shows as null
+        arr(name, values, px) {
+          const shown = values.map(v => v === null ? null : typeof v === "string" ? JSON.stringify(v) : String(v));
+          const widest = Math.max(1, ...shown.map(t => t === null ? 4 : t.length));
+          return new Strip(name, shown).named(name ? `${name} = ${fmt(values)}` : fmt(values)).width(px || Math.max(42, widest * 12 + 26));
+        },
+        // a string built from pieces [[text, cls], ...]; piece number `fresh` is marked as just added
+        cat(label, parts, fresh) {
+          const s = new Strip("", parts.map(p => p[0]).join("")).named(label);
+          let k = 0;
+          parts.forEach(([t, c], j) => { if (c) s.cls(k, k + t.length, c); if (j === fresh) s.cls(k, k + t.length, "new"); k += t.length; });
+          return s;
+        },
+        fmt, esc,
+        q: v => esc(fmt(v)),            // formatted + escaped, for narration
+        push(line, msg, o) {
+          o = o || {};
+          const vars = {};
+          for (const k of Object.keys(T.vars)) if (T.vars[k] !== undefined) vars[k] = fmt(T.vars[k]);
+          let hvars = null;
+          if (T.help) { hvars = {}; for (const k of Object.keys(T.help)) if (T.help[k] !== undefined) hvars[k] = fmt(T.help[k]); }
+          steps.push({ line, msg, vars, hvars, strips: o.strips || (T.view ? T.view() : []), chk: o.chk || null, inner: !!o.in || !!T.help });
+        },
+        ret(line, msg, value, o) {
+          T.vars.returns = value;
+          T.push(line, msg, o);
+          steps[steps.length - 1].ret = value;
+        }
+      };
+      for (let k = 0; k < cfg.inputs.length; k++) {
+        const inp = cfg.inputs[k];
+        if (inp.kind === "array" && !vals[k].every(Number.isInteger)) return [{ line: 0, msg: `<code>${esc(inp.id)}</code> must be a list of whole numbers separated by commas, like <code>1, 2, 3</code>.`, vars: {}, strips: [], err: true }];
+        if (inp.kind === "int" && !Number.isInteger(vals[k])) return [{ line: 0, msg: `<code>${esc(inp.id)}</code> must be a whole number.`, vars: {}, strips: [], err: true }];
+      }
+      const bad = cfg.validate && cfg.validate(vals);
+      if (bad) return [{ line: 0, msg: bad, vars: {}, strips: [], err: true }];
+      cfg.trace(vals.map(v => Array.isArray(v) ? v.slice() : v), T);   // a copy, so methods that change the array leave the inputs alone
+      return steps;
+    }
+
+    // ---------- Rendering ----------
+    let trace = [], pos = 0, timer = null, vals = [], blocks = [];
+
+    function stripKey(s) {
+      return s.label + "\u0000" + s.text + "\u0000" + s.cw + "\u0000" + ncols(s) + "\u0000" + (Object.keys(s.g).length > 0) + "\u0000" + s.off;
+    }
+    function ncols(s) {
+      let n = s.text.length;
+      for (const m of [s.t, s.b, s.g, s.c]) for (const k of Object.keys(m)) n = Math.max(n, +k + 1);
+      return n;
+    }
+    function buildBlock(s) {
+      const el = document.createElement("div");
+      const n = ncols(s);
+      const hasBadges = Object.keys(s.g).length > 0;
+      el.innerHTML = `<div class="strip-label"><span></span><span class="tags"></span></div>` +
+        `<div class="strip-wrap"><div class="strip${hasBadges ? " badges" : ""}"></div></div>`;
+      el.querySelector(".strip-label span").textContent = s.label;
+      const strip = el.querySelector(".strip");
+      if (s.cw) strip.style.setProperty("--cw", s.cw + "px");
+      const cols = [];
+      if (n === 0) {
+        strip.classList.add("none");
+        strip.innerHTML = `<div class="col"><div class="ptr"></div><div class="cell empty">${Array.isArray(s.text) ? "empty array" : "empty string"}</div><div class="ptr"></div></div>`;
+      }
+      for (let k = 0; k < s.off; k++) {
+        const pad = document.createElement("div");
+        pad.className = "col"; pad.style.visibility = "hidden";
+        pad.innerHTML = `<div class="ptr"></div><div class="cell"></div><div class="ptr"></div>`;
+        strip.appendChild(pad);
+      }
+      for (let k = 0; k < n; k++) {
+        const col = document.createElement("div");
+        col.className = "col";
+        const ch = s.text[k];
+        col.innerHTML = `<div class="ptr"></div><div class="cell"><span class="idx">${k}</span></div><div class="ptr"></div>` +
+          (hasBadges ? `<div class="badge"></div>` : "");
+        if (ch !== undefined) col.children[1].append(ch === null ? "null" : ch === " " ? "␣" : ch);
+        strip.appendChild(col);
+        cols.push({ top: col.children[0], cell: col.children[1], bot: col.children[2], badge: col.children[3], ghost: ch === undefined, space: ch === " ", nul: ch === null });
+      }
+      return { key: stripKey(s), el, cols, tags: el.querySelector(".tags") };
+    }
+    function paintBlock(b, s) {
+      b.tags.innerHTML = s.tags.map(t => `<span class="tag ${t.color}">${t.text}</span>`).join("");
+      b.cols.forEach((c, k) => {
+        c.cell.className = "cell" + (c.ghost ? " ghost" : "") + (c.space ? " space" : "") + (c.nul ? " nul" : "") + (s.c[k] ? " " + s.c[k] : "");
+        const t = s.t[k], bt = s.b[k], g = s.g[k];
+        // Anchor the arrow over the box so a long label hangs off to one side.
+        // A "label ▼" that would run off the left edge is flipped to "▼ label" so it reads to the right.
+        const flip = t && /.\s?▼$/.test(t.text) && (k + 1) * (s.cw || 42) - 17 < t.text.length * 7.5;
+        c.top.className = "ptr" + (t ? " " + t.color + (flip ? " l" : /.\s?▼$/.test(t.text) ? " r" : "") : "");
+        c.top.textContent = t ? (flip ? "▼ " + t.text.replace(/\s?▼$/, "") : t.text) : "";
+        c.bot.className = "ptr" + (bt ? " " + bt.color + (/^▲\s?./.test(bt.text) ? " l" : "") : "");
+        c.bot.textContent = bt ? bt.text : "";
+        if (c.badge) { c.badge.className = "badge" + (g ? " " + g.kind : ""); c.badge.textContent = g ? g.text : ""; }
+      });
+    }
+    // Scroll a long strip sideways so the boxes being worked on stay in view.
+    function follow(b) {
+      const wrap = b.el.querySelector(".strip-wrap");
+      if (wrap.scrollWidth <= wrap.clientWidth) return;
+      const busy = b.cols.filter(c => / (outer|inner|win2?|new)\b/.test(c.cell.className) || c.top.textContent);
+      if (!busy.length) return;
+      const first = busy[0].cell.parentNode, last = busy[busy.length - 1].cell.parentNode;
+      const left = first.offsetLeft, right = last.offsetLeft + last.offsetWidth;   // .strip-wrap is the offsetParent
+      if (left < wrap.scrollLeft) wrap.scrollLeft = left - 8;
+      else if (right > wrap.scrollLeft + wrap.clientWidth) wrap.scrollLeft = right - wrap.clientWidth + 8;
+    }
+    function renderStrips(list) {
+      const host = $("strips");
+      if (blocks.length !== list.length) { host.innerHTML = ""; blocks = []; }
+      list.forEach((s, k) => {
+        if (!blocks[k] || blocks[k].key !== stripKey(s)) {
+          const nb = buildBlock(s);
+          if (blocks[k]) host.replaceChild(nb.el, blocks[k].el); else host.appendChild(nb.el);
+          blocks[k] = nb;
+        }
+        paintBlock(blocks[k], s);
+        follow(blocks[k]);
+      });
+    }
+
+    function render() {
+      const st = trace[pos], prev = trace[pos - 1];
+      const last = pos === trace.length - 1;
+
+      lineEls.forEach((el, n) => { el.classList.toggle("active", !st.err && n === st.line); el.classList.toggle("in", st.inner); });
+      renderStrips(st.strips);
+
+      const narr = $("narr");
+      narr.innerHTML = st.msg;
+      narr.className = "narr" + (st.inner ? " in" : "") + (st.err ? " err" : "");
+
+      const fill = (vt, cur, old) => {
+        vt.innerHTML = "";
+        for (const k of Object.keys(cur || {})) {
+          const tr = document.createElement("tr");
+          const a = document.createElement("td"), b = document.createElement("td");
+          a.textContent = k; b.textContent = cur[k];
+          if (old && old[k] !== cur[k]) b.className = "changed";
+          tr.append(a, b); vt.appendChild(tr);
+        }
+      };
+      fill($("vars"), st.vars, prev && prev.vars);
+      if (cfg.helper) {
+        fill($("hvars"), st.hvars, prev && prev.hvars);
+        $("fHelp").classList.toggle("idle", !st.hvars);
+        $("fMain").classList.toggle("idle", !!st.hvars);   // the caller waits while the helper runs
+      }
+
+      const ct = $("chk");
+      if (ct) { ct.innerHTML = ""; $("fChk").classList.toggle("idle", !st.chk); }
+      for (const [expr, val, ok] of (ct && st.chk) || []) {
+        const row = document.createElement("div");
+        row.className = "ck";
+        row.innerHTML = `<span class="e">${expr}</span><span class="v${ok === true ? " ok" : ok === false ? " no" : ""}"></span>`;
+        row.lastChild.textContent = val;
+        ct.appendChild(row);
+      }
+
+      const res = $("result");
+      if (last && "ret" in st) {
+        const r = st.ret;
+        res.className = "result on " + (typeof r === "boolean" ? String(r) : "val");
+        res.textContent = cfg.output ? cfg.output(vals, r) : `${cfg.name}(${argList(vals)}) returns ${fmt(r)}`;
+      } else res.className = "result";
+
+      $("bar").style.width = (trace.length > 1 ? pos / (trace.length - 1) * 100 : 100) + "%";
+      $("stepcount").textContent = `step ${pos + 1} of ${trace.length}`;
+      $("back").disabled = pos === 0;
+      $("step").disabled = last;
+      if (last) stop();
+    }
+
+    function delay() { return 1700 / Math.pow(1.45, +$("speed").value - 1); }
+    function stop() { clearTimeout(timer); timer = null; $("play").textContent = "▶ Play"; }
+    function tick() {
+      if (pos < trace.length - 1) { pos++; render(); }
+      if (pos < trace.length - 1) timer = setTimeout(tick, delay()); else stop();
+    }
+    function play() {
+      if (timer) return stop();
+      if (pos >= trace.length - 1) { pos = 0; render(); }
+      $("play").textContent = "❚❚ Pause";
+      timer = setTimeout(tick, delay());
+    }
+
+    function load() {
+      stop();
+      vals = readInputs();
+      trace = record(vals);
+      pos = 0;
+      render();
+    }
+
+    $("reset").onclick = load;
+    if ($("detail")) $("detail").onchange = load;
+    cfg.inputs.forEach(inp => $("in_" + inp.id).addEventListener("keydown", e => { if (e.key === "Enter") load(); }));
+    cfg.inputs.forEach(inp => { if (inp.kind === "bool") $("in_" + inp.id).addEventListener("change", load); });
+    if ($("preset")) $("preset").onchange = e => {
+      if (e.target.value === "") return;
+      const p = cfg.presets[+e.target.value];
+      cfg.inputs.forEach((inp, k) => { $("in_" + inp.id).value = inp.kind === "array" ? p[k].join(", ") : String(p[k]); });
+      e.target.value = "";
+      load();
+    };
+    $("play").onclick = play;
+    $("step").onclick = () => { stop(); if (pos < trace.length - 1) { pos++; render(); } };
+    $("back").onclick = () => { stop(); if (pos > 0) { pos--; render(); } };
+    document.addEventListener("keydown", e => {
+      if (e.target.tagName === "INPUT" && e.target.type !== "range" && e.target.type !== "checkbox") return;
+      if (e.key === "ArrowRight") $("step").click();
+      else if (e.key === "ArrowLeft") $("back").click();
+      else if (e.key === " ") { e.preventDefault(); play(); }
+    });
+
+    load();
+    // A link like page.html#12 opens at step 12.
+    const m = /^#(\d+)$/.exec(location.hash);
+    if (m) { pos = Math.min(+m[1] - 1, trace.length - 1); render(); }
+  };
+})();
+
+</script>
+<script>
+Tracer({
+  name: "ppap",
+  wide: true,
+  stripsTitle: "The strings",
+  code: [
+    "public static String ppap (String lyric) {",
+    "    int indexOfComma = lyric.indexOf(\",\");",
+    "    String a = lyric.substring(9, indexOfComma);",
+    "    String b = lyric.substring( lyric.lastIndexOf(\" \")+1 );",
+    "    return \"Uh! \" + b + \" \" + a + \".\";",
+    "}"
+  ],
+  inputs: [{ id: "lyric", value: "I have a man, I have a dog", width: 300 }],
+  chk: false,
+  presets: [["I have a man, I have a dog"], ["I have a pen, I have an apple"], ["I have a pen, I have a pineapple"], ["I have a cat, I have a hat"], ["I have a dream, I have a plan"], ["I have an apple, I have a pen"]],
+  validate([lyric]) {
+    const c = lyric.indexOf(",");
+    if (c < 0) return `The lyric needs a comma — without one, <code>indexOf(",")</code> is -1 and <code>substring(9, -1)</code> would throw an exception.`;
+    if (c < 9) return `The comma has to come at index 9 or later (after <code>"I have a "</code>) — here it's at ${c}, so <code>substring(9, ${c})</code> would end before it starts and throw an exception.`;
+  },
+  legend: [
+    ["outer", "<code>a</code> = <code>lyric.substring(9, indexOfComma)</code>"],
+    ["inner", "<code>b</code> = the last word"],
+    ["match", "just joined on"]
+  ],
+  output: ([lyric], r) => `${lyric}\n${r}`,
+  trace([lyric], T) {
+    const q = T.q, n = lyric.length;
+    let stage = 0, comma = -1, sp = -1, a = null, b = null, built = null, fresh = -1;
+    T.view = () => {
+      const L = T.strip("lyric", lyric), list = [L];
+      if (stage === 1) L.at(comma, "outer").top(comma, `indexOfComma=${comma} ▼`);
+      if (stage === 2) L.cls(0, 9, "done").cut(9, comma, "win");
+      if (stage >= 3) L.cls(9, comma, "win");
+      if (stage === 3) { if (sp >= 0) L.at(sp, "outer").top(sp, `lastIndexOf=${sp} ▼`); L.cut(sp + 1, n, "win2"); }
+      if (stage >= 4) L.cls(sp + 1, n, "win2");
+      if (a !== null) list.push(T.strip("a", a).cls(0, a.length, stage === 2 ? "win new" : "win"));
+      if (b !== null) list.push(T.strip("b", b).cls(0, b.length, stage === 3 ? "win2 new" : "win2"));
+      if (built) {
+        const names = ['"Uh! "', "b", '" "', "a", '"."'].slice(0, built.length);
+        const s = built.map(p => p[0]).join("");
+        list.push(T.cat(`${names.join(" + ")} = ${JSON.stringify(s)}`, built, fresh));
+      }
+      return list;
+    };
+    T.vars.lyric = lyric;
+    T.push(0, `Call <code>ppap(${q(lyric)})</code>. (In <code>main</code>, the lyric is printed first, then the result.)`);
+    comma = lyric.indexOf(","); stage = 1; T.vars.indexOfComma = comma;
+    T.push(1, `<code>lyric.indexOf(",")</code> searches from the start and finds the comma at index ${comma}.`);
+    a = lyric.substring(9, comma); stage = 2; T.vars.a = a;
+    T.push(2, `<code>lyric.substring(9, ${comma})</code>: boxes 0–8 are <code>"I have a "</code>, so the first thing starts at index 9. It stops just before the comma → <code>a = ${q(a)}</code>.${a.startsWith(" ") ? " It starts with a space, because this lyric says \"an\" instead of \"a\" — 9 only works when the word before is \"a\"." : ""}`);
+    sp = lyric.lastIndexOf(" "); stage = 3; b = lyric.substring(sp + 1); T.vars.b = b;
+    T.push(3, sp >= 0
+      ? `<code>lyric.lastIndexOf(" ")</code> searches from the <em>end</em> and finds the last space at index ${sp}. <code>+1</code> moves past it, and <code>substring(${sp + 1})</code> goes to the end → <code>b = ${q(b)}</code>.`
+      : `There's no space, so <code>lyric.lastIndexOf(" ")</code> is -1. <code>+1</code> makes it 0, and <code>substring(0)</code> is the whole lyric → <code>b = ${q(b)}</code>.`);
+    stage = 4;
+    const parts = [["Uh! ", "soft"], [b, "win2"], [" ", ""], [a, "win"], [".", "soft"]];
+    built = parts.slice(0, 2); fresh = 1;
+    T.push(4, `Build the answer left to right: <code>"Uh! " + b</code> → <code>${q("Uh! " + b)}</code>.`);
+    built = parts.slice(0, 4); fresh = 3;
+    T.push(4, `<code>+ " " + a</code> adds a space and the first thing → <code>${q("Uh! " + b + " " + a)}</code>.`);
+    built = parts; fresh = 4;
+    const r = "Uh! " + b + " " + a + ".";
+    T.push(4, `<code>+ "."</code> finishes it → <code>${q(r)}</code>.`);
+    fresh = -1;
+    T.ret(4, `<code>return</code> → <code>${q(r)}</code>. <code>main</code> prints it on the second line.`, r);
+  }
+});
+</script>
+</body>
+</html>

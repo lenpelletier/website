@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Abecedarian Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f5f0;
+    --panel: #ffffff;
+    --border: #dcd9cf;
+    --text: #23241f;
+    --muted: #6b6a62;
+    --outer: #e07b00;     /* s.charAt(i) */
+    --inner: #0a8fb0;     /* s.charAt(i-1) */
+    --match: #4f9a12;
+    --bad: #d0284f;
+    --cell: #fbfaf6;
+    --code-bg: #272822;
+    --code-hl: #49483e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1b1c18;
+      --panel: #23241f;
+      --border: #3a3b34;
+      --text: #f0efe8;
+      --muted: #a09f95;
+      --outer: #fd971f;
+      --inner: #66d9ef;
+      --match: #a6e22e;
+      --bad: #f92672;
+      --cell: #2c2d27;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1b1c18;
+    --panel: #23241f;
+    --border: #3a3b34;
+    --text: #f0efe8;
+    --muted: #a09f95;
+    --outer: #fd971f;
+    --inner: #66d9ef;
+    --match: #a6e22e;
+    --bad: #f92672;
+    --cell: #2c2d27;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, sans-serif;
+    line-height: 1.45;
+  }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  code, .mono { font-family: "Victor Mono", ui-monospace, monospace; font-variant-ligatures: none; }
+
+  #sLabel { text-transform: none; letter-spacing: 0; font-size: 0.9rem; color: var(--text); margin-left: 6px; }
+
+  /* Controls */
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px; margin-bottom: 16px;
+  }
+  .controls input[type=text] {
+    font: 600 1rem "Victor Mono", monospace;
+    padding: 7px 10px; border-radius: 6px; width: 170px;
+    border: 1px solid var(--border); background: var(--cell); color: var(--text);
+  }
+  .controls select, .controls button {
+    font: 600 0.9rem Inter, sans-serif;
+    padding: 7px 12px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--cell); color: var(--text);
+  }
+  .controls button.primary { background: var(--outer); border-color: var(--outer); color: #1b1c18; }
+  .controls button:disabled { opacity: 0.4; cursor: default; }
+  .controls label { font-size: 0.85rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .spacer { flex: 1; }
+
+  /* Layout */
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; min-width: 0;
+  }
+  .card h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 12px; }
+
+  /* Code panel (always Monokai, to match the answer-key screenshots) */
+  pre.code {
+    margin: 0; background: var(--code-bg); color: #f8f8f2;
+    border-radius: 8px; padding: 12px 0; overflow-x: auto;
+    font: 14px/1.6 "Victor Mono", monospace;
+  }
+  /* No ligatures: students should see <= and <, not ≤ and a fused glyph. */
+  pre.code, .narr code, .frame table, .cell, .cmp { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+  pre.code .ln { display: block; padding: 0 14px; white-space: pre; border-left: 4px solid transparent; transition: background .15s; }
+  pre.code .ln.active { background: var(--code-hl); border-left-color: var(--outer); }
+  .k { color: #f92672; } .t { color: #66d9ef; font-style: italic; }
+  .f { color: #a6e22e; } .n { color: #ae81ff; } .s { color: #e6db74; }
+
+  /* String strip */
+  .strip-wrap { overflow-x: auto; padding-bottom: 4px; }
+  .strip { display: grid; grid-auto-flow: column; grid-auto-columns: 52px; gap: 6px; width: max-content; margin: 0 auto; }
+  .col { display: grid; grid-template-rows: 26px 52px 30px; gap: 4px; justify-items: center; align-items: center; }
+  .ptr { font: 600 12px "Victor Mono", monospace; opacity: 0; transition: opacity .15s; white-space: nowrap; }
+  .ptr.outer { color: var(--outer); }
+  .ptr.inner { color: var(--inner); }
+  .ptr.on { opacity: 1; }
+  .cell {
+    width: 52px; height: 52px; border-radius: 8px;
+    display: grid; place-items: center; position: relative;
+    font: 600 24px "Victor Mono", monospace;
+    background: var(--cell); border: 2px solid var(--border);
+    transition: border-color .15s, background .15s, transform .15s;
+  }
+  .cell .idx { position: absolute; top: 2px; left: 5px; font-size: 10px; color: var(--muted); font-weight: 400; }
+  .cell .code { position: absolute; bottom: 1px; right: 5px; font-size: 10px; color: var(--muted); font-weight: 400; }
+  .cell.outer { border-color: var(--outer); transform: translateY(-3px); }
+  .cell.inner { border-color: var(--inner); transform: translateY(-3px); }
+  .cell.checked { background: color-mix(in srgb, var(--match) 18%, var(--cell)); }
+  .cell.broken { background: color-mix(in srgb, var(--bad) 22%, var(--cell)); }
+  .cell.space { color: var(--muted); }
+  .badge {
+    font: 600 13px "Victor Mono", monospace; padding: 2px 8px; border-radius: 999px;
+    opacity: 0; transition: opacity .2s; white-space: nowrap;
+  }
+  .badge.on { opacity: 1; }
+  .badge.ok { background: color-mix(in srgb, var(--match) 25%, transparent); color: var(--match); }
+  .badge.no { background: color-mix(in srgb, var(--bad) 22%, transparent); color: var(--bad); }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.8rem; color: var(--muted); margin-top: 12px; }
+  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--c); }
+
+  /* Narration + variables */
+  .narr {
+    font-size: 1.02rem; min-height: 3.2em; margin: 16px 0 0;
+    padding: 12px 14px; border-radius: 8px; background: var(--cell); border-left: 4px solid var(--outer);
+  }
+  .narr code { font-size: 0.95em; }
+  .vars { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  @media (max-width: 520px) { .vars { grid-template-columns: 1fr; } }
+  .frame { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; transition: opacity .2s; }
+  .frame.idle { opacity: 0.45; }
+  .frame h3 { margin: 0 0 6px; font: 600 0.85rem "Victor Mono", monospace; color: var(--outer); }
+  .frame table { border-collapse: collapse; width: 100%; font: 14px "Victor Mono", monospace; }
+  .frame td { padding: 2px 0; }
+  .frame td:first-child { color: var(--muted); width: 45%; }
+  .frame td.changed { color: var(--outer); font-weight: 600; }
+
+  /* The comparison s.charAt(i) < s.charAt(i-1) */
+  .cmp { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; text-align: center; font-family: "Victor Mono", monospace; }
+  .cmp .side { border-radius: 8px; padding: 6px 4px; background: var(--cell); }
+  .cmp .expr { font-size: 11px; color: var(--muted); }
+  .cmp .ch { font-size: 24px; font-weight: 600; }
+  .cmp .num { font-size: 12px; color: var(--muted); }
+  .cmp .a .ch { color: var(--outer); }
+  .cmp .b .ch { color: var(--inner); }
+  .cmp .op { font-size: 22px; font-weight: 600; }
+  .cmp-out { text-align: center; margin-top: 8px; font: 600 14px "Victor Mono", monospace; min-height: 1.4em; }
+  .cmp-out.ok { color: var(--match); }
+  .cmp-out.no { color: var(--bad); }
+
+  .result {
+    margin-top: 16px; padding: 12px 14px; border-radius: 8px; font-weight: 700; text-align: center;
+    display: none;
+  }
+  .result.on { display: block; }
+  .result.true { background: color-mix(in srgb, var(--match) 22%, transparent); color: var(--match); }
+  .result.false { background: color-mix(in srgb, var(--bad) 20%, transparent); color: var(--bad); }
+  .progress { height: 4px; background: var(--border); border-radius: 2px; margin-top: 14px; overflow: hidden; }
+  .progress div { height: 100%; width: 0; background: var(--outer); transition: width .15s; }
+  .stepcount { font-size: 0.8rem; color: var(--muted); margin-top: 6px; text-align: right; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Is it Abecedarian?</h1>
+  <p class="sub">A word is abecedarian when its letters are in alphabetical order. Step through <code>isAbecedarian</code> and watch the loop compare each letter with the one just before it. Java compares <code>char</code>s by their Unicode numbers, shown in the corner of each box.</p>
+
+  <div class="controls">
+    <input id="word" type="text" value="abcde" spellcheck="false" aria-label="Word to test">
+    <select id="preset" aria-label="Example words">
+      <option value="">Examples…</option>
+      <option>abcde</option><option>abbey</option><option>almost</option><option>biopsy</option>
+      <option>chimp</option><option>hello</option><option>aBc</option><option>a</option>
+    </select>
+    <button id="reset">Load</button>
+    <span class="spacer"></span>
+    <button id="back" title="Step back (←)">◀ Back</button>
+    <button id="play" class="primary" title="Play / pause (space)">▶ Play</button>
+    <button id="step" title="Step forward (→)">Step ▶</button>
+    <label>Speed <input id="speed" type="range" min="1" max="10" value="5"></label>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Code</h2>
+      <pre class="code" id="code"></pre>
+    </section>
+
+    <section class="card">
+      <h2>The string <span class="mono" id="sLabel"></span></h2>
+      <div class="strip-wrap"><div class="strip" id="strip"></div></div>
+      <div class="legend">
+        <span style="--c: var(--outer)"><code>s.charAt(i)</code></span>
+        <span style="--c: var(--inner)"><code>s.charAt(i-1)</code></span>
+        <span style="--c: var(--match)">pair in order</span>
+        <span style="--c: var(--bad)">pair out of order</span>
+      </div>
+
+      <div class="narr" id="narr"></div>
+
+      <div class="vars">
+        <div class="frame">
+          <h3>isAbecedarian</h3>
+          <table id="vars"></table>
+        </div>
+        <div class="frame idle" id="fCmp">
+          <h3>the comparison</h3>
+          <div class="cmp">
+            <div class="side a"><div class="expr">s.charAt(i)</div><div class="ch" id="cA">&nbsp;</div><div class="num" id="nA">&nbsp;</div></div>
+            <div class="op">&lt;</div>
+            <div class="side b"><div class="expr">s.charAt(i-1)</div><div class="ch" id="cB">&nbsp;</div><div class="num" id="nB">&nbsp;</div></div>
+          </div>
+          <div class="cmp-out" id="cOut"></div>
+        </div>
+      </div>
+
+      <div class="result" id="result"></div>
+      <div class="progress"><div id="bar"></div></div>
+      <div class="stepcount" id="stepcount"></div>
+    </section>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  const CODE = [
+    "public static boolean isAbecedarian (String s) {",
+    "    if (s.length() <= 1) return true;",
+    "    for (int i = 1; i < s.length(); i++) {",
+    "        if (s.charAt(i) < s.charAt(i-1))",
+    "            return false;",
+    "    }",
+    "    return true;",
+    "}"
+  ];
+
+  // ---------- Syntax highlighting (Monokai) ----------
+  const KW = /^(public|static|for|if|return)$/;
+  const TY = /^(int|char|boolean|String)$/;
+  const LIT = /^(true|false)$/;
+  function esc(t) { return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function highlight(line) {
+    return line.replace(/[A-Za-z_]\w*(?=\s*\()|[A-Za-z_]\w*|\d+|"[^"]*"|'[^']*'|[^\w"']+/g, (tok, off, str) => {
+      const e = esc(tok);
+      if (KW.test(tok)) return `<span class="k">${e}</span>`;
+      if (TY.test(tok)) return `<span class="t">${e}</span>`;
+      if (LIT.test(tok) || /^\d+$/.test(tok)) return `<span class="n">${e}</span>`;
+      if (/^["']/.test(tok)) return `<span class="s">${e}</span>`;
+      if (/^[A-Za-z_]/.test(tok) && /^\s*\(/.test(str.slice(off + tok.length))) return `<span class="f">${e}</span>`;
+      return e;
+    });
+  }
+  const codeEl = document.getElementById("code");
+  codeEl.innerHTML = CODE.map(l => `<span class="ln">${highlight(l) || " "}</span>`).join("");
+  const lineEls = [...codeEl.querySelectorAll(".ln")];
+
+  // ---------- Trace generation ----------
+  const show = ch => `'${ch}'`;
+  const code = ch => ch.charCodeAt(0);
+
+  function buildTrace(s) {
+    const steps = [];
+    const results = new Array(s.length).fill(null);   // per index i: true = in order with i-1
+    const vars = { s: JSON.stringify(s), "s.length()": s.length };
+
+    function push(line, msg, extra) {
+      steps.push(Object.assign({
+        line, msg, results: results.slice(), vars: Object.assign({}, vars),
+        i: null, cmp: null, broken: null
+      }, extra));
+    }
+
+    push(0, `Call <code>isAbecedarian(${esc(JSON.stringify(s))})</code>.`, {});
+    if (s.length <= 1) {
+      vars.returns = "true";
+      push(1, `<code>${s.length} &lt;= 1</code> is <b>true</b> — a string with ${s.length ? "one letter" : "no letters"} can't be out of order, so <code>return true</code>.`, { done: true });
+      return steps;
+    }
+    push(1, `<code>${s.length} &lt;= 1</code> is <b>false</b> — there are at least two letters to compare.`, {});
+
+    for (let i = 1; ; i++) {
+      vars.i = i;
+      if (i >= s.length) {
+        push(2, `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${s.length}</code> is <b>false</b> — every neighbouring pair has been checked.`, {});
+        break;
+      }
+      push(2, i === 1
+        ? `Loop starts at <code>i = 1</code> (not 0!) because each letter is compared with the one <em>before</em> it. <code>1 &lt; ${s.length}</code> is <b>true</b>.`
+        : `Loop: <code>i = ${i}</code>, <code>${i} &lt; ${s.length}</code> is <b>true</b>.`, { i });
+
+      const a = s[i], b = s[i - 1];
+      const out = code(a) < code(b);
+      const cmp = { a, b, out };
+      results[i] = !out;
+      if (out) {
+        push(3, `<code>${esc(show(a))} &lt; ${esc(show(b))}</code> → <code>${code(a)} &lt; ${code(b)}</code> is <b>true</b> — <code>${esc(show(a))}</code> comes before <code>${esc(show(b))}</code>, so this pair is out of order.`, { i, cmp, broken: i });
+        vars.returns = "false";
+        push(4, `<code>return false</code> — the loop stops immediately; the remaining letters are never checked.`, { i, cmp, broken: i });
+        return steps;
+      }
+      push(3, `<code>${esc(show(a))} &lt; ${esc(show(b))}</code> → <code>${code(a)} &lt; ${code(b)}</code> is <b>false</b> — ${a === b ? "equal letters are allowed" : `<code>${esc(show(b))}</code> then <code>${esc(show(a))}</code> is in order`}. Keep going (<code>i++</code>).`, { i, cmp });
+    }
+    vars.returns = "true";
+    push(6, `<code>return true</code> — no letter was smaller than the one before it. It's abecedarian!`, { done: true });
+    return steps;
+  }
+
+  // ---------- Rendering ----------
+  const $ = id => document.getElementById(id);
+  const strip = $("strip");
+  let trace = [], pos = 0, timer = null, cells = [], word = "";
+
+  function buildStrip(s) {
+    strip.innerHTML = "";
+    cells = [...s].map((ch, k) => {
+      const col = document.createElement("div");
+      col.className = "col";
+      col.innerHTML =
+        `<div class="ptr"></div>` +
+        `<div class="cell${ch === " " ? " space" : ""}"><span class="idx">${k}</span><span class="code">${code(ch)}</span></div>` +
+        `<div class="badge"></div>`;
+      col.querySelector(".cell").append(ch === " " ? "␣" : ch);
+      strip.appendChild(col);
+      return { ptr: col.children[0], cell: col.children[1], badge: col.children[2] };
+    });
+    $("sLabel").textContent = `s = "${s}"`;
+  }
+
+  function table(el, obj, prev) {
+    el.innerHTML = "";
+    for (const k of Object.keys(obj)) {
+      const tr = document.createElement("tr");
+      const a = document.createElement("td"), b = document.createElement("td");
+      a.textContent = k;
+      b.textContent = obj[k];
+      if (prev && prev[k] !== obj[k]) b.className = "changed";
+      tr.append(a, b); el.appendChild(tr);
+    }
+  }
+
+  function render() {
+    const st = trace[pos], prev = trace[pos - 1];
+
+    lineEls.forEach((el, n) => el.classList.toggle("active", n === st.line));
+
+    cells.forEach((c, k) => {
+      const isI = st.i === k, isPrev = st.i !== null && st.i - 1 === k;
+      c.ptr.className = "ptr" + (isI ? " outer on" : isPrev ? " inner on" : "");
+      c.ptr.textContent = isI ? `i=${k} ▼` : isPrev ? `i-1=${k} ▼` : "";
+      c.cell.classList.toggle("outer", isI);
+      c.cell.classList.toggle("inner", isPrev);
+      // Shade both letters of every pair that has been checked.
+      const inOkPair = st.results[k] === true || st.results[k + 1] === true;
+      const inBadPair = st.broken !== null && (k === st.broken || k === st.broken - 1);
+      c.cell.classList.toggle("checked", inOkPair && !inBadPair);
+      c.cell.classList.toggle("broken", inBadPair);
+      const r = st.results[k];
+      if (r === null) c.badge.className = "badge";
+      else {
+        c.badge.textContent = r ? `≥ ${word[k - 1]} ✓` : `< ${word[k - 1]} ✗`;
+        c.badge.className = "badge on " + (r ? "ok" : "no");
+      }
+    });
+
+    $("narr").innerHTML = st.msg;
+    table($("vars"), st.vars, prev && prev.vars);
+
+    $("fCmp").classList.toggle("idle", !st.cmp);
+    $("cA").textContent = st.cmp ? show(st.cmp.a) : " ";
+    $("cB").textContent = st.cmp ? show(st.cmp.b) : " ";
+    $("nA").textContent = st.cmp ? code(st.cmp.a) : " ";
+    $("nB").textContent = st.cmp ? code(st.cmp.b) : " ";
+    const out = $("cOut");
+    out.textContent = st.cmp ? `${code(st.cmp.a)} < ${code(st.cmp.b)} is ${st.cmp.out}` : "";
+    out.className = "cmp-out" + (st.cmp ? (st.cmp.out ? " no" : " ok") : "");
+
+    const res = $("result");
+    const last = pos === trace.length - 1;
+    res.className = "result" + (last ? " on " + st.vars.returns : "");
+    res.textContent = last ? `isAbecedarian("${word}") returns ${st.vars.returns}` : "";
+
+    $("bar").style.width = (trace.length > 1 ? pos / (trace.length - 1) * 100 : 100) + "%";
+    $("stepcount").textContent = `step ${pos + 1} of ${trace.length}`;
+    $("back").disabled = pos === 0;
+    $("step").disabled = last;
+    if (last) stop();
+  }
+
+  function delay() { return 1700 / Math.pow(1.45, +$("speed").value - 1); }
+  function stop() { clearTimeout(timer); timer = null; $("play").textContent = "▶ Play"; }
+  function tick() {
+    if (pos < trace.length - 1) { pos++; render(); }
+    if (pos < trace.length - 1) timer = setTimeout(tick, delay()); else stop();
+  }
+  function play() {
+    if (timer) return stop();
+    if (pos >= trace.length - 1) { pos = 0; render(); }
+    $("play").textContent = "❚❚ Pause";
+    timer = setTimeout(tick, delay());
+  }
+
+  function load() {
+    stop();
+    word = $("word").value;
+    trace = buildTrace(word);
+    pos = 0;
+    buildStrip(word);
+    render();
+  }
+
+  $("reset").onclick = load;
+  $("word").addEventListener("keydown", e => { if (e.key === "Enter") load(); });
+  $("preset").onchange = e => { if (e.target.value) { $("word").value = e.target.value; e.target.value = ""; load(); } };
+  $("play").onclick = play;
+  $("step").onclick = () => { stop(); if (pos < trace.length - 1) { pos++; render(); } };
+  $("back").onclick = () => { stop(); if (pos > 0) { pos--; render(); } };
+  document.addEventListener("keydown", e => {
+    if (e.target.tagName === "INPUT" && e.target.type === "text") return;
+    if (e.key === "ArrowRight") $("step").click();
+    else if (e.key === "ArrowLeft") $("back").click();
+    else if (e.key === " ") { e.preventDefault(); play(); }
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>

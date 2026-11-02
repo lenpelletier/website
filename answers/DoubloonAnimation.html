@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doubloon Loop Tracer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Victor+Mono:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f5f0;
+    --panel: #ffffff;
+    --border: #dcd9cf;
+    --text: #23241f;
+    --muted: #6b6a62;
+    --outer: #e07b00;     /* isDoubloon's i */
+    --inner: #0a8fb0;     /* letterCount's i */
+    --match: #4f9a12;
+    --bad: #d0284f;
+    --cell: #fbfaf6;
+    --code-bg: #272822;
+    --code-hl: #49483e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1b1c18;
+      --panel: #23241f;
+      --border: #3a3b34;
+      --text: #f0efe8;
+      --muted: #a09f95;
+      --outer: #fd971f;
+      --inner: #66d9ef;
+      --match: #a6e22e;
+      --bad: #f92672;
+      --cell: #2c2d27;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1b1c18;
+    --panel: #23241f;
+    --border: #3a3b34;
+    --text: #f0efe8;
+    --muted: #a09f95;
+    --outer: #fd971f;
+    --inner: #66d9ef;
+    --match: #a6e22e;
+    --bad: #f92672;
+    --cell: #2c2d27;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, sans-serif;
+    line-height: 1.45;
+  }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  code, .mono { font-family: "Victor Mono", ui-monospace, monospace; font-variant-ligatures: none; }
+
+  #sLabel { text-transform: none; letter-spacing: 0; font-size: 0.9rem; color: var(--text); margin-left: 6px; }
+
+  /* Controls */
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px; margin-bottom: 16px;
+  }
+  .controls input[type=text] {
+    font: 600 1rem "Victor Mono", monospace;
+    padding: 7px 10px; border-radius: 6px; width: 170px;
+    border: 1px solid var(--border); background: var(--cell); color: var(--text);
+  }
+  .controls select, .controls button {
+    font: 600 0.9rem Inter, sans-serif;
+    padding: 7px 12px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--cell); color: var(--text);
+  }
+  .controls button.primary { background: var(--outer); border-color: var(--outer); color: #1b1c18; }
+  .controls button:disabled { opacity: 0.4; cursor: default; }
+  .controls label { font-size: 0.85rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .spacer { flex: 1; }
+
+  /* Layout */
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; min-width: 0;
+  }
+  .card h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 12px; }
+
+  /* Code panel (always Monokai, to match the answer-key screenshots) */
+  pre.code {
+    margin: 0; background: var(--code-bg); color: #f8f8f2;
+    border-radius: 8px; padding: 12px 0; overflow-x: auto;
+    font: 14px/1.6 "Victor Mono", monospace;
+  }
+  /* No ligatures: students should see != and ==, not ≠ and a fused glyph. */
+  pre.code, .narr code, .frame table, .cell { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+  pre.code .ln { display: block; padding: 0 14px; white-space: pre; border-left: 4px solid transparent; transition: background .15s; }
+  pre.code .ln.active { background: var(--code-hl); border-left-color: var(--outer); }
+  pre.code .ln.active.in { border-left-color: var(--inner); }
+  .k { color: #f92672; } .t { color: #66d9ef; font-style: italic; }
+  .f { color: #a6e22e; } .n { color: #ae81ff; } .s { color: #e6db74; }
+
+  /* String strip */
+  .strip-wrap { overflow-x: auto; padding-bottom: 4px; }
+  .strip { display: grid; grid-auto-flow: column; grid-auto-columns: 52px; gap: 6px; width: max-content; margin: 0 auto; }
+  .col { display: grid; grid-template-rows: 26px 52px 26px 30px; gap: 4px; justify-items: center; align-items: center; }
+  .ptr { font: 600 12px "Victor Mono", monospace; opacity: 0; transition: opacity .15s; white-space: nowrap; }
+  .ptr.outer { color: var(--outer); }
+  .ptr.inner { color: var(--inner); }
+  .ptr.on { opacity: 1; }
+  .cell {
+    width: 52px; height: 52px; border-radius: 8px;
+    display: grid; place-items: center; position: relative;
+    font: 600 24px "Victor Mono", monospace;
+    background: var(--cell); border: 2px solid var(--border);
+    transition: border-color .15s, background .15s, transform .15s;
+  }
+  .cell .idx { position: absolute; top: 2px; left: 5px; font-size: 10px; color: var(--muted); font-weight: 400; }
+  .cell.outer { border-color: var(--outer); }
+  .cell.inner { transform: translateY(-3px); box-shadow: 0 0 0 3px color-mix(in srgb, var(--inner) 45%, transparent); }
+  .cell.same { background: color-mix(in srgb, var(--match) 14%, var(--cell)); }
+  .cell.counted { background: color-mix(in srgb, var(--match) 35%, var(--cell)); border-color: var(--match); }
+  .cell.space { color: var(--muted); }
+  .badge {
+    font: 600 13px "Victor Mono", monospace; padding: 2px 8px; border-radius: 999px;
+    opacity: 0; transition: opacity .2s;
+  }
+  .badge.on { opacity: 1; }
+  .badge.ok { background: color-mix(in srgb, var(--match) 25%, transparent); color: var(--match); }
+  .badge.no { background: color-mix(in srgb, var(--bad) 22%, transparent); color: var(--bad); }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.8rem; color: var(--muted); margin-top: 12px; }
+  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--c); }
+
+  /* Narration + variables */
+  .narr {
+    font-size: 1.02rem; min-height: 3.2em; margin: 16px 0 0;
+    padding: 12px 14px; border-radius: 8px; background: var(--cell); border-left: 4px solid var(--outer);
+  }
+  .narr.in { border-left-color: var(--inner); }
+  .narr code { font-size: 0.95em; }
+  .vars { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  @media (max-width: 520px) { .vars { grid-template-columns: 1fr; } }
+  .frame { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; transition: opacity .2s; }
+  .frame.idle { opacity: 0.45; }
+  .frame h3 { margin: 0 0 6px; font: 600 0.85rem "Victor Mono", monospace; }
+  .frame.outer h3 { color: var(--outer); }
+  .frame.inner h3 { color: var(--inner); }
+  .frame table { border-collapse: collapse; width: 100%; font: 14px "Victor Mono", monospace; }
+  .frame td { padding: 2px 0; }
+  .frame td:first-child { color: var(--muted); width: 45%; }
+  .frame td.changed { color: var(--outer); font-weight: 600; }
+  .frame.inner td.changed { color: var(--inner); }
+
+  .result {
+    margin-top: 16px; padding: 12px 14px; border-radius: 8px; font-weight: 700; text-align: center;
+    display: none;
+  }
+  .result.on { display: block; }
+  .result.true { background: color-mix(in srgb, var(--match) 22%, transparent); color: var(--match); }
+  .result.false { background: color-mix(in srgb, var(--bad) 20%, transparent); color: var(--bad); }
+  .progress { height: 4px; background: var(--border); border-radius: 2px; margin-top: 14px; overflow: hidden; }
+  .progress div { height: 100%; width: 0; background: var(--outer); transition: width .15s; }
+  .stepcount { font-size: 0.8rem; color: var(--muted); margin-top: 6px; text-align: right; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Is it a Doubloon?</h1>
+  <p class="sub">A word is a doubloon when every letter in it appears exactly twice. Step through <code>isDoubloon</code> and watch the outer loop pick each letter while <code>letterCount</code> scans the whole string to count it.</p>
+
+  <div class="controls">
+    <input id="word" type="text" value="Anna" spellcheck="false" aria-label="Word to test">
+    <select id="preset" aria-label="Example words">
+      <option value="">Examples…</option>
+      <option>Anna</option><option>Otto</option><option>appall</option><option>Emmett</option>
+      <option>intestines</option><option>Hannah</option><option>bob</option><option>Java</option><option>banana</option>
+    </select>
+    <button id="reset">Load</button>
+    <span class="spacer"></span>
+    <button id="back" title="Step back (←)">◀ Back</button>
+    <button id="play" class="primary" title="Play / pause (space)">▶ Play</button>
+    <button id="step" title="Step forward (→)">Step ▶</button>
+    <label>Speed <input id="speed" type="range" min="1" max="10" value="5"></label>
+    <label><input id="detail" type="checkbox" checked> Step inside letterCount</label>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Code</h2>
+      <pre class="code" id="code"></pre>
+    </section>
+
+    <section class="card">
+      <h2>The string <span class="mono" id="sLabel"></span></h2>
+      <div class="strip-wrap"><div class="strip" id="strip"></div></div>
+      <div class="legend">
+        <span style="--c: var(--outer)">isDoubloon's <code>i</code> (picks the letter)</span>
+        <span style="--c: var(--inner)">letterCount's <code>i</code> (scans)</span>
+        <span style="--c: var(--match)">counted as a match</span>
+      </div>
+
+      <div class="narr" id="narr"></div>
+
+      <div class="vars">
+        <div class="frame outer" id="fOuter">
+          <h3>isDoubloon</h3>
+          <table id="vOuter"></table>
+        </div>
+        <div class="frame inner idle" id="fInner">
+          <h3>letterCount</h3>
+          <table id="vInner"></table>
+        </div>
+      </div>
+
+      <div class="result" id="result"></div>
+      <div class="progress"><div id="bar"></div></div>
+      <div class="stepcount" id="stepcount"></div>
+    </section>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  const CODE = [
+    "public static boolean isDoubloon (String s) {",
+    "    s = s.toLowerCase();",
+    "    for (int i = 0; i < s.length(); i++) {",
+    "        char letter = s.charAt(i);",
+    "        if (letterCount(s, letter) != 2)",
+    "            return false;",
+    "    }",
+    "    return true;",
+    "}",
+    "",
+    "public static int letterCount(String s, char c) {",
+    "    int sum = 0;",
+    "    for (int i = 0; i < s.length(); i++) {",
+    "        char letter = s.charAt(i);",
+    "        if (letter == c) sum++;",
+    "    }",
+    "    return sum;",
+    "}"
+  ];
+  const INNER_LINES = new Set([10, 11, 12, 13, 14, 15, 16, 17]);
+
+  // ---------- Syntax highlighting (Monokai) ----------
+  const KW = /^(public|static|for|if|return)$/;
+  const TY = /^(int|char|boolean|String)$/;
+  const LIT = /^(true|false)$/;
+  function esc(t) { return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function highlight(line) {
+    return line.replace(/[A-Za-z_]\w*(?=\s*\()|[A-Za-z_]\w*|\d+|"[^"]*"|'[^']*'|[^\w"']+/g, (tok, off, str) => {
+      const e = esc(tok);
+      if (KW.test(tok)) return `<span class="k">${e}</span>`;
+      if (TY.test(tok)) return `<span class="t">${e}</span>`;
+      if (LIT.test(tok) || /^\d+$/.test(tok)) return `<span class="n">${e}</span>`;
+      if (/^["']/.test(tok)) return `<span class="s">${e}</span>`;
+      if (/^[A-Za-z_]/.test(tok) && /^\s*\(/.test(str.slice(off + tok.length))) return `<span class="f">${e}</span>`;
+      return e;
+    });
+  }
+  const codeEl = document.getElementById("code");
+  codeEl.innerHTML = CODE.map((l, n) =>
+    `<span class="ln">${highlight(l) || " "}</span>`
+  ).join("");
+  const lineEls = [...codeEl.querySelectorAll(".ln")];
+
+  // ---------- Trace generation ----------
+  const show = ch => ch === " " ? "' '" : `'${ch}'`;
+
+  function buildTrace(original, detail) {
+    const steps = [];
+    const s = original.toLowerCase();
+    const results = new Array(s.length).fill(null);   // count returned for each outer i
+    let outer = { s: JSON.stringify(original) };
+    let inner = null;
+
+    function push(line, msg, extra) {
+      steps.push(Object.assign({
+        line, msg, s, results: results.slice(),
+        outer: Object.assign({}, outer), inner: inner && Object.assign({}, inner),
+        oi: null, ii: null, c: null, counted: []
+      }, extra));
+    }
+
+    push(0, `Call <code>isDoubloon(${esc(JSON.stringify(original))})</code>.`, {});
+    outer.s = JSON.stringify(s);
+    push(1, original === s
+      ? `<code>toLowerCase()</code> — already lowercase: <code>${esc(JSON.stringify(s))}</code>.`
+      : `<code>toLowerCase()</code> so <code>'A'</code> and <code>'a'</code> count as the same letter: <code>${esc(JSON.stringify(s))}</code>.`, {});
+
+    for (let i = 0; ; i++) {
+      outer.i = i;
+      if (i >= s.length) {
+        push(2, `Outer loop: <code>i = ${i}</code>, <code>${i} &lt; ${s.length}</code> is <b>false</b> — every letter has been checked.`, { oi: null });
+        break;
+      }
+      push(2, `Outer loop: <code>i = ${i}</code>, <code>${i} &lt; ${s.length}</code> is <b>true</b>, so enter the loop body.`, { oi: i });
+      const letter = s[i];
+      outer.letter = show(letter);
+      push(3, `<code>letter = s.charAt(${i})</code> → <code>${esc(show(letter))}</code>. Now count how many times it appears.`, { oi: i });
+
+      // ----- inner call -----
+      inner = { s: JSON.stringify(s), c: show(letter) };
+      push(10, `Call <code>letterCount(s, ${esc(show(letter))})</code> — it will scan the <em>whole</em> string from the start.`, { oi: i, c: letter, inCall: true });
+      let sum = 0;
+      const counted = [];
+      inner.sum = 0;
+
+      if (detail) {
+        push(11, `<code>sum = 0</code>. No matches yet.`, { oi: i, c: letter, inCall: true, counted: [] });
+        for (let j = 0; ; j++) {
+          inner.i = j;
+          if (j >= s.length) {
+            push(12, `Inner loop: <code>i = ${j}</code>, <code>${j} &lt; ${s.length}</code> is <b>false</b> — scan finished.`, { oi: i, c: letter, inCall: true, counted: counted.slice() });
+            break;
+          }
+          push(12, `Inner loop: <code>i = ${j}</code>, <code>${j} &lt; ${s.length}</code> is <b>true</b>.`, { oi: i, ii: j, c: letter, inCall: true, counted: counted.slice() });
+          inner.letter = show(s[j]);
+          push(13, `<code>letter = s.charAt(${j})</code> → <code>${esc(show(s[j]))}</code>.`, { oi: i, ii: j, c: letter, inCall: true, counted: counted.slice() });
+          if (s[j] === letter) {
+            sum++; counted.push(j); inner.sum = sum;
+            push(14, `<code>${esc(show(s[j]))} == ${esc(show(letter))}</code> is <b>true</b> → <code>sum++</code>, now <code>sum = ${sum}</code>.`, { oi: i, ii: j, c: letter, inCall: true, counted: counted.slice(), hit: true });
+          } else {
+            push(14, `<code>${esc(show(s[j]))} == ${esc(show(letter))}</code> is <b>false</b> → skip.`, { oi: i, ii: j, c: letter, inCall: true, counted: counted.slice() });
+          }
+        }
+      } else {
+        for (let j = 0; j < s.length; j++) if (s[j] === letter) { sum++; counted.push(j); }
+        inner.sum = sum; inner.i = s.length; inner.letter = show(s[s.length - 1]);
+        push(12, `Scanning all ${s.length} characters for <code>${esc(show(letter))}</code>… found it at index ${counted.join(", ")}.`, { oi: i, c: letter, inCall: true, counted: counted.slice() });
+      }
+      push(16, `<code>return sum</code> → <code>${sum}</code>. There ${sum === 1 ? "is" : "are"} ${sum} <code>${esc(show(letter))}</code>${sum === 1 ? "" : "s"} in the string.`, { oi: i, c: letter, inCall: true, counted: counted.slice() });
+
+      // ----- back in isDoubloon -----
+      inner = null;
+      results[i] = sum;
+      outer.count = sum;
+      if (sum !== 2) {
+        push(4, `Back in isDoubloon: <code>${sum} != 2</code> is <b>true</b> — this letter does not appear exactly twice.`, { oi: i, c: letter, counted, bad: true });
+        outer.ret = "false";
+        push(5, `<code>return false</code> — the loop stops immediately; the remaining letters are never checked.`, { oi: i, c: letter, counted, done: false });
+        return steps;
+      }
+      push(4, `Back in isDoubloon: <code>2 != 2</code> is <b>false</b> — <code>${esc(show(letter))}</code> appears exactly twice. Keep going (<code>i++</code>).`, { oi: i, c: letter, counted });
+      delete outer.count;
+    }
+    outer.ret = "true";
+    push(7, s.length
+      ? `<code>return true</code> — every letter appeared exactly twice. It's a doubloon!`
+      : `<code>return true</code> — the string is empty, so no letter breaks the rule.`, { done: true });
+    return steps;
+  }
+
+  // ---------- Rendering ----------
+  const $ = id => document.getElementById(id);
+  const strip = $("strip");
+  let trace = [], pos = 0, timer = null, cells = [];
+
+  function buildStrip(s) {
+    strip.innerHTML = "";
+    cells = [...s].map((ch, k) => {
+      const col = document.createElement("div");
+      col.className = "col";
+      col.innerHTML =
+        `<div class="ptr outer">i=${k} ▼</div>` +
+        `<div class="cell${ch === " " ? " space" : ""}"><span class="idx">${k}</span></div>` +
+        `<div class="ptr inner">▲ i=${k}</div>` +
+        `<div class="badge"></div>`;
+      col.querySelector(".cell").append(ch === " " ? "␣" : ch);
+      strip.appendChild(col);
+      return {
+        outer: col.children[0], cell: col.children[1], inner: col.children[2], badge: col.children[3]
+      };
+    });
+    $("sLabel").textContent = `s = "${s}"`;
+  }
+
+  function table(el, obj, prev, keys) {
+    el.innerHTML = "";
+    for (const k of keys) {
+      if (obj == null || obj[k] === undefined) continue;
+      const tr = document.createElement("tr");
+      const a = document.createElement("td"), b = document.createElement("td");
+      a.textContent = k === "ret" ? "returns" : k === "count" ? "count" : k;
+      b.textContent = obj[k];
+      if (prev && prev[k] !== obj[k]) b.className = "changed";
+      tr.append(a, b); el.appendChild(tr);
+    }
+  }
+
+  function render() {
+    const st = trace[pos], prev = trace[pos - 1];
+    if (cells.length !== st.s.length) buildStrip(st.s);
+
+    // Display the original string for the very first step (before toLowerCase).
+    if (pos === 0) {
+      const orig = $("word").value;
+      cells.forEach((c, k) => { c.cell.lastChild.textContent = orig[k] === " " ? "␣" : orig[k]; });
+      $("sLabel").textContent = `s = "${orig}"`;
+    } else {
+      cells.forEach((c, k) => { c.cell.lastChild.textContent = st.s[k] === " " ? "␣" : st.s[k]; });
+      $("sLabel").textContent = `s = "${st.s}"`;
+    }
+
+    const isIn = INNER_LINES.has(st.line);
+    lineEls.forEach((el, n) => { el.classList.toggle("active", n === st.line); el.classList.toggle("in", isIn); });
+
+    cells.forEach((c, k) => {
+      c.outer.classList.toggle("on", st.oi === k);
+      c.inner.classList.toggle("on", st.ii === k);
+      c.cell.classList.toggle("outer", st.oi === k);
+      c.cell.classList.toggle("inner", st.ii === k);
+      c.cell.classList.toggle("counted", st.counted.includes(k));
+      c.cell.classList.toggle("same", st.c != null && st.s[k] === st.c && !st.counted.includes(k) && !st.inCall);
+      const r = st.results[k];
+      c.badge.classList.toggle("on", r !== null);
+      if (r !== null) {
+        c.badge.textContent = r === 2 ? "2 ✓" : `${r} ✗`;
+        c.badge.className = "badge on " + (r === 2 ? "ok" : "no");
+      }
+    });
+
+    const narr = $("narr");
+    narr.innerHTML = st.msg;
+    narr.classList.toggle("in", isIn);
+
+    table($("vOuter"), st.outer, prev && prev.outer, ["s", "i", "letter", "count", "ret"]);
+    table($("vInner"), st.inner, prev && prev.inner, ["s", "c", "sum", "i", "letter"]);
+    $("fInner").classList.toggle("idle", !st.inner);
+    $("fOuter").classList.toggle("idle", !!st.inner);
+
+    const res = $("result");
+    const last = pos === trace.length - 1;
+    res.className = "result" + (last ? " on " + (st.outer.ret === "true" ? "true" : "false") : "");
+    res.textContent = last ? `Is ${$("word").value} a Doubloon? ${st.outer.ret}` : "";
+
+    $("bar").style.width = (trace.length > 1 ? pos / (trace.length - 1) * 100 : 100) + "%";
+    $("stepcount").textContent = `step ${pos + 1} of ${trace.length}`;
+    $("back").disabled = pos === 0;
+    $("step").disabled = last;
+    if (last) stop();
+  }
+
+  function delay() { return 1700 / Math.pow(1.45, +$("speed").value - 1); }
+  function stop() { clearTimeout(timer); timer = null; $("play").textContent = "▶ Play"; }
+  function tick() {
+    if (pos < trace.length - 1) { pos++; render(); }
+    if (pos < trace.length - 1) timer = setTimeout(tick, delay()); else stop();
+  }
+  function play() {
+    if (timer) return stop();
+    if (pos >= trace.length - 1) { pos = 0; render(); }
+    $("play").textContent = "❚❚ Pause";
+    timer = setTimeout(tick, delay());
+  }
+
+  function load() {
+    stop();
+    trace = buildTrace($("word").value, $("detail").checked);
+    pos = 0;
+    cells = [];
+    render();
+  }
+
+  $("reset").onclick = load;
+  $("word").addEventListener("keydown", e => { if (e.key === "Enter") load(); });
+  $("preset").onchange = e => { if (e.target.value) { $("word").value = e.target.value; e.target.value = ""; load(); } };
+  $("detail").onchange = load;
+  $("play").onclick = play;
+  $("step").onclick = () => { stop(); if (pos < trace.length - 1) { pos++; render(); } };
+  $("back").onclick = () => { stop(); if (pos > 0) { pos--; render(); } };
+  document.addEventListener("keydown", e => {
+    if (e.target.tagName === "INPUT" && e.target.type === "text") return;
+    if (e.key === "ArrowRight") $("step").click();
+    else if (e.key === "ArrowLeft") $("back").click();
+    else if (e.key === " ") { e.preventDefault(); play(); }
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>

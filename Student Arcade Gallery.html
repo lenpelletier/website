@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Arcade Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14112a; --panel:#1f1b3d; --panel2:#2a2552; --ink:#f3f0ff; --muted:#a9a3d1;
+    --accent:#ffcc33; --accent2:#4fd1c5; --pink:#ff6fa8; --line:#3b3570;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+  body{
+    background:
+      radial-gradient(circle at 20% -10%, #3a2d7a 0, transparent 45%),
+      radial-gradient(circle at 110% 10%, #12484a 0, transparent 40%),
+      var(--bg);
+    min-height:100vh;
+  }
+  header{max-width:1200px;margin:0 auto;padding:40px 20px 16px;text-align:center}
+  h1{font-family:"Press Start 2P",monospace;font-size:clamp(18px,3.6vw,34px);line-height:1.4;margin:0 0 12px;
+     color:var(--accent);text-shadow:3px 3px 0 #8a3b00, 0 0 18px rgba(255,204,51,.35)}
+  .sub{color:var(--muted);margin:0 0 24px;font-size:15px}
+  .tools{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:8px}
+  .tools input{background:var(--panel);border:2px solid var(--line);color:var(--ink);padding:10px 14px;border-radius:10px;
+     font:inherit;width:min(320px,100%)}
+  .tools input:focus{outline:none;border-color:var(--accent2)}
+  button,.btn{font:600 14px Inter,sans-serif;cursor:pointer;border-radius:10px;border:2px solid var(--line);
+     background:var(--panel2);color:var(--ink);padding:10px 14px;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+  button:hover,.btn:hover{border-color:var(--accent2)}
+  .count{color:var(--muted);font-size:13px;margin-top:6px}
+  main{max-width:1200px;margin:0 auto;padding:16px 20px 60px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+  .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:2px solid var(--line);border-radius:16px;
+     padding:16px;display:flex;flex-direction:column;gap:12px;transition:transform .15s,border-color .15s}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .screen{aspect-ratio:4/3;border-radius:10px;display:grid;place-items:center;position:relative;overflow:hidden;
+     border:2px solid #000;box-shadow:inset 0 0 0 3px rgba(255,255,255,.06)}
+  .screen span{font-family:"Press Start 2P",monospace;font-size:56px;color:rgba(255,255,255,.92);text-shadow:3px 3px 0 rgba(0,0,0,.35)}
+  .screen::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 2px,transparent 2px 4px)}
+  .badge{font-family:"Press Start 2P",monospace;font-size:11px;color:#2a1a00;background:var(--accent);align-self:flex-start;padding:6px 8px;border-radius:6px;margin:-2px 0 -4px}
+  .title{font-family:"Press Start 2P",monospace;font-size:12px;line-height:1.6;margin:0;min-height:2.2em}
+  .title.untitled{color:var(--muted)}
+  .by{color:var(--muted);font-size:14px;margin:-6px 0 0}
+  .actions{display:flex;gap:8px;margin-top:auto}
+  .play{background:var(--accent);color:#2a1a00;border-color:var(--accent);flex:1;justify-content:center}
+  .play:hover{border-color:#fff}
+  .ext{padding:10px 12px}
+  /* player */
+  dialog{border:none;padding:0;background:transparent;max-width:none;max-height:none;width:100%;height:100%}
+  dialog::backdrop{background:rgba(8,6,20,.88)}
+  .player{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:12px}
+  .bar{width:min(900px,100%);display:flex;align-items:center;gap:10px;color:var(--ink)}
+  .bar h2{font-family:"Press Start 2P",monospace;font-size:14px;margin:0;flex:1;line-height:1.5}
+  .bar .who{color:var(--muted);font-family:Inter;font-size:14px;display:block;margin-top:4px}
+  .frame{width:min(900px,100%,calc((100vh - 170px) * 1.25));aspect-ratio:5/4;background:#000;border-radius:14px;overflow:hidden;border:3px solid var(--line)}
+  .frame iframe{width:100%;height:100%;border:0;display:block}
+  .hint{color:var(--muted);font-size:13px;text-align:center}
+  kbd{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12px;color:var(--ink)}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:0 20px 40px}
+</style>
+</head>
+<body>
+<header>
+  <h1>STUDENT ARCADE</h1>
+  <p class="sub">Pick a game and press Play to open it in MakeCode Arcade.</p>
+  <div class="tools">
+    <input id="q" type="search" placeholder="Search by number, game or maker…" aria-label="Search games">
+    <button id="shuffle" type="button">🎲 Random game</button>
+  </div>
+  <div class="count" id="count"></div>
+</header>
+<main><div class="grid" id="grid"></div></main>
+<footer>Made with MakeCode Arcade · Lord Byng Secondary Computer Science</footer>
+
+<dialog id="dlg" aria-label="Game player">
+  <div class="player">
+    <div class="bar">
+      <h2 id="pt">Game<span class="who" id="pw"></span></h2>
+      <a class="btn" id="pext" target="_blank" rel="noopener">Open in MakeCode ↗</a>
+      <button id="pclose" type="button">✕ Close</button>
+    </div>
+    <div class="frame" id="pframe"></div>
+    <div class="hint">Click the game first, then play with <kbd>←↑↓→</kbd> or <kbd>WASD</kbd> · A = <kbd>Z</kbd>/<kbd>Space</kbd> · B = <kbd>X</kbd>/<kbd>Enter</kbd> · <kbd>Esc</kbd> to close</div>
+  </div>
+</dialog>
+
+<script>
+const EMBED = false;
+const GAMES = [{"title": "CaveTown", "untitled": false, "by": "Erik S.", "url": "https://arcade.makecode.com/S61869-22085-45783-32216", "id": "S61869-22085-45783-32216", "i": 0}, {"title": "Clockwork Core", "untitled": false, "by": "Olivia W.", "url": "https://arcade.makecode.com/S92395-72906-34932-88210", "id": "S92395-72906-34932-88210", "i": 1}, {"title": "Ducky Platformer", "untitled": false, "by": "Jaycee W.", "url": "https://arcade.makecode.com/S12367-50013-79015-24531", "id": "S12367-50013-79015-24531", "i": 2}, {"title": "Dungeon Quest", "untitled": false, "by": "Anthony A.", "url": "https://arcade.makecode.com/S44860-28251-25510-56897", "id": "S44860-28251-25510-56897", "i": 3}, {"title": "Feral Cat Simulator", "untitled": false, "by": "Ava D.", "url": "https://arcade.makecode.com/S04122-25747-06030-73284", "id": "S04122-25747-06030-73284", "i": 4}, {"title": "Journey to the West", "untitled": false, "by": "Henry Y.", "url": "https://arcade.makecode.com/S29068-07471-72656-36632", "id": "S29068-07471-72656-36632", "i": 5}, {"title": "JUMP", "untitled": false, "by": "Ruby Y.", "url": "https://arcade.makecode.com/S61045-51263-62780-26360", "id": "S61045-51263-62780-26360", "i": 6}, {"title": "Miffy's Adventure", "untitled": false, "by": "Rachel L.", "url": "https://arcade.makecode.com/S82035-47191-61215-25255", "id": "S82035-47191-61215-25255", "i": 7}, {"title": "Minecraft Platformer!", "untitled": false, "by": "Colin M.", "url": "https://arcade.makecode.com/S56804-10238-82770-55787", "id": "S56804-10238-82770-55787", "i": 8}, {"title": "Monkey Around", "untitled": false, "by": "Cameron K.", "url": "https://arcade.makecode.com/S43367-41039-31501-93462", "id": "S43367-41039-31501-93462", "i": 9}, {"title": "Monkey Run", "untitled": false, "by": "Joshua L.", "url": "https://arcade.makecode.com/S33721-75625-28641-05608", "id": "S33721-75625-28641-05608", "i": 10}, {"title": "Plat Fix", "untitled": false, "by": "Justin G.", "url": "https://arcade.makecode.com/S67536-82151-62115-21262", "id": "S67536-82151-62115-21262", "i": 11}, {"title": "RAM Crisis", "untitled": false, "by": "Sasha D.", "url": "https://arcade.makecode.com/S69135-95242-51649-07933", "id": "S69135-95242-51649-07933", "i": 12}, {"title": "Snake Run", "untitled": false, "by": "Oliver L.", "url": "https://arcade.makecode.com/S58028-63960-58277-17793", "id": "S58028-63960-58277-17793", "i": 13}, {"title": "Stereo Happiness", "untitled": false, "by": "David W.", "url": "https://arcade.makecode.com/S25843-54873-94088-72187", "id": "S25843-54873-94088-72187", "i": 14}, {"title": "Val Run", "untitled": false, "by": "Rocky M.", "url": "https://arcade.makecode.com/S83441-52606-52697-35553", "id": "S83441-52606-52697-35553", "i": 15}, {"title": "World of Witchcraft", "untitled": false, "by": "Claire Z.", "url": "https://arcade.makecode.com/S59888-38553-96789-32047", "id": "S59888-38553-96789-32047", "i": 16}, {"title": "Zombie Platformer", "untitled": false, "by": "Arwin Z.", "url": "https://arcade.makecode.com/S47472-67938-16745-30786", "id": "S47472-67938-16745-30786", "i": 17}, {"title": "Untitled game", "untitled": true, "by": "Curtis L.", "url": "https://arcade.makecode.com/S36978-39502-11209-23615", "id": "S36978-39502-11209-23615", "i": 18}, {"title": "Untitled game", "untitled": true, "by": "Herine L.", "url": "https://arcade.makecode.com/S81043-28806-63168-46706", "id": "S81043-28806-63168-46706", "i": 19}, {"title": "Untitled game", "untitled": true, "by": "Angel U.", "url": "https://arcade.makecode.com/S08829-97550-67313-98174", "id": "S08829-97550-67313-98174", "i": 20}, {"title": "Untitled game", "untitled": true, "by": "Bobson W.", "url": "https://arcade.makecode.com/S48491-42448-17617-29681", "id": "S48491-42448-17617-29681", "i": 21}, {"title": "Untitled game", "untitled": true, "by": "Ryan W.", "url": "https://arcade.makecode.com/S29578-32641-97794-26282", "id": "S29578-32641-97794-26282", "i": 22}, {"title": "Untitled game", "untitled": true, "by": "Jeffrey Z.", "url": "https://arcade.makecode.com/S21987-38398-56102-12000", "id": "S21987-38398-56102-12000", "i": 23}, {"title": "Untitled game", "untitled": true, "by": "Lauren H.", "url": "https://arcade.makecode.com/S89819-41875-59673-94844", "id": "S89819-41875-59673-94844", "i": 24}, {"title": "Untitled game", "untitled": true, "by": "Sunny L.", "url": "https://arcade.makecode.com/S63554-91252-41095-79950", "id": "S63554-91252-41095-79950", "i": 25}, {"title": "Untitled game", "untitled": true, "by": "Junho L.", "url": "https://arcade.makecode.com/S26260-87275-73991-67883", "id": "S26260-87275-73991-67883", "i": 26}, {"title": "Untitled game", "untitled": true, "by": "Morton Y.", "url": "https://arcade.makecode.com/S05863-08396-55138-16566", "id": "S05863-08396-55138-16566", "i": 27}, {"title": "Untitled game", "untitled": true, "by": "Bob Y.", "url": "https://arcade.makecode.com/S31337-28558-32227-61101", "id": "S31337-28558-32227-61101", "i": 28}];
+
+const palette = [["#ff6fa8","#8b2fc9"],["#4fd1c5","#2563eb"],["#ffcc33","#f97316"],["#34d399","#0f766e"],
+                 ["#a78bfa","#4338ca"],["#fb7185","#b91c1c"],["#60a5fa","#0e7490"],["#facc15","#65a30d"]];
+const grid = document.getElementById("grid"), q = document.getElementById("q"), count = document.getElementById("count");
+const dlg = document.getElementById("dlg"), pframe = document.getElementById("pframe");
+
+function initials(t){ return t.replace(/[^A-Za-z0-9 ]/g,"").split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase() || "?"; }
+function esc(s){ return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function render(){
+  const term = q.value.trim().toLowerCase();
+  const list = GAMES.filter(g => !term || (g.title+" "+g.by).toLowerCase().includes(term) || String(g.i+1) === term.replace("#",""));
+  grid.innerHTML = list.map((g,i) => {
+    const [a,b] = palette[g.i % palette.length];
+    const label = String(g.i + 1);
+    return `<article class="card">
+      <div class="screen" style="background:linear-gradient(135deg,${a},${b})"><span>${esc(label)}</span></div>
+      <div class="badge">GAME #${g.i + 1}</div>
+      <h3 class="title${g.untitled?" untitled":""}">${esc(g.title)}</h3>
+      <p class="by">by ${esc(g.by)}</p>
+      <div class="actions">
+        ${EMBED
+          ? `<button class="btn play" data-i="${g.i}" type="button">▶ Play</button>
+             <a class="btn ext" href="${g.url}" target="_blank" rel="noopener" title="Open in MakeCode">↗</a>`
+          : `<a class="btn play" href="${g.url}" target="_blank" rel="noopener">▶ Play in MakeCode ↗</a>`}
+      </div></article>`;
+  }).join("");
+  count.textContent = `${list.length} of ${GAMES.length} games`;
+}
+
+function openGame(i){
+  const g = GAMES[i];
+  if(!EMBED){ window.open(g.url,"_blank","noopener"); return; }
+  document.getElementById("pt").firstChild.textContent = `#${g.i + 1}  ${g.title}`;
+  document.getElementById("pw").textContent = "by " + g.by;
+  document.getElementById("pext").href = g.url;
+  pframe.innerHTML = `<iframe src="https://arcade.makecode.com/---run?id=${g.id}" allowfullscreen
+     sandbox="allow-popups allow-forms allow-scripts allow-same-origin" title="${esc(g.title)}"></iframe>`;
+  dlg.showModal();
+  setTimeout(()=>{ const f=pframe.querySelector("iframe"); f && f.focus(); }, 300);
+}
+function closeGame(){ pframe.innerHTML = ""; if(dlg.open) dlg.close(); }
+
+grid.addEventListener("click", e => { const b = e.target.closest("button.play"); if(b) openGame(+b.dataset.i); });
+document.getElementById("pclose").addEventListener("click", closeGame);
+dlg.addEventListener("close", () => { pframe.innerHTML = ""; });  // stops the game (and its sound) on Esc too
+document.getElementById("shuffle").addEventListener("click", () => {
+  const g = GAMES[Math.floor(Math.random()*GAMES.length)];
+  if(EMBED) openGame(g.i); else { q.value = "#" + (g.i + 1); render(); }
+});
+q.addEventListener("input", render);
+render();
+</script>
+</body>
+</html>
